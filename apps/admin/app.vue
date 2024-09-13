@@ -1,6 +1,7 @@
 <template>
   <div>
     <NuxtRouteAnnouncer />
-    <NuxtWelcome />
+    <UButton>Samc</UButton>
+    <ThemeButton />
   </div>
 </template>

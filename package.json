@@ -1,8 +1,24 @@
 {
   "name": "tourney",
-  "version": "1.0.0",
-  "description": "",
-  "keywords": [],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "version": "0.0.1",
+  "description": "This project is a web application for managing tournaments.",
+  "scripts": {
+    "dev:admin": "nuxt dev --filter=tourney-admin",
+    "dev:viewer": "nuxt dev --filter=tourney-viewer",
+    "dev:core": "nuxt dev --filter=tourney-core"
+  },
+  "keywords": [
+    "tournaments",
+    "nuxt",
+    "vue"
+  ],
   "author": "Dino Kupinic",
-  "license": "ISC"
+  "license": "MIT",
+  "dependencies": {
+    "nuxt": "^3.13.1"
+  }
 }

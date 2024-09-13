@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-app",
+  "name": "tourney-core",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,8 +10,11 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "nuxt": "^3.13.0",
+    "nuxt": "^3.13.1",
     "vue": "latest",
     "vue-router": "latest"
+  },
+  "devDependencies": {
+    "@nuxt/ui": "^2.18.4"
   }
 }
