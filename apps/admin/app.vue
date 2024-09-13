@@ -1,7 +1,7 @@
 <template>
   <div>
     <NuxtRouteAnnouncer />
-    <UButton>Samc</UButton>
+    <UButton>Admin</UButton>
     <ThemeButton />
   </div>
 </template>
