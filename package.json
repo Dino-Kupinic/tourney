@@ -1,11 +1,11 @@
 {
   "name": "tourney",
+  "version": "0.0.1",
+  "description": "This project is a web application for managing tournaments.",
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
-  "version": "0.0.1",
-  "description": "This project is a web application for managing tournaments.",
   "scripts": {
     "dev:admin": "nuxt dev --filter=tourney-admin",
     "dev:viewer": "nuxt dev --filter=tourney-viewer",
