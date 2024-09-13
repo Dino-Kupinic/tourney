@@ -7,6 +7,9 @@
     "apps/*"
   ],
   "scripts": {
+    "build:tourney-admin": "pnpm --filter tourney-admin run build",
+    "build:tourney-viewer": "pnpm --filter tourney-viewer run build",
+    "build": "pnpm run build:tourney-admin && pnpm run build:tourney-viewer",
     "dev:admin": "nuxt dev --filter=tourney-admin",
     "dev:viewer": "nuxt dev --filter=tourney-viewer",
     "dev:core": "nuxt dev --filter=tourney-core"
