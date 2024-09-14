@@ -7,12 +7,12 @@
     "apps/*"
   ],
   "scripts": {
-    "build:tourney-admin": "pnpm --filter tourney-admin run build",
-    "build:tourney-viewer": "pnpm --filter tourney-viewer run build",
-    "build": "pnpm run build:tourney-admin && pnpm run build:tourney-viewer",
-    "dev:admin": "nuxt dev --filter=tourney-admin",
-    "dev:viewer": "nuxt dev --filter=tourney-viewer",
-    "dev:core": "nuxt dev --filter=tourney-core"
+    "build:admin": "pnpm --filter=tourney-admin run build",
+    "build:viewer": "pnpm --filter=tourney-viewer run build",
+    "build": "pnpm run build:admin && pnpm run build:viewer",
+    "dev:admin": "pnpm --filter=tourney-admin run dev",
+    "dev:viewer": "pnpm --filter=tourney-viewer run dev",
+    "dev:core": "pnpm --filter=tourney-core run dev"
   },
   "keywords": [
     "tournaments",
@@ -20,8 +20,5 @@
     "vue"
   ],
   "author": "Dino Kupinic",
-  "license": "MIT",
-  "dependencies": {
-    "nuxt": "^3.13.1"
-  }
+  "license": "MIT"
 }

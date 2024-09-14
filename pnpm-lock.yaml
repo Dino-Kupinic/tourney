@@ -6,11 +6,7 @@ settings:
 
 importers:
 
-  .:
-    dependencies:
-      nuxt:
-        specifier: ^3.13.1
-        version: 3.13.1(@parcel/watcher@2.4.1)(@types/node@22.5.4)(ioredis@5.4.1)(magicast@0.3.5)(rollup@4.21.3)(terser@5.32.0)(typescript@5.6.2)(vite@5.4.5(@types/node@22.5.4)(terser@5.32.0))(vue-tsc@2.0.29(typescript@5.6.2))
+  .: {}
 
   apps/admin:
     dependencies:
@@ -43,6 +39,9 @@ importers:
       '@nuxtjs/supabase':
         specifier: ^1.4.0
         version: 1.4.0
+      '@types/k6':
+        specifier: ^0.53.1
+        version: 0.53.1
 
   packages/core:
     dependencies:
@@ -1198,6 +1197,9 @@ packages:
 
   '@types/http-proxy@1.17.15':
     resolution: {integrity: sha512-25g5atgiVNTIv0LBDTg1H74Hvayx0ajtJPLLcYE3whFv75J0pWNtOBzaXJQgDTmrX1bx5U9YC2w/n65BN1HwRQ==}
+
+  '@types/k6@0.53.1':
+    resolution: {integrity: sha512-Mm1+7kESDNssyBiMV+5MVAJKwpJbj1Y3X1YkCDlaiPbjuc8DeaPtQFBv3pnip/0ZjM9P/P/aDNvd4BvQT0lQDg==}
 
   '@types/node@22.5.4':
     resolution: {integrity: sha512-FDuKUJQm/ju9fT/SeX/6+gBzoPzlVCzfzmGkwKvRHQVxi4BntVbyIwf6a4Xn62mrvndLiml6z/UBXIdEVjQLXg==}
@@ -5229,6 +5231,8 @@ snapshots:
   '@types/http-proxy@1.17.15':
     dependencies:
       '@types/node': 22.5.4
+
+  '@types/k6@0.53.1': {}
 
   '@types/node@22.5.4':
     dependencies:
