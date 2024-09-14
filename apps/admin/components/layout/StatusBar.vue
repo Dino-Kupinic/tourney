@@ -1,19 +1,19 @@
 <script setup lang="ts">
-const appVersion = useAppVersion();
+const appVersion = useAppVersion()
 
-const isOnline = useOnline();
-const { isSupported, memory } = useMemory();
-const formatted = useDateFormat(useNow(), "dddd HH:mm:ss");
+const isOnline = useOnline()
+const { isSupported, memory } = useMemory()
+const formatted = useDateFormat(useNow(), "dddd HH:mm:ss")
 
 function size(v: number) {
-  const kb = v / 1024 / 1024;
-  return `${kb.toFixed(2)} MB`;
+  const kb = v / 1024 / 1024
+  return `${kb.toFixed(2)} MB`
 }
 </script>
 
 <template>
-  <nav class="w-full flex justify-between items-center">
-    <div class="items-center flex gap-1 p-1 pr-0 justify-end w-full">
+  <nav class="flex w-full items-center justify-between">
+    <div class="flex w-full items-center justify-end gap-1 p-1 pr-0">
       <UBadge
         v-if="isOnline"
         color="green"

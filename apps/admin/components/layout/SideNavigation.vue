@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { createAvatar } from "@dicebear/core";
-import { glass } from "@dicebear/collection";
+import { createAvatar } from "@dicebear/core"
+import { glass } from "@dicebear/collection"
 
-const user = ref("Dino Kupinic");
+const user = ref("Dino Kupinic")
 const avatar = createAvatar(glass, {
   seed: user.value,
-});
-const svg = avatar.toDataUri();
+})
+const svg = avatar.toDataUri()
 
 const links = [
   [
@@ -56,7 +56,7 @@ const links = [
       to: "/settings",
     },
   ],
-];
+]
 </script>
 
 <template>

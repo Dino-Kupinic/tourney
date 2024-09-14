@@ -7,18 +7,27 @@
     "apps/*"
   ],
   "scripts": {
+    "start": "pm2 start ecosystem.config.cjs",
+    "kill": "pm2 kill",
+    "monitor": "pm2 monit",
     "build:admin": "pnpm --filter=tourney-admin run build",
     "build:viewer": "pnpm --filter=tourney-viewer run build",
     "build": "pnpm run build:admin && pnpm run build:viewer",
     "dev:admin": "pnpm --filter=tourney-admin run dev",
     "dev:viewer": "pnpm --filter=tourney-viewer run dev",
-    "dev:core": "pnpm --filter=tourney-core run dev"
+    "dev:core": "pnpm --filter=tourney-core run dev",
+    "format": "npx prettier . --check",
+    "format:write": "npx prettier . --write"
   },
   "keywords": [
     "tournaments",
     "nuxt",
     "vue"
   ],
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "prettier-plugin-tailwindcss": "^0.6.6"
+  },
   "author": "Dino Kupinic",
   "license": "MIT"
 }

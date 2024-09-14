@@ -1,5 +1,5 @@
-import http from "k6/http";
-import { sleep } from "k6";
+import http from "k6/http"
+import { sleep } from "k6"
 
 export const options = {
   // A number specifying the number of VUs to run concurrently.
@@ -46,7 +46,7 @@ export const options = {
   //     },
   //   },
   // }
-};
+}
 
 // The function that defines VU logic.
 //
@@ -54,6 +54,6 @@ export const options = {
 // about authoring k6 scripts.
 //
 export default function () {
-  http.get("http://localhost:3000");
-  sleep(1);
+  http.get("http://localhost:3000")
+  sleep(1)
 }
