@@ -1,7 +1,8 @@
 <template>
   <div>
     <NuxtRouteAnnouncer />
-    <UButton>Admin</UButton>
-    <ThemeButton />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>

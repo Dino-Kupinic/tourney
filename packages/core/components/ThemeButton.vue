@@ -1,12 +1,12 @@
 <script setup lang="ts">
 const colorMode = useColorMode()
 const isDark = computed({
-  get () {
-    return colorMode.value === 'dark'
+  get() {
+    return colorMode.value === "dark"
   },
-  set () {
-    colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-  }
+  set() {
+    colorMode.preference = colorMode.value === "dark" ? "light" : "dark"
+  },
 })
 </script>
 
@@ -20,7 +20,7 @@ const isDark = computed({
       @click="isDark = !isDark"
     />
     <template #fallback>
-      <div class="w-8 h-8" />
+      <USkeleton class="h-8 w-8" />
     </template>
   </ClientOnly>
 </template>
