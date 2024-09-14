@@ -1,15 +1,17 @@
-# Tourney
+![tourney](./.github/assets/banner.png)
 
-Mono repository for the Tourney project. This project is a web application for managing tournaments.
+# tourney
+
+Mono repository for the tourney project. This project is a web application for managing tournaments.
 
 It includes an admin dashboard for managing tournaments, teams/players, live scores, and a client app for tournament attendees.
 
 > [!CAUTION]
-> Tourney is still in development. You will find bugs and broken/unfinished features.
+> tourney is still in development. You will find bugs and broken/unfinished features.
 
 ## ♻️ Release Cycle
 
-Tourney follows the [Semantic Versioning](https://semver.org/) guidelines.
+tourney follows the [Semantic Versioning](https://semver.org/) guidelines.
 
 ## ✨ Installation and Configuration
 
