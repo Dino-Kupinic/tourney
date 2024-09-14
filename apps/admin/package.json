@@ -17,6 +17,8 @@
   "devDependencies": {
     "@dicebear/collection": "^9.2.1",
     "@dicebear/core": "^9.2.1",
-    "@nuxtjs/supabase": "^1.4.0"
+    "@nuxtjs/supabase": "^1.4.0",
+    "@vueuse/core": "^11.0.3",
+    "@vueuse/nuxt": "^11.0.3"
   }
 }

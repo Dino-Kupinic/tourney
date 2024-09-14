@@ -63,7 +63,7 @@ const links = [
   <UVerticalNavigation
     :links="links"
     :ui="{
-      wrapper: 'flex flex-col justify-between mr-2',
+      wrapper: 'flex flex-col justify-between mr-2 pb-2',
       badge: {
         color: 'primary',
         variant: 'subtle',
