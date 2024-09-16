@@ -16,6 +16,8 @@
     "dev:admin": "pnpm --filter=tourney-admin run dev",
     "dev:viewer": "pnpm --filter=tourney-viewer run dev",
     "dev:core": "pnpm --filter=tourney-core run dev",
+    "start:supabase": "cd ./apps/api/supabase && npx supabase start",
+    "stop:supabase": "cd ./apps/api/supabase && npx supabase stop",
     "format": "npx prettier . --check",
     "format:write": "npx prettier . --write"
   },

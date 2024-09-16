@@ -13,31 +13,14 @@ function size(v: number) {
 
 <template>
   <nav class="flex w-full items-center justify-between">
-    <div class="flex w-full items-center justify-end gap-1 p-1 pr-0">
-      <UBadge
-        v-if="isOnline"
-        color="green"
-        size="xs"
-        variant="subtle"
-        class="font-mono tracking-tight"
-      >
+    <div
+      class="flex w-full items-center justify-end gap-1 p-1 pr-0 font-mono tracking-tight"
+    >
+      <UBadge v-if="isOnline" color="green" size="xs" variant="subtle">
         Online
       </UBadge>
-      <UBadge
-        v-else
-        color="red"
-        size="xs"
-        variant="subtle"
-        class="font-mono tracking-tight"
-      >
-        Offline
-      </UBadge>
-      <UBadge
-        color="purple"
-        size="xs"
-        variant="subtle"
-        class="font-mono tracking-tight"
-      >
+      <UBadge v-else color="red" size="xs" variant="subtle"> Offline </UBadge>
+      <UBadge color="purple" size="xs" variant="subtle">
         {{ formatted }}
       </UBadge>
       <UBadge
@@ -45,22 +28,13 @@ function size(v: number) {
         color="yellow"
         size="xs"
         variant="subtle"
-        class="font-mono tracking-tight"
       >
         {{ size(memory.usedJSHeapSize) }}
       </UBadge>
-      <UBadge
-        v-else
-        color="yellow"
-        size="xs"
-        variant="subtle"
-        class="font-mono tracking-tight"
-      >
+      <UBadge v-else color="yellow" size="xs" variant="subtle">
         Kalkuliere...
       </UBadge>
-      <UBadge color="white" size="xs" class="font-mono tracking-tight">
-        Tourney v{{ appVersion }}
-      </UBadge>
+      <UBadge color="white" size="xs"> Tourney v{{ appVersion }} </UBadge>
     </div>
   </nav>
 </template>

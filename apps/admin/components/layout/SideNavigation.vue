@@ -2,18 +2,19 @@
 import { createAvatar } from "@dicebear/core"
 import { glass } from "@dicebear/collection"
 
-const user = ref("Dino Kupinic")
+const user = ref<string>("Dino Kupinic")
 const avatar = createAvatar(glass, {
   seed: user.value,
 })
 const svg = avatar.toDataUri()
+const liveTournaments = ref<number>(3)
 
-const links = [
+const navigationLinks = [
   [
     {
       label: "Live",
       icon: "i-heroicons-signal",
-      badge: 3,
+      badge: liveTournaments.value,
       to: "/live",
     },
     {
@@ -28,8 +29,15 @@ const links = [
     },
     {
       label: "Anmeldung",
-      icon: "i-heroicons-users",
+      icon: "i-heroicons-ticket",
       to: "/registration",
+    },
+  ],
+  [
+    {
+      label: "Regeln",
+      icon: "i-heroicons-hand-raised",
+      to: "/rules",
     },
     {
       label: "Aktuelles",
@@ -44,33 +52,55 @@ const links = [
   ],
   [
     {
-      label: user.value,
-      avatar: {
-        src: svg,
-      },
-      badge: "Admin",
+      label: "Log",
+      icon: "i-heroicons-queue-list",
+      to: "/logs",
     },
     {
-      label: "Einstellungen",
-      icon: "i-heroicons-cog-8-tooth",
-      to: "/settings",
+      label: "Nutzer",
+      icon: "i-heroicons-users",
+      to: "/users",
     },
   ],
+]
+
+const profileLinks = [
+  {
+    label: user.value,
+    avatar: {
+      src: svg,
+    },
+    badge: "Admin",
+  },
+  {
+    label: "Einstellungen",
+    icon: "i-heroicons-cog-8-tooth",
+    to: "/settings",
+  },
 ]
 </script>
 
 <template>
-  <UVerticalNavigation
-    :links="links"
-    :ui="{
-      wrapper: 'flex flex-col justify-between mr-2 pb-2',
-      badge: {
-        color: 'primary',
-        variant: 'subtle',
-      },
-      divider: {
-        type: 'dashed',
-      },
-    }"
-  />
+  <div class="flex h-full flex-col pb-2">
+    <UVerticalNavigation
+      :links="navigationLinks"
+      :ui="{
+        wrapper: 'mr-2 grow',
+        badge: {
+          color: 'red',
+          variant: 'subtle',
+        },
+      }"
+    />
+    <UVerticalNavigation
+      :links="profileLinks"
+      :ui="{
+        wrapper: 'mr-2',
+        badge: {
+          color: 'primary',
+          variant: 'subtle',
+        },
+      }"
+    />
+  </div>
 </template>
