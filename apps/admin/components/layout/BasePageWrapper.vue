@@ -5,6 +5,6 @@
     >
       <slot />
     </main>
-    <StatusBar />
+    <TheStatusBar />
   </div>
 </template>

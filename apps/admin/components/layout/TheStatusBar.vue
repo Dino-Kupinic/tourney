@@ -31,10 +31,18 @@ function size(v: number) {
       >
         {{ size(memory.usedJSHeapSize) }}
       </UBadge>
+      <UBadge
+        v-else-if="!isSupported"
+        color="yellow"
+        size="xs"
+        variant="subtle"
+      >
+        Nicht Unterstützt
+      </UBadge>
       <UBadge v-else color="yellow" size="xs" variant="subtle">
         Kalkuliere...
       </UBadge>
-      <UBadge color="white" size="xs"> Tourney v{{ appVersion }} </UBadge>
+      <UBadge color="white" size="xs"> tourney v{{ appVersion }} </UBadge>
     </div>
   </nav>
 </template>

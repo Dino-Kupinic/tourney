@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-dvh p-2 pb-0">
-    <SideNavigation />
+    <TheSideNavigation />
     <BasePageWrapper>
       <slot />
     </BasePageWrapper>

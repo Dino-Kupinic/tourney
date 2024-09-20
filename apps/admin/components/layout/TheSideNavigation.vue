@@ -12,6 +12,18 @@ const liveTournaments = ref<number>(3)
 const navigationLinks = [
   [
     {
+      label: "Home",
+      icon: "i-heroicons-home",
+      to: "/",
+    },
+    {
+      label: "Dashboard",
+      icon: "i-heroicons-chart-bar",
+      to: "/dashboard",
+    },
+  ],
+  [
+    {
       label: "Live",
       icon: "i-heroicons-signal",
       badge: liveTournaments.value,
@@ -35,9 +47,9 @@ const navigationLinks = [
   ],
   [
     {
-      label: "Regeln",
-      icon: "i-heroicons-hand-raised",
-      to: "/rules",
+      label: "Preise",
+      icon: "i-heroicons-gift",
+      to: "/prices",
     },
     {
       label: "Aktuelles",
@@ -52,7 +64,7 @@ const navigationLinks = [
   ],
   [
     {
-      label: "Log",
+      label: "Aktivität",
       icon: "i-heroicons-queue-list",
       to: "/logs",
     },

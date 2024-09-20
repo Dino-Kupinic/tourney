@@ -1,5 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+definePageMeta({
+  name: "Dashboard",
+})
+</script>
 
-<template></template>
+<template>
+  <InConstruction />
+</template>
 
 <style scoped></style>

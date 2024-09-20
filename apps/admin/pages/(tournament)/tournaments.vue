@@ -1,5 +1,13 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const title = ref<string>("Turniere")
+useHead({
+  title: () => title.value,
+})
+</script>
 
-<template></template>
-
-<style scoped></style>
+<template>
+  <BasePageHeader>
+    {{ title }}
+  </BasePageHeader>
+  <BasePageContent> <InConstruction /> </BasePageContent>
+</template>

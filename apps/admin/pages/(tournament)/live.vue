@@ -1,5 +1,14 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const title = ref<string>("Live")
+useHead({
+  title: () => title.value,
+})
+</script>
 
-<template>hello</template>
+<template>
+  <BasePageHeader>
+    {{ title }}
+  </BasePageHeader>
 
-<style scoped></style>
+  <InConstruction />
+</template>
