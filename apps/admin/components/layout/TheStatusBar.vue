@@ -32,7 +32,7 @@ function size(v: number) {
         {{ size(memory.usedJSHeapSize) }}
       </UBadge>
       <UBadge
-        v-else-if="!isSupported"
+        v-else-if="!isSupported && !memory"
         color="yellow"
         size="xs"
         variant="subtle"
