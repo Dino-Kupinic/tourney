@@ -16,3 +16,4 @@ logs
 # Generated files
 node_modules
 .nuxt
+docs/.vitepress/cache

@@ -1,6 +1,14 @@
+<script setup lang="ts">
+useHead({
+  titleTemplate: "%s - tourney",
+})
+</script>
+
 <template>
   <div>
     <NuxtRouteAnnouncer />
-    <UButton>Viewer</UButton>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>

@@ -1,6 +1,6 @@
 {
   "name": "tourney",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "This project is a web application for managing tournaments.",
   "workspaces": [
     "packages/*",
@@ -10,12 +10,15 @@
     "start": "pm2 start ecosystem.config.cjs",
     "kill": "pm2 kill",
     "monitor": "pm2 monit",
+    "build:docs": "vitepress build docs",
     "build:admin": "pnpm --filter=tourney-admin run build",
     "build:viewer": "pnpm --filter=tourney-viewer run build",
     "build": "pnpm run build:admin && pnpm run build:viewer",
     "dev:admin": "pnpm --filter=tourney-admin run dev",
     "dev:viewer": "pnpm --filter=tourney-viewer run dev",
     "dev:core": "pnpm --filter=tourney-core run dev",
+    "dev:docs": "vitepress dev docs",
+    "start:docs": "vitepress preview docs",
     "start:supabase": "cd ./apps/api/supabase && npx supabase start",
     "stop:supabase": "cd ./apps/api/supabase && npx supabase stop",
     "format": "npx prettier . --check",
@@ -28,7 +31,8 @@
   ],
   "devDependencies": {
     "prettier": "^3.3.3",
-    "prettier-plugin-tailwindcss": "^0.6.6"
+    "prettier-plugin-tailwindcss": "^0.6.6",
+    "vitepress": "^1.3.4"
   },
   "author": "Dino Kupinic",
   "license": "MIT"
