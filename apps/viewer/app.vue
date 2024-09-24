@@ -7,7 +7,7 @@ useHead({
 <template>
   <div>
     <NuxtRouteAnnouncer />
-    <NuxtLayout>
+    <NuxtLayout :name="$device.isMobile ? 'default' : 'desktop'">
       <NuxtPage />
     </NuxtLayout>
   </div>

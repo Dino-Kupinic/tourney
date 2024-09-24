@@ -2,10 +2,9 @@
 
 <template>
   <div class="flex h-dvh w-full flex-col">
-    <TheMobileHeader />
-    <div class="mt-16 grow pb-16">
+    <TheNavigation />
+    <div class="grow">
       <slot />
     </div>
-    <TheNavigation />
   </div>
 </template>

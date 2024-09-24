@@ -4,13 +4,13 @@ const links = getNavLinks(true)
 
 <template>
   <nav
-    class="bottom-0 flex w-full justify-around border-t border-gray-200 dark:border-gray-800"
+    class="fixed bottom-0 flex h-16 w-full justify-around border-t border-gray-200 bg-gray-50 py-1 dark:border-gray-800"
   >
     <div v-for="link in links">
       <NuxtLink :to="link.to" active-class="text-primary-500">
-        <div class="flex flex-col items-center justify-center gap-1 p-2">
+        <div class="flex flex-col items-center justify-center p-2 px-4">
           <UIcon :name="link.icon ?? ''" class="h-5 w-5" />
-          <p class="text text-wrap text-sm">{{ link.label }}</p>
+          <p class="text text-wrap text-sm font-medium">{{ link.label }}</p>
         </div>
       </NuxtLink>
     </div>

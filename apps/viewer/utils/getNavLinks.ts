@@ -4,24 +4,19 @@ export default function (mobileOrder: boolean = false) {
   if (mobileOrder) {
     return [
       {
-        label: "Medien",
-        icon: "i-lucide-newspaper",
-        to: "/news",
-      },
-      {
-        label: "Live",
-        icon: "i-lucide-radio",
-        to: "/live",
-      },
-      {
         label: "Turniere",
-        icon: "i-lucide-trophy",
+        icon: "i-heroicons-trophy",
         to: "/tournaments",
       },
       {
-        label: "Einstellungen",
-        icon: "i-lucide-settings",
-        to: "/settings",
+        label: "Live",
+        icon: "i-heroicons-signal",
+        to: "/live",
+      },
+      {
+        label: "Medien",
+        icon: "i-heroicons-newspaper",
+        to: "/news",
       },
     ] as HorizontalNavigationLink[]
   }
@@ -29,23 +24,18 @@ export default function (mobileOrder: boolean = false) {
   return [
     {
       label: "Live",
-      icon: "i-lucide-radio",
+      icon: "i-heroicons-signal",
       to: "/live",
     },
     {
       label: "Turniere",
-      icon: "i-lucide-trophy",
+      icon: "i-heroicons-trophy",
       to: "/tournaments",
     },
     {
       label: "Medien",
-      icon: "i-lucide-newspaper",
+      icon: "i-heroicons-newspaper",
       to: "/news",
-    },
-    {
-      label: "Einstellungen",
-      icon: "i-lucide-settings",
-      to: "/settings",
     },
   ] as HorizontalNavigationLink[]
 }
