@@ -7,9 +7,9 @@
     "apps/*"
   ],
   "scripts": {
-    "start": "pm2 start ecosystem.config.cjs",
-    "kill": "pm2 kill",
-    "monitor": "pm2 monit",
+    "app:start": "pm2 start ecosystem.config.cjs",
+    "app:kill": "pm2 kill",
+    "app:monitor": "pm2 monit",
     "build:docs": "vitepress build docs",
     "build:admin": "pnpm --filter=tourney-admin run build",
     "build:viewer": "pnpm --filter=tourney-viewer run build",
@@ -18,6 +18,8 @@
     "dev:viewer": "pnpm --filter=tourney-viewer run dev",
     "dev:core": "pnpm --filter=tourney-core run dev",
     "dev:docs": "vitepress dev docs",
+    "dev:admin:host": "pnpm --filter=tourney-admin run dev --host",
+    "dev:viewer:host": "pnpm --filter=tourney-viewer run dev --host",
     "start:docs": "vitepress preview docs",
     "start:supabase": "cd ./apps/api/supabase && npx supabase start",
     "stop:supabase": "cd ./apps/api/supabase && npx supabase stop",

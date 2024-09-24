@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { VerticalNavigationLink } from "#ui/types"
 import { createAvatar } from "@dicebear/core"
 import { glass } from "@dicebear/collection"
 
@@ -9,7 +10,7 @@ const avatar = createAvatar(glass, {
 const svg = avatar.toDataUri()
 const liveTournaments = ref<number>(3)
 
-const navigationLinks = [
+const navigationLinks: VerticalNavigationLink[][] = [
   [
     {
       label: "Home",
@@ -76,7 +77,7 @@ const navigationLinks = [
   ],
 ]
 
-const profileLinks = [
+const profileLinks: VerticalNavigationLink[] = [
   {
     label: user.value,
     avatar: {

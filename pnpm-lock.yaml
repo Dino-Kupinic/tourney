@@ -58,6 +58,9 @@ importers:
         specifier: latest
         version: 4.4.5(vue@3.5.4(typescript@5.6.2))
     devDependencies:
+      '@nuxtjs/device':
+        specifier: ^3.2.4
+        version: 3.2.4
       '@nuxtjs/supabase':
         specifier: ^1.4.0
         version: 1.4.0
@@ -1171,6 +1174,9 @@ packages:
 
   '@nuxtjs/color-mode@3.5.0':
     resolution: {integrity: sha512-vM14Gx05X+nqRXN0h48WqcxQ6YQVCKyobU04KIzqlRrzlpRA5bbuHpHEg+X0vGJCq2JX0skK1rBqvrQv3DVDPw==}
+
+  '@nuxtjs/device@3.2.4':
+    resolution: {integrity: sha512-jIvN6QeodBNrUrL/1FCHk4bebsiLsGHlJd8c/m2ksLrGY4IZ0npA8IYhDTdYV92epGxoe8+3iZOzCjav+6TshQ==}
 
   '@nuxtjs/supabase@1.4.0':
     resolution: {integrity: sha512-IWe+zIfL4nZ6+2Ul2J2cu53RluuM7xChLPJV0arf4xohYg0WK0Ers6MM65Wx71nmH3AAOpz33apzJn7R1f6JvQ==}
@@ -5787,6 +5793,10 @@ snapshots:
       - rollup
       - supports-color
       - webpack-sources
+
+  '@nuxtjs/device@3.2.4':
+    dependencies:
+      defu: 6.1.4
 
   '@nuxtjs/supabase@1.4.0':
     dependencies:
