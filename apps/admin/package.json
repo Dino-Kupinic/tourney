@@ -12,7 +12,8 @@
   "dependencies": {
     "nuxt": "^3.13.1",
     "vue": "latest",
-    "vue-router": "latest"
+    "vue-router": "latest",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@dicebear/collection": "^9.2.1",

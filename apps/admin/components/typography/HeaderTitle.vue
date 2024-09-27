@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <InConstruction />
+  <p class="font-mono font-medium">
+    <slot />
+  </p>
 </template>
-
-<style scoped></style>

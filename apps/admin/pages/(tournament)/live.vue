@@ -6,9 +6,7 @@ useHead({
 </script>
 
 <template>
-  <BasePageHeader>
-    {{ title }}
-  </BasePageHeader>
+  <BasePageHeader :title="title">a </BasePageHeader>
 
   <InConstruction />
 </template>

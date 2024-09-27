@@ -11,9 +11,6 @@ export default defineNuxtConfig({
     },
     families: [{ name: "JetBrains Mono", provider: "google" }],
   },
-  supabase: {
-    redirect: false, // TODO: remove after login page is implemented
-  },
   components: [
     {
       path: "~/components",

@@ -36,22 +36,12 @@ const navigationLinks: VerticalNavigationLink[][] = [
       to: "/tournaments",
     },
     {
-      label: "Formate",
-      icon: "i-heroicons-table-cells",
-      to: "/formats",
-    },
-    {
       label: "Anmeldung",
       icon: "i-heroicons-ticket",
       to: "/registration",
     },
   ],
   [
-    {
-      label: "Preise",
-      icon: "i-heroicons-gift",
-      to: "/prices",
-    },
     {
       label: "Aktuelles",
       icon: "i-heroicons-newspaper",
@@ -68,11 +58,6 @@ const navigationLinks: VerticalNavigationLink[][] = [
       label: "Aktivität",
       icon: "i-heroicons-queue-list",
       to: "/logs",
-    },
-    {
-      label: "Nutzer",
-      icon: "i-heroicons-users",
-      to: "/users",
     },
   ],
 ]
