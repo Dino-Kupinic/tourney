@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import BaseSettingsItem from "~/components/settings/BaseSettingsItem.vue"
-
 const title = ref<string>("Einstellungen")
 useHead({
   title: () => title.value,
