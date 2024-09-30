@@ -1,0 +1,12 @@
+{
+  "name": "tourney-user-creator",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "create": "node --env-file=.env ./index.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4"
+  }
+}

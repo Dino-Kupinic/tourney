@@ -6,7 +6,6 @@ definePageMeta({
   layout: false,
 })
 
-const supabase = useSupabaseClient()
 const schema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string(),
@@ -25,11 +24,9 @@ const state = reactive({
   password: "a",
 })
 
+const { login } = useUser()
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: state.email ?? "",
-    password: state.password ?? "",
-  })
+  const { data, error } = await login(state.email ?? "", state.password ?? "")
   if (error) console.log(error)
   if (data.user) await navigateTo("/")
 }

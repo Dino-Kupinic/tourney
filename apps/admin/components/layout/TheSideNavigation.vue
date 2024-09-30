@@ -3,7 +3,7 @@ import type { VerticalNavigationLink } from "#ui/types"
 import { createAvatar } from "@dicebear/core"
 import { glass } from "@dicebear/collection"
 
-const { name } = useUser()
+const { name, role } = useUser()
 const avatar = createAvatar(glass, {
   seed: name.value,
 })
@@ -68,7 +68,7 @@ const profileLinks: VerticalNavigationLink[] = [
     avatar: {
       src: svg,
     },
-    badge: "Admin",
+    badge: role.value,
   },
   {
     label: "Einstellungen",

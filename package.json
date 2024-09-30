@@ -7,6 +7,7 @@
     "apps/*"
   ],
   "scripts": {
+    "create:users": "pnpm --filter=tourney-user-creator run create",
     "app:start": "pm2 start ecosystem.config.cjs",
     "app:kill": "pm2 kill",
     "app:monitor": "pm2 monit",
