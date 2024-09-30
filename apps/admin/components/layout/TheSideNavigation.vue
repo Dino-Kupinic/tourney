@@ -3,9 +3,9 @@ import type { VerticalNavigationLink } from "#ui/types"
 import { createAvatar } from "@dicebear/core"
 import { glass } from "@dicebear/collection"
 
-const user = ref<string>("Dino Kupinic")
+const { name } = useUser()
 const avatar = createAvatar(glass, {
-  seed: user.value,
+  seed: name.value,
 })
 const svg = avatar.toDataUri()
 const liveTournaments = ref<number>(3)
@@ -64,7 +64,7 @@ const navigationLinks: VerticalNavigationLink[][] = [
 
 const profileLinks: VerticalNavigationLink[] = [
   {
-    label: user.value,
+    label: name.value,
     avatar: {
       src: svg,
     },
