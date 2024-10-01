@@ -8,7 +8,7 @@ const titleUppercase = computed(() => title.toUpperCase())
 
 <template>
   <header
-    class="flex w-full justify-between rounded-t-md border-b border-gray-200 bg-white p-2 px-6 text-sm dark:border-gray-800 dark:bg-gray-900"
+    class="flex w-full items-center justify-between rounded-t-md border-b border-gray-200 bg-white p-2 px-6 text-sm dark:border-gray-800 dark:bg-gray-900"
   >
     <HeaderTitle>
       {{ titleUppercase }}

@@ -79,7 +79,7 @@ const profileLinks: VerticalNavigationLink[] = [
 </script>
 
 <template>
-  <div class="flex h-full flex-col pb-2">
+  <div class="flex h-full min-w-44 flex-col pb-2">
     <UVerticalNavigation
       :links="navigationLinks"
       :ui="{
