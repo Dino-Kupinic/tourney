@@ -1,5 +1,7 @@
+import type { Database } from "~/types/database.types"
+
 export const useUser = () => {
-  const supabase = useSupabaseClient()
+  const supabase = useSupabaseClient<Database>()
   const session = useSupabaseSession()
 
   const index = session.value?.user.email?.indexOf("@")
