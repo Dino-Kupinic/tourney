@@ -347,7 +347,11 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      registration_status: "In Progress" | "Submitted" | "Completed"
+      registration_status:
+        | "Ausstehend"
+        | "Abgesendet"
+        | "Abgeschlossen"
+        | "Abgelehnt"
       sport_type: "Fußball" | "Volleyball" | "Basketball"
     }
     CompositeTypes: {

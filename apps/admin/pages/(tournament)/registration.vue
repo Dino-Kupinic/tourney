@@ -1,48 +1,21 @@
 <script setup lang="ts">
-import type { Database } from "~/types/database.types"
+import type { Database, Tables } from "~/types/database.types"
+import type { QueryData } from "@supabase/supabase-js"
 
 const title = ref<string>("Anmeldung")
 useHead({
   title: () => title.value,
 })
 
-const columns = [
-  {
-    key: "tournament",
-    label: "Turnier",
-    sortable: true,
-  },
-  {
-    key: "team",
-    label: "Team",
-    sortable: true,
-  },
-  {
-    key: "expire_date",
-    label: "Ablaufdatum",
-    sortable: true,
-  },
-  {
-    key: "status",
-    label: "Status",
-    sortable: true,
-  },
-  {
-    key: "actions",
-    label: "Aktionen",
-    sortable: false,
-  },
-]
+const { actions, todoStatus, columns } = useRegistrationTable()
 
 const selectedColumns = ref(columns)
 const columnsTable = computed(() =>
   columns.filter((column) => selectedColumns.value.includes(column)),
 )
 
-// Selected Rows
-const selectedRows = ref([])
-
-function select(row) {
+const selectedRows = ref<Tables<"registration">[]>([])
+function select(row: Tables<"registration">) {
   const index = selectedRows.value.findIndex((item) => item.id === row.id)
   if (index === -1) {
     selectedRows.value.push(row)
@@ -51,75 +24,32 @@ function select(row) {
   }
 }
 
-// Actions
-const actions = [
-  [
-    {
-      key: "in_progress",
-      label: "Ausstehend",
-      icon: "i-heroicons-arrow-path",
-    },
-  ],
-  [
-    {
-      key: "submitted",
-      label: "Abgesendet",
-      icon: "i-heroicons-envelope",
-    },
-  ],
-  [
-    {
-      key: "completed",
-      label: "Abgeschlossen",
-      icon: "i-heroicons-check",
-    },
-  ],
-  [
-    {
-      key: "discarded",
-      label: "Abgelehnt",
-      icon: "i-heroicons-no-symbol",
-    },
-  ],
-]
-
-// Filters
-const todoStatus = [
-  {
-    key: "in_progress",
-    label: "Ausstehend",
-    value: "Ausstehend",
-  },
-  {
-    key: "submitted",
-    label: "Abgesendet",
-    value: "Abgesendet",
-  },
-  {
-    key: "completed",
-    label: "Abgeschlossen",
-    value: "Abgeschlossen",
-  },
-  {
-    key: "declined",
-    label: "Abgelehnt",
-    value: "Abgelehnt",
-  },
-]
-
 const client = useSupabaseClient<Database>()
+const registrationViewQuery = client
+  .from("registration")
+  .select("*, class(id, name)")
+
+// const { data: tournament } = await useAsyncData("tournament", async () => {
+//   const { data } = await client
+//     .from("tournament")
+//     .select("*, team:team_id(name), registration:registration_id(name)")
+//   return data
+// })
+// console.log(tournament, tournament.value)
+
+type registrationView = QueryData<typeof registrationViewQuery>
+
 const { data, status, error } = await useAsyncData("registration", async () => {
-  const { data } = await client.from("registration").select("*")
+  const { data } = await registrationViewQuery.returns<registrationView>()
   return data
 })
-console.log(data.value)
-console.log(error.value)
+console.log(data)
 
 const tableData = ref(
   data?.value?.map((item) => ({
     id: item.id,
-    tournament: "aaa", // Add your value for tournament
-    team: "bbb", // Add your value for team
+    tournament: "aaa",
+    class: item.class?.name,
     expire_date: item.expire_date,
     status: item.status,
   })) ?? [],
@@ -144,11 +74,11 @@ const resetFilters = () => {
   selectedStatus.value = []
 }
 
-const items = (row) =>
+const items = (row: Tables<"registration">) =>
   ref([
     [
       {
-        label: "Edit",
+        label: "Editieren",
         icon: "i-heroicons-pencil-square-20-solid",
       },
       {
