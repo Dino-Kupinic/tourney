@@ -1,3 +1,5 @@
+import type { Tables } from "~/types/database.types"
+
 export const useRegistrationTable = () => {
   const actions = [
     [
@@ -55,17 +57,12 @@ export const useRegistrationTable = () => {
 
   const columns = [
     {
-      key: "tournament",
-      label: "Turnier",
-      sortable: true,
-    },
-    {
       key: "class",
       label: "Klasse",
       sortable: true,
     },
     {
-      key: "expire_date",
+      key: "date",
       label: "Ablaufdatum",
       sortable: true,
     },
@@ -81,9 +78,24 @@ export const useRegistrationTable = () => {
     },
   ]
 
+  const items = (row: Tables<"registration">) =>
+    ref([
+      [
+        {
+          label: "Editieren",
+          icon: "i-heroicons-pencil-square-20-solid",
+        },
+        {
+          label: "Info",
+          icon: "i-heroicons-information-circle",
+        },
+      ],
+    ])
+
   return {
     actions,
     todoStatus,
     columns,
+    items,
   }
 }

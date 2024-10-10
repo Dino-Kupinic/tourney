@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { Database, Tables } from "~/types/database.types"
 import type { QueryData } from "@supabase/supabase-js"
-import { z } from "zod"
+import { number, z } from "zod"
 
 const title = ref<string>("Anmeldung")
 useHead({
   title: () => title.value,
 })
 
-const { actions, todoStatus, columns } = useRegistrationTable()
+const { actions, todoStatus, columns, items } = useRegistrationTable()
 
 const selectedColumns = ref(columns)
 const columnsTable = computed(() =>
@@ -28,22 +28,24 @@ function select(row: Tables<"registration">) {
 const client = useSupabaseClient<Database>()
 const registrationViewQuery = client
   .from("registration")
-  .select("*, class(id, name), team(id, name, tournament(id, name))")
+  .select("*, class(id, name)")
 
 type registrationView = QueryData<typeof registrationViewQuery>
 
-const { data, status, error } = await useAsyncData("registration", async () => {
-  const { data } = await registrationViewQuery.returns<registrationView>()
-  return data
-})
+const { data, status, error, refresh } = await useAsyncData(
+  "registration",
+  async () => {
+    const { data } = await registrationViewQuery.returns<registrationView>()
+    return data
+  },
+)
 console.log(data)
 
 const tableData = ref(
   data?.value?.map((item) => ({
     id: item.id,
-    tournament: item.team[0]?.tournament?.name ?? "",
     class: item.class?.name,
-    expire_date: item.expire_date,
+    date: item.expire_date,
     status: item.status,
   })) ?? [],
 )
@@ -66,20 +68,6 @@ const resetFilters = () => {
   search.value = ""
   selectedStatus.value = []
 }
-
-const items = (row: Tables<"registration">) =>
-  ref([
-    [
-      {
-        label: "Editieren",
-        icon: "i-heroicons-pencil-square-20-solid",
-      },
-      {
-        label: "Info",
-        icon: "i-heroicons-information-circle",
-      },
-    ],
-  ])
 
 // Pagination
 const sort = ref({ column: "id", direction: "asc" as const })
@@ -110,6 +98,23 @@ const sort = ref({ column: "id", direction: "asc" as const })
 // )
 
 const isOpen = ref<boolean>(false)
+
+const years = Array.from({ length: 20 }, (_, i) => new Date().getFullYear() + i)
+const classYear = ref<number>(years[0])
+
+const { data: classes } = await useAsyncData(
+  "classes",
+  async () => {
+    const { data } = await client
+      .from("class")
+      .select("name, year")
+      .eq("year", classYear.value)
+      .order("name", { ascending: false })
+    return data
+  },
+  { watch: [classYear] },
+)
+console.log(classes.value)
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -142,15 +147,6 @@ const state = reactive({
         size="xs"
         placeholder="Status"
         class="w-32"
-      />
-
-      <UButton
-        icon="i-heroicons-funnel"
-        color="gray"
-        size="xs"
-        :disabled="search === '' && selectedStatus.length === 0"
-        @click="resetFilters"
-        square
       />
 
       <UDropdown
@@ -187,6 +183,23 @@ const state = reactive({
       </USelectMenu>
 
       <UButton
+        icon="i-heroicons-funnel"
+        color="gray"
+        size="xs"
+        :disabled="search === '' && selectedStatus.length === 0"
+        @click="resetFilters"
+        square
+      />
+
+      <UButton
+        icon="i-heroicons-arrow-path"
+        color="gray"
+        size="xs"
+        square
+        @click="refresh"
+      />
+
+      <UButton
         size="xs"
         variant="soft"
         @click="isOpen = true"
@@ -198,10 +211,10 @@ const state = reactive({
             ring: '',
             divide: 'divide-y divide-gray-100 dark:divide-gray-800',
             body: {
-              padding: 'p-3',
+              padding: 'p-5',
             },
             header: {
-              padding: 'p-4',
+              padding: 'p-3',
             },
             footer: {
               padding: 'p-3',
@@ -211,7 +224,30 @@ const state = reactive({
           <template #header> Neue Anmeldung </template>
 
           <UForm :schema="schema" :state="state" class="space-y-4">
+            <UFormGroup
+              label="Klassen"
+              name="classes"
+              class="grow"
+              description="Für diese Klassen wird ein Link generiert."
+            >
+              <ul
+                class="h-40 w-full overflow-y-auto rounded-md border border-gray-800"
+              >
+                <li
+                  v-for="schoolClass in classes"
+                  class="flex justify-between border-b border-gray-800 p-2 px-4"
+                >
+                  <p>{{ schoolClass.name }}</p>
+                  <p>{{ schoolClass.year }}</p>
+                </li>
+              </ul>
+            </UFormGroup>
+
             <UFormGroup label="E-mail" name="email">
+              <UInput v-model="state.email" />
+            </UFormGroup>
+
+            <UFormGroup label="Jahr" name="year">
               <UInput v-model="state.email" />
             </UFormGroup>
 
@@ -223,7 +259,13 @@ const state = reactive({
           <template #footer>
             <div class="flex items-center gap-2">
               <UButton variant="soft" size="xs">Erstellen</UButton>
-              <UButton variant="soft" color="red" size="xs">Abbrechen</UButton>
+              <UButton
+                variant="soft"
+                color="red"
+                size="xs"
+                @click="isOpen = false"
+                >Abbrechen</UButton
+              >
             </div>
           </template>
         </UCard>
@@ -279,6 +321,10 @@ const state = reactive({
           color="red"
           variant="subtle"
         />
+      </template>
+
+      <template #date-data="{ row }">
+        <span>{{ useDateFormat(row.expire_date, "DD.MM.YYYY") }}</span>
       </template>
 
       <template #actions-data="{ row }">
