@@ -22,7 +22,7 @@
     "dev:admin:host": "pnpm --filter=tourney-admin run dev --host",
     "dev:viewer:host": "pnpm --filter=tourney-viewer run dev --host",
     "start:docs": "vitepress preview docs",
-    "start:supabase": "cd ./apps/api/supabase && npx supabase start",
+    "start:supabase": "cd ./apps/api/supabase && npx supabase start --ignore-health-check",
     "stop:supabase": "cd ./apps/api/supabase && npx supabase stop",
     "format": "npx prettier . --check",
     "format:write": "npx prettier . --write"

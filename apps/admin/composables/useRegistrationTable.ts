@@ -61,7 +61,7 @@ export const useRegistrationTable = () => {
     },
     {
       key: "class",
-      label: "Class",
+      label: "Klasse",
       sortable: true,
     },
     {

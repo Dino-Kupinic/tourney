@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Database, Tables } from "~/types/database.types"
 import type { QueryData } from "@supabase/supabase-js"
+import { z } from "zod"
 
 const title = ref<string>("Anmeldung")
 useHead({
@@ -27,15 +28,7 @@ function select(row: Tables<"registration">) {
 const client = useSupabaseClient<Database>()
 const registrationViewQuery = client
   .from("registration")
-  .select("*, class(id, name)")
-
-// const { data: tournament } = await useAsyncData("tournament", async () => {
-//   const { data } = await client
-//     .from("tournament")
-//     .select("*, team:team_id(name), registration:registration_id(name)")
-//   return data
-// })
-// console.log(tournament, tournament.value)
+  .select("*, class(id, name), team(id, name, tournament(id, name))")
 
 type registrationView = QueryData<typeof registrationViewQuery>
 
@@ -48,7 +41,7 @@ console.log(data)
 const tableData = ref(
   data?.value?.map((item) => ({
     id: item.id,
-    tournament: "aaa",
+    tournament: item.team[0]?.tournament?.name ?? "",
     class: item.class?.name,
     expire_date: item.expire_date,
     status: item.status,
@@ -115,6 +108,20 @@ const sort = ref({ column: "id", direction: "asc" as const })
 //     watch: [search, searchStatus, sort],
 //   },
 // )
+
+const isOpen = ref<boolean>(false)
+
+const schema = z.object({
+  email: z.string().email("Invalid email"),
+  password: z.string(),
+})
+
+type Schema = z.output<typeof schema>
+
+const state = reactive({
+  email: undefined,
+  password: undefined,
+})
 </script>
 
 <template>
@@ -179,7 +186,48 @@ const sort = ref({ column: "id", direction: "asc" as const })
         </UButton>
       </USelectMenu>
 
-      <UButton size="xs" variant="soft"> Neue Anmeldung... </UButton>
+      <UButton
+        size="xs"
+        variant="soft"
+        @click="isOpen = true"
+        label="Neue Anmeldung..."
+      />
+      <UModal v-model="isOpen">
+        <UCard
+          :ui="{
+            ring: '',
+            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+            body: {
+              padding: 'p-3',
+            },
+            header: {
+              padding: 'p-4',
+            },
+            footer: {
+              padding: 'p-3',
+            },
+          }"
+        >
+          <template #header> Neue Anmeldung </template>
+
+          <UForm :schema="schema" :state="state" class="space-y-4">
+            <UFormGroup label="E-mail" name="email">
+              <UInput v-model="state.email" />
+            </UFormGroup>
+
+            <UFormGroup label="Passwort" name="password">
+              <UInput v-model="state.password" type="password" />
+            </UFormGroup>
+          </UForm>
+
+          <template #footer>
+            <div class="flex items-center gap-2">
+              <UButton variant="soft" size="xs">Erstellen</UButton>
+              <UButton variant="soft" color="red" size="xs">Abbrechen</UButton>
+            </div>
+          </template>
+        </UCard>
+      </UModal>
     </div>
   </BasePageHeader>
   <BasePageContent>
