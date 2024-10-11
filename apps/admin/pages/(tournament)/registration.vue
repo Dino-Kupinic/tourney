@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Database, Tables } from "~/types/database.types"
-import type { QueryData } from "@supabase/supabase-js"
-import { number, z } from "zod"
+import type { Tables } from "~/types/database.types"
+import { z } from "zod"
+import type { FormSubmitEvent } from "#ui/types"
 
 const title = ref<string>("Anmeldung")
 useHead({
@@ -25,32 +25,21 @@ function select(row: Tables<"registration">) {
   }
 }
 
-const client = useSupabaseClient<Database>()
-const registrationViewQuery = client
-  .from("registration")
-  .select("*, class(id, name)")
-
-type registrationView = QueryData<typeof registrationViewQuery>
-
-const { data, status, error, refresh } = await useAsyncData(
-  "registration",
-  async () => {
-    const { data } = await registrationViewQuery.returns<registrationView>()
-    return data
+const { data, status, error, refresh } = useFetch("/api/registrations", {
+  transform: (item) => {
+    if (!item) return []
+    return item.map((item) => ({
+      id: item.id,
+      class: item.class?.name,
+      expire_date: item.expire_date,
+      status: item.status,
+    }))
   },
-)
-console.log(data)
+})
 
-const tableData = ref(
-  data?.value?.map((item) => ({
-    id: item.id,
-    class: item.class?.name,
-    date: item.expire_date,
-    status: item.status,
-  })) ?? [],
-)
+const tableData = computed(() => data.value || [])
 
-const search = ref("")
+const search = ref<string>("")
 const selectedStatus = ref([])
 const searchStatus = computed(() => {
   if (selectedStatus.value?.length === 0) {
@@ -98,35 +87,31 @@ const sort = ref({ column: "id", direction: "asc" as const })
 // )
 
 const isOpen = ref<boolean>(false)
-
-const years = Array.from({ length: 20 }, (_, i) => new Date().getFullYear() + i)
-const classYear = ref<number>(years[0])
-
-const { data: classes } = await useAsyncData(
-  "classes",
-  async () => {
-    const { data } = await client
-      .from("class")
-      .select("name, year")
-      .eq("year", classYear.value)
-      .order("name", { ascending: false })
-    return data
-  },
-  { watch: [classYear] },
+const years = Array.from(
+  { length: 10 },
+  (_, i) =>
+    `${new Date().getFullYear() + i}/${(new Date().getFullYear() + i + 1).toString().slice(2)}`,
 )
-console.log(classes.value)
+const classYear = ref<string>(years[0])
+const encodedYear = computed(() => encodeURIComponent(classYear.value))
+
+const { data: classes } = useFetch(`/api/classes/${encodedYear.value}`, {
+  watch: [classYear],
+})
 
 const schema = z.object({
-  email: z.string().email("Invalid email"),
-  password: z.string(),
+  expire_date: z.date(),
+  teams: z.number().min(1),
 })
 
 type Schema = z.output<typeof schema>
 
 const state = reactive({
-  email: undefined,
-  password: undefined,
+  expire_date: undefined,
+  teams: 1,
 })
+
+const onSubmit = async (event: FormSubmitEvent<Schema>) => {}
 </script>
 
 <template>
@@ -163,13 +148,14 @@ const state = reactive({
           Markieren als
         </UButton>
       </UDropdown>
+
       <USelectMenu
         v-model="selectedColumns"
         :options="columns"
         multiple
         v-slot="{ open }"
       >
-        <UButton color="gray" size="xs" class="w-36 flex-1 justify-between">
+        <UButton color="gray" size="xs" class="w-32 flex-1 justify-between">
           <div class="flex items-center gap-1">
             <UIcon name="i-heroicons-view-columns" class="h-4 w-4" />
             Spalten
@@ -205,25 +191,41 @@ const state = reactive({
         @click="isOpen = true"
         label="Neue Anmeldung..."
       />
-      <UModal v-model="isOpen">
+
+      <UModal v-model="isOpen" :ui="{ width: 'w-full sm:max-w-md' }">
         <UCard
           :ui="{
-            ring: '',
             divide: 'divide-y divide-gray-100 dark:divide-gray-800',
             body: {
-              padding: 'p-5',
+              padding: 'px-4 py-5 sm:p-6',
             },
             header: {
-              padding: 'p-3',
+              padding: 'px-4 py-3 sm:px-6',
             },
             footer: {
-              padding: 'p-3',
+              padding: 'px-4 py-3 sm:px-6',
             },
           }"
         >
-          <template #header> Neue Anmeldung </template>
+          <template #header>
+            <strong> Neue Anmeldung </strong>
+          </template>
 
-          <UForm :schema="schema" :state="state" class="space-y-4">
+          <UForm
+            :schema="schema"
+            :state="state"
+            class="space-y-4"
+            @submit="onSubmit"
+          >
+            <UFormGroup
+              label="Teams"
+              name="teams"
+              description="Anzahl an Anmeldungen für jede Klasse"
+              required
+            >
+              <UInput v-model="state.teams" type="number" />
+            </UFormGroup>
+
             <UFormGroup
               label="Klassen"
               name="classes"
@@ -231,11 +233,11 @@ const state = reactive({
               description="Für diese Klassen wird ein Link generiert."
             >
               <ul
-                class="h-40 w-full overflow-y-auto rounded-md border border-gray-800"
+                class="h-40 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
               >
                 <li
                   v-for="schoolClass in classes"
-                  class="flex justify-between border-b border-gray-800 p-2 px-4"
+                  class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
                 >
                   <p>{{ schoolClass.name }}</p>
                   <p>{{ schoolClass.year }}</p>
@@ -243,16 +245,17 @@ const state = reactive({
               </ul>
             </UFormGroup>
 
-            <UFormGroup label="E-mail" name="email">
-              <UInput v-model="state.email" />
+            <UFormGroup label="Datensatz">
+              <USelect v-model="classYear" :options="years" />
             </UFormGroup>
 
-            <UFormGroup label="Jahr" name="year">
-              <UInput v-model="state.email" />
-            </UFormGroup>
-
-            <UFormGroup label="Passwort" name="password">
-              <UInput v-model="state.password" type="password" />
+            <UFormGroup
+              label="Ablaufdatum"
+              name="date"
+              description="An diesem Datum werden die Anmeldungen automatisch geschlossen."
+              required
+            >
+              <UInput v-model="state.expire_date" type="date" />
             </UFormGroup>
           </UForm>
 
@@ -279,6 +282,10 @@ const state = reactive({
       :rows="tableData"
       :columns="columnsTable"
       :loading="status === 'pending'"
+      :loading-state="{
+        icon: 'i-heroicons-arrow-path-20-solid',
+        label: 'Lade...',
+      }"
       sort-asc-icon="i-heroicons-arrow-up"
       sort-desc-icon="i-heroicons-arrow-down"
       sort-mode="manual"
@@ -337,6 +344,24 @@ const state = reactive({
             square
           />
         </UDropdown>
+      </template>
+
+      <template #empty-state>
+        <div class="mt-64 flex w-full items-center justify-center">
+          <div class="max-w-96 space-y-3">
+            <UIcon
+              name="i-heroicons-ticket"
+              size="24"
+              class="text-gray-500 dark:text-gray-400"
+            />
+            <p class="text-base font-semibold tracking-tight">
+              Keine Anmeldungen
+            </p>
+            <p class="text-sm text-gray-700 dark:text-gray-500">
+              Mit Anmeldungen können sich Klassen bei Turnieren registrieren.
+            </p>
+          </div>
+        </div>
       </template>
     </UTable>
   </BasePageContent>

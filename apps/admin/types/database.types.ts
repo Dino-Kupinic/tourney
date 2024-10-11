@@ -38,17 +38,17 @@ export type Database = {
         Row: {
           id: string
           name: string
-          year: number
+          year: string
         }
         Insert: {
           id?: string
           name: string
-          year: number
+          year: string
         }
         Update: {
           id?: string
           name?: string
-          year?: number
+          year?: string
         }
         Relationships: []
       }
@@ -210,18 +210,21 @@ export type Database = {
           class_id: string
           expire_date: string
           id: string
+          name: string
           status: Database["public"]["Enums"]["registration_status"]
         }
         Insert: {
           class_id: string
           expire_date: string
           id?: string
+          name: string
           status?: Database["public"]["Enums"]["registration_status"]
         }
         Update: {
           class_id?: string
           expire_date?: string
           id?: string
+          name?: string
           status?: Database["public"]["Enums"]["registration_status"]
         }
         Relationships: [
