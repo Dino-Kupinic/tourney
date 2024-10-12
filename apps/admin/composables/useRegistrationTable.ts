@@ -32,30 +32,12 @@ export const useRegistrationTable = () => {
     ],
   ]
 
-  const todoStatus = [
-    {
-      key: "in_progress",
-      label: "Ausstehend",
-      value: "Ausstehend",
-    },
-    {
-      key: "submitted",
-      label: "Abgesendet",
-      value: "Abgesendet",
-    },
-    {
-      key: "completed",
-      label: "Abgeschlossen",
-      value: "Abgeschlossen",
-    },
-    {
-      key: "declined",
-      label: "Abgelehnt",
-      value: "Abgelehnt",
-    },
-  ]
-
   const columns = [
+    {
+      key: "name",
+      label: "Name",
+      sortable: true,
+    },
     {
       key: "class",
       label: "Klasse",
@@ -64,7 +46,7 @@ export const useRegistrationTable = () => {
     {
       key: "date",
       label: "Ablaufdatum",
-      sortable: true,
+      sortable: false,
     },
     {
       key: "status",
@@ -74,7 +56,6 @@ export const useRegistrationTable = () => {
     {
       key: "actions",
       label: "Aktionen",
-      sortable: false,
     },
   ]
 
@@ -86,6 +67,10 @@ export const useRegistrationTable = () => {
           icon: "i-heroicons-pencil-square-20-solid",
         },
         {
+          label: "Löschen...",
+          icon: "i-heroicons-trash",
+        },
+        {
           label: "Info",
           icon: "i-heroicons-information-circle",
         },
@@ -94,7 +79,6 @@ export const useRegistrationTable = () => {
 
   return {
     actions,
-    todoStatus,
     columns,
     items,
   }

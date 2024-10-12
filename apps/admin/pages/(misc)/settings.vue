@@ -41,7 +41,15 @@ const onLogout = async () => {
         <UButton label="Logout" @click="onLogout()" />
       </template>
     </UCard>
+    <UCard>
+      <template #header> Kontakt </template>
+      <BaseSettingsItem>
+        <strong>Dino Kupinic</strong>
+        <p>dinokupinic2006@gmail.com</p>
+        <br />
+        <strong>Peter Rathgeb</strong>
+        <p>Peter.Rathgeb@htl-steyr.ac.at</p>
+      </BaseSettingsItem>
+    </UCard>
   </main>
 </template>
-
-<style scoped></style>

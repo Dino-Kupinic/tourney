@@ -8,7 +8,7 @@ useHead({
   title: () => title.value,
 })
 
-const { actions, todoStatus, columns, items } = useRegistrationTable()
+const { actions, columns, items } = useRegistrationTable()
 
 const selectedColumns = ref(columns)
 const columnsTable = computed(() =>
@@ -25,11 +25,12 @@ function select(row: Tables<"registration">) {
   }
 }
 
-const { data, status, error, refresh } = useFetch("/api/registrations", {
+const { data, status, refresh } = useFetch("/api/registrations", {
   transform: (item) => {
     if (!item) return []
     return item.map((item) => ({
       id: item.id,
+      name: item.name,
       class: item.class?.name,
       expire_date: item.expire_date,
       status: item.status,
@@ -37,56 +38,23 @@ const { data, status, error, refresh } = useFetch("/api/registrations", {
   },
 })
 
-const tableData = computed(() => data.value || [])
-
 const search = ref<string>("")
-const selectedStatus = ref([])
-const searchStatus = computed(() => {
-  if (selectedStatus.value?.length === 0) {
-    return ""
+const tableData = computed(() => data.value || [])
+const filteredRows = computed(() => {
+  if (!search.value) {
+    return tableData.value
   }
 
-  // if (selectedStatus?.value?.length > 1) {
-  //   return `?completed=${selectedStatus.value[0].value}&completed=${selectedStatus.value[1].value}`
-  // }
-  //
-  // return `?completed=${selectedStatus.value[0].value}`
+  return tableData.value.filter((item) => {
+    return Object.values(item).some((value) => {
+      return String(value).toLowerCase().includes(search.value.toLowerCase())
+    })
+  })
 })
 
-const resetFilters = () => {
-  search.value = ""
-  selectedStatus.value = []
-}
-
-// Pagination
-const sort = ref({ column: "id", direction: "asc" as const })
-// Data
-// const { data: todos, status } = await useLazyAsyncData<
-//   {
-//     id: number
-//     title: string
-//     completed: string
-//   }[]
-// >(
-//   "todos",
-//   () =>
-//     ($fetch as any)(
-//       `https://jsonplaceholder.typicode.com/todos${searchStatus.value}`,
-//       {
-//         query: {
-//           q: search.value,
-//           _sort: sort.value.column,
-//           _order: sort.value.direction,
-//         },
-//       },
-//     ),
-//   {
-//     default: () => [],
-//     watch: [search, searchStatus, sort],
-//   },
-// )
-
-const isOpen = ref<boolean>(false)
+const isOpenDelete = ref<boolean>(false)
+const sort = ref({ column: "status", direction: "asc" as const })
+const isOpenCreate = ref<boolean>(false)
 const years = Array.from(
   { length: 10 },
   (_, i) =>
@@ -100,8 +68,9 @@ const { data: classes } = useFetch(`/api/classes/${encodedYear.value}`, {
 })
 
 const schema = z.object({
-  expire_date: z.date(),
-  teams: z.number().min(1),
+  expire_date: z.string().date(),
+  teams: z.number().min(1, "Mindestens ein Team pro Klasse").default(1),
+  year: z.string(),
 })
 
 type Schema = z.output<typeof schema>
@@ -109,29 +78,95 @@ type Schema = z.output<typeof schema>
 const state = reactive({
   expire_date: undefined,
   teams: 1,
+  year: classYear.value,
 })
 
-const onSubmit = async (event: FormSubmitEvent<Schema>) => {}
+const onSubmitCreate = async (event: FormSubmitEvent<Schema>) => {
+  // TODO: error handling
+  schema.parse(state)
+  await $fetch("/api/registrations/create", { method: "POST", body: state })
+  isOpenCreate.value = false
+  await refresh()
+}
+
+const onDelete = async () => {
+  // TODO: error handling
+  const ids = selectedRows.value.map((row) => row.id)
+  await $fetch("/api/registrations/delete", {
+    method: "DELETE",
+    body: ids,
+  })
+  isOpenDelete.value = false
+  selectedRows.value = []
+  await refresh()
+}
 </script>
 
 <template>
   <BasePageHeader :title="title">
     <!-- Filters -->
     <div class="ml-4 flex items-center gap-2">
+      <!-- Delete Modal -->
+      <UModal v-model="isOpenDelete" :ui="{ width: 'w-full sm:max-w-md' }">
+        <UCard
+          :ui="{
+            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+            body: {
+              padding: 'px-4 py-5 sm:p-6',
+            },
+            header: {
+              padding: 'px-4 py-3 sm:px-6',
+            },
+            footer: {
+              padding: 'px-4 py-3 sm:px-6',
+            },
+          }"
+        >
+          <template #header>
+            <strong> Anmeldungen löschen </strong>
+          </template>
+
+          <p>
+            Möchten Sie wirklich
+            <strong>{{ selectedRows.length }}</strong> Anmeldungen löschen?
+          </p>
+
+          <template #footer>
+            <div class="flex items-center gap-2">
+              <UButton
+                variant="soft"
+                size="xs"
+                color="red"
+                @click="onDelete"
+                label="Löschen"
+              />
+              <UButton
+                variant="soft"
+                size="xs"
+                color="gray"
+                @click="isOpenDelete = false"
+                label="Abbrechen"
+              />
+            </div>
+          </template>
+        </UCard>
+      </UModal>
+
+      <UButton
+        v-if="selectedRows.length > 1"
+        @click="isOpenDelete = true"
+        icon="i-heroicons-trash"
+        variant="soft"
+        color="red"
+        size="xs"
+        label="Löschen..."
+      />
+
       <UInput
         v-model="search"
         icon="i-heroicons-magnifying-glass-20-solid"
         placeholder="Suchen..."
         size="xs"
-      />
-
-      <USelectMenu
-        v-model="selectedStatus"
-        :options="todoStatus"
-        multiple
-        size="xs"
-        placeholder="Status"
-        class="w-32"
       />
 
       <UDropdown
@@ -144,9 +179,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {}
           trailing
           color="gray"
           size="xs"
-        >
-          Markieren als
-        </UButton>
+          label="Markieren als"
+        />
       </UDropdown>
 
       <USelectMenu
@@ -169,15 +203,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {}
       </USelectMenu>
 
       <UButton
-        icon="i-heroicons-funnel"
-        color="gray"
-        size="xs"
-        :disabled="search === '' && selectedStatus.length === 0"
-        @click="resetFilters"
-        square
-      />
-
-      <UButton
         icon="i-heroicons-arrow-path"
         color="gray"
         size="xs"
@@ -188,11 +213,12 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {}
       <UButton
         size="xs"
         variant="soft"
-        @click="isOpen = true"
+        @click="isOpenCreate = true"
         label="Neue Anmeldung..."
       />
 
-      <UModal v-model="isOpen" :ui="{ width: 'w-full sm:max-w-md' }">
+      <!-- Create Modal -->
+      <UModal v-model="isOpenCreate" :ui="{ width: 'w-full sm:max-w-md' }">
         <UCard
           :ui="{
             divide: 'divide-y divide-gray-100 dark:divide-gray-800',
@@ -215,7 +241,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {}
             :schema="schema"
             :state="state"
             class="space-y-4"
-            @submit="onSubmit"
+            @submit="onSubmitCreate"
           >
             <UFormGroup
               label="Teams"
@@ -261,14 +287,19 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {}
 
           <template #footer>
             <div class="flex items-center gap-2">
-              <UButton variant="soft" size="xs">Erstellen</UButton>
               <UButton
                 variant="soft"
-                color="red"
                 size="xs"
-                @click="isOpen = false"
-                >Abbrechen</UButton
-              >
+                @click="onSubmitCreate"
+                label="Erstellen"
+              />
+              <UButton
+                variant="soft"
+                color="gray"
+                size="xs"
+                @click="isOpenCreate = false"
+                label="Abbrechen"
+              />
             </div>
           </template>
         </UCard>
@@ -276,19 +307,17 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {}
     </div>
   </BasePageHeader>
   <BasePageContent>
+    <!-- Table -->
     <UTable
       v-model="selectedRows"
       v-model:sort="sort"
-      :rows="tableData"
+      :rows="filteredRows"
       :columns="columnsTable"
       :loading="status === 'pending'"
       :loading-state="{
         icon: 'i-heroicons-arrow-path-20-solid',
         label: 'Lade...',
       }"
-      sort-asc-icon="i-heroicons-arrow-up"
-      sort-desc-icon="i-heroicons-arrow-down"
-      sort-mode="manual"
       class="h-full w-full bg-white dark:bg-gray-900"
       :ui="{
         wrapper: 'relative overflow-auto',
