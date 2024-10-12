@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Tables } from "~/types/database.types"
+import type { Enums, Tables } from "~/types/database.types"
 import { z } from "zod"
 import type { FormSubmitEvent } from "#ui/types"
 
@@ -8,7 +8,41 @@ useHead({
   title: () => title.value,
 })
 
-const { actions, columns, items } = useRegistrationTable()
+const { columns, items } = useRegistrationTable()
+const actions = [
+  [
+    {
+      key: "in_progress",
+      label: "Ausstehend",
+      icon: "i-heroicons-arrow-path",
+      click: () => onUpdate("Ausstehend"),
+    },
+  ],
+  [
+    {
+      key: "submitted",
+      label: "Abgesendet",
+      icon: "i-heroicons-envelope",
+      click: () => onUpdate("Abgesendet"),
+    },
+  ],
+  [
+    {
+      key: "completed",
+      label: "Abgeschlossen",
+      icon: "i-heroicons-check",
+      click: () => onUpdate("Abgeschlossen"),
+    },
+  ],
+  [
+    {
+      key: "discarded",
+      label: "Abgelehnt",
+      icon: "i-heroicons-no-symbol",
+      click: () => onUpdate("Abgelehnt"),
+    },
+  ],
+]
 
 const selectedColumns = ref(columns)
 const columnsTable = computed(() =>
@@ -89,14 +123,24 @@ const onSubmitCreate = async (event: FormSubmitEvent<Schema>) => {
   await refresh()
 }
 
+const registrationIds = computed(() => selectedRows.value.map((row) => row.id))
 const onDelete = async () => {
   // TODO: error handling
-  const ids = selectedRows.value.map((row) => row.id)
   await $fetch("/api/registrations/delete", {
     method: "DELETE",
-    body: ids,
+    body: registrationIds.value,
   })
   isOpenDelete.value = false
+  selectedRows.value = []
+  await refresh()
+}
+
+const onUpdate = async (status: Enums<"registration_status">) => {
+  // TODO: error handling
+  await $fetch("/api/registrations/update", {
+    method: "PUT",
+    body: { registrations: registrationIds.value, status: status },
+  })
   selectedRows.value = []
   await refresh()
 }
@@ -141,9 +185,8 @@ const onDelete = async () => {
                 label="Löschen"
               />
               <UButton
-                variant="soft"
-                size="xs"
                 color="gray"
+                size="xs"
                 @click="isOpenDelete = false"
                 label="Abbrechen"
               />
@@ -294,7 +337,6 @@ const onDelete = async () => {
                 label="Erstellen"
               />
               <UButton
-                variant="soft"
                 color="gray"
                 size="xs"
                 @click="isOpenCreate = false"

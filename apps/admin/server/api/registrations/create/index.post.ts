@@ -2,37 +2,46 @@ import { serverSupabaseClient } from "#supabase/server"
 import type { Database, Tables } from "~/types/database.types"
 
 export default defineEventHandler(async (event) => {
-  const data = await readBody<{
+  const { expire_date, teams, year } = await readBody<{
     expire_date: string
     teams: number
     year: string
   }>(event)
+
   const supabase = await serverSupabaseClient<Database>(event)
 
   type RegistrationDTO = Omit<Tables<"registration">, "id">
-  const registrations: RegistrationDTO[] = []
 
-  const { data: classes } = await supabase
+  const { data: classes, error: fetchError } = await supabase
     .from("class")
     .select("id, name, year")
-    .eq("year", data.year)
+    .eq("year", year)
 
-  for (let i = 0; i < data.teams; i++) {
-    classes?.forEach((item) => {
-      registrations.push({
-        class_id: item.id,
-        expire_date: data.expire_date,
-        status: "Ausstehend",
-        name: `Team ${i + 1}`,
-      })
+  if (fetchError || !classes) {
+    throw createError({
+      message: fetchError?.message || "Failed to fetch classes.",
+      statusCode: 500,
     })
   }
 
-  const { error } = await supabase.from("registration").insert(registrations)
+  const registrations: RegistrationDTO[] = Array.from({
+    length: teams,
+  }).flatMap((_, i) =>
+    classes.map((item) => ({
+      class_id: item.id,
+      expire_date,
+      status: "Ausstehend",
+      name: `Team ${i + 1}`,
+    })),
+  )
 
-  if (error) {
+  const { error: insertError } = await supabase
+    .from("registration")
+    .insert(registrations)
+
+  if (insertError) {
     throw createError({
-      message: error.message,
+      message: insertError.message,
       statusCode: 500,
     })
   }

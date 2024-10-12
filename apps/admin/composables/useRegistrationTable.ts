@@ -1,37 +1,6 @@
 import type { Tables } from "~/types/database.types"
 
 export const useRegistrationTable = () => {
-  const actions = [
-    [
-      {
-        key: "in_progress",
-        label: "Ausstehend",
-        icon: "i-heroicons-arrow-path",
-      },
-    ],
-    [
-      {
-        key: "submitted",
-        label: "Abgesendet",
-        icon: "i-heroicons-envelope",
-      },
-    ],
-    [
-      {
-        key: "completed",
-        label: "Abgeschlossen",
-        icon: "i-heroicons-check",
-      },
-    ],
-    [
-      {
-        key: "discarded",
-        label: "Abgelehnt",
-        icon: "i-heroicons-no-symbol",
-      },
-    ],
-  ]
-
   const columns = [
     {
       key: "name",
@@ -78,7 +47,6 @@ export const useRegistrationTable = () => {
     ])
 
   return {
-    actions,
     columns,
     items,
   }
