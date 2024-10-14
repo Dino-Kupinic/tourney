@@ -3,7 +3,9 @@
 <template>
   <div class="flex h-dvh w-full flex-col">
     <TheNavigation />
-    <div class="grow">
+    <div
+      class="m-auto w-[1024px] grow border-x border-gray-200 p-4 pb-0 dark:border-gray-800"
+    >
       <slot />
     </div>
   </div>

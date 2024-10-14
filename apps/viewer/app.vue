@@ -2,12 +2,24 @@
 useHead({
   titleTemplate: "%s - tourney",
 })
+
+const route = useRoute()
+const device = useDevice()
+
+// dynamically change layout
+const layout = computed(() => {
+  if (route.path === "/") {
+    return "home"
+  }
+
+  return device.isMobile ? "default" : "desktop"
+})
 </script>
 
 <template>
   <div>
     <NuxtRouteAnnouncer />
-    <NuxtLayout :name="$device.isMobile ? 'default' : 'desktop'">
+    <NuxtLayout :name="layout">
       <NuxtPage />
     </NuxtLayout>
   </div>

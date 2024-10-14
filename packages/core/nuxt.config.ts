@@ -8,7 +8,7 @@ const currentDir = dirname(fileURLToPath(import.meta.url))
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
-  modules: ["@nuxt/ui", "@nuxt/fonts", "@nuxt/test-utils"],
+  modules: ["@nuxt/ui", "@nuxt/fonts", "@nuxt/test-utils", "@nuxt/image"],
   css: [join(currentDir, "./assets/base.css")],
   runtimeConfig: {
     public: {
@@ -17,10 +17,13 @@ export default defineNuxtConfig({
   },
   fonts: {
     defaults: {
-      weights: [400, 500],
+      weights: [400, 500, 600],
       styles: ["normal", "italic"],
     },
-    families: [{ name: "Inter", provider: "google" }],
+    families: [
+      { name: "Inter", provider: "google" },
+      { name: "JetBrains Mono", provider: "google" },
+    ],
   },
   colorMode: {
     preference: "light",

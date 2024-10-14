@@ -47,7 +47,7 @@ const onLogout = async () => {
         <strong>Dino Kupinic</strong>
         <p>dinokupinic2006@gmail.com</p>
         <br />
-        <strong>Peter Rathgeb</strong>
+        <strong>Prof. Mag. Peter Rathgeb</strong>
         <p>Peter.Rathgeb@htl-steyr.ac.at</p>
       </BaseSettingsItem>
     </UCard>

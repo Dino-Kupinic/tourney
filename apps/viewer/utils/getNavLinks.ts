@@ -16,7 +16,7 @@ export default function (mobileOrder: boolean = false) {
       {
         label: "Medien",
         icon: "i-heroicons-newspaper",
-        to: "/news",
+        to: "/media",
       },
     ] as HorizontalNavigationLink[]
   }
@@ -35,7 +35,7 @@ export default function (mobileOrder: boolean = false) {
     {
       label: "Medien",
       icon: "i-heroicons-newspaper",
-      to: "/news",
+      to: "/media",
     },
   ] as HorizontalNavigationLink[]
 }

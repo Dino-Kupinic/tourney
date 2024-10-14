@@ -28,7 +28,7 @@
 
     "start:supabase": "cd ./apps/api/supabase && npx supabase start --ignore-health-check",
     "stop:supabase": "cd ./apps/api/supabase && npx supabase stop",
-    "types:supabase": "cd ./apps/api/supabase && supabase gen types --lang=typescript --local > ../admin/types/database.types.ts",
+    "types:supabase": "cd ./apps/api/supabase && npx supabase gen types --lang=typescript --local > ../../admin/types/database.types.ts && npx supabase gen types --lang=typescript --local > ../../viewer/types/database.types.ts",
     "schema:supabase": "supabase db diff -f --local",
 
     "format": "npx prettier . --check",

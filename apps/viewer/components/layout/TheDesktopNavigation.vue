@@ -3,8 +3,10 @@ const links = getNavLinks()
 </script>
 
 <template>
-  <UHorizontalNavigation
-    :links="links"
-    class="border-b border-gray-200 px-2 dark:border-gray-800"
-  />
+  <div
+    class="m-auto flex w-[1024px] items-center border border-gray-200 bg-gray-50 px-2 dark:border-gray-800 dark:bg-gray-900"
+  >
+    <UHorizontalNavigation :links="links" />
+    <SettingsButton size="sm" />
+  </div>
 </template>
