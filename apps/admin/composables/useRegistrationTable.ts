@@ -28,26 +28,7 @@ export const useRegistrationTable = () => {
     },
   ]
 
-  const items = (row: Tables<"registration">) =>
-    ref([
-      [
-        {
-          label: "Editieren",
-          icon: "i-heroicons-pencil-square-20-solid",
-        },
-        {
-          label: "Löschen...",
-          icon: "i-heroicons-trash",
-        },
-        {
-          label: "Info",
-          icon: "i-heroicons-information-circle",
-        },
-      ],
-    ])
-
   return {
     columns,
-    items,
   }
 }

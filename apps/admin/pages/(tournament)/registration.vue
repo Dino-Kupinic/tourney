@@ -8,7 +8,7 @@ useHead({
   title: () => title.value,
 })
 
-const { columns, items } = useRegistrationTable()
+const { columns } = useRegistrationTable()
 const actions = [
   [
     {
@@ -43,6 +43,25 @@ const actions = [
     },
   ],
 ]
+
+const items = (row: Tables<"registration">) =>
+  ref([
+    [
+      {
+        label: "Editieren",
+        icon: "i-heroicons-pencil-square-20-solid",
+      },
+      {
+        label: "Info",
+        icon: "i-heroicons-information-circle",
+      },
+      {
+        label: "Löschen",
+        icon: "i-heroicons-trash",
+        click: () => onDelete(),
+      },
+    ],
+  ])
 
 const selectedColumns = ref(columns)
 const columnsTable = computed(() =>
