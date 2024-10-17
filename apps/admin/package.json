@@ -10,7 +10,6 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.4",
     "nuxt": "^3.13.1",
     "vue": "latest",
     "vue-router": "latest",
@@ -20,8 +19,9 @@
     "@dicebear/collection": "^9.2.1",
     "@dicebear/core": "^9.2.1",
     "@iconify-json/heroicons": "^1.2.0",
-    "@nuxtjs/supabase": "^1.4.0",
     "@vueuse/core": "^11.0.3",
-    "@vueuse/nuxt": "^11.0.3"
+    "@vueuse/nuxt": "^11.0.3",
+    "@supabase/supabase-js": "^2.45.4",
+    "@nuxtjs/supabase": "^1.4.0"
   }
 }

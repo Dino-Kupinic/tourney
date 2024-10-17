@@ -295,7 +295,6 @@ export type Database = {
       tournament: {
         Row: {
           created_at: string
-          description: string | null
           from: string
           id: string
           is_live: boolean
@@ -311,7 +310,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          description?: string | null
           from: string
           id?: string
           is_live?: boolean
@@ -327,7 +325,6 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          description?: string | null
           from?: string
           id?: string
           is_live?: boolean

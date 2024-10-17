@@ -31,6 +31,7 @@ export default defineEventHandler(async (event) => {
       class_id: item.id,
       expire_date,
       status: "Ausstehend",
+      hidden: false,
       name: `Team ${i + 1}`,
     })),
   )
