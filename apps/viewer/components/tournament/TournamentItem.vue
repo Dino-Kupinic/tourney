@@ -15,6 +15,9 @@ defineProps<{
       body: {
         padding: 'p-4 sm:p-3',
       },
+      footer: {
+        padding: 'py-3',
+      },
     }"
   >
     <template #header>
