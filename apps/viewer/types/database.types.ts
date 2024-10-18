@@ -299,6 +299,7 @@ export type Database = {
           id: string
           is_live: boolean
           last_edited_by_id: string
+          location: string
           name: string
           prizes: Json | null
           rules: string | null
@@ -314,6 +315,7 @@ export type Database = {
           id?: string
           is_live?: boolean
           last_edited_by_id: string
+          location?: string
           name: string
           prizes?: Json | null
           rules?: string | null
@@ -329,6 +331,7 @@ export type Database = {
           id?: string
           is_live?: boolean
           last_edited_by_id?: string
+          location?: string
           name?: string
           prizes?: Json | null
           rules?: string | null
