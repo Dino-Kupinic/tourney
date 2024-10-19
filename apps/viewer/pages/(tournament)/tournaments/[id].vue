@@ -2,7 +2,11 @@
 const route = useRoute()
 const uuid = route.params
 
-const { data: tournament } = useFetch(`/api/tournament/${uuid}`)
+const { data: tournament } = await useFetch(`/api/tournament/${uuid}`)
+
+// definePageMeta({
+//   name: tournament.value.name,
+// })
 </script>
 
 <template>

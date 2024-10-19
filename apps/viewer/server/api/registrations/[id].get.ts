@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   const { data } = await supabase
     .from("registration")
-    .select("*")
+    .select("*, class(*)")
     .eq("id", id)
     .single()
 

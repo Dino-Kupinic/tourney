@@ -6,6 +6,7 @@ useHead({
 
 <template>
   <div>
+    <NuxtLoadingIndicator />
     <NuxtRouteAnnouncer />
     <NuxtLayout>
       <NuxtPage />

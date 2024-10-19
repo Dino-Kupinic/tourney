@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import type { ParsedJsonTournament } from "~/types/prizes"
 
-defineProps<{
+const { tournament } = defineProps<{
   tournament: ParsedJsonTournament
 }>()
+
+const link = computed(() => {
+  return `/tournaments/${tournament.id}`
+})
 </script>
 
 <template>
@@ -22,7 +26,7 @@ defineProps<{
   >
     <template #header>
       <div
-        class="relative flex h-[200px] flex-col justify-end overflow-hidden rounded-t-lg p-3"
+        class="relative flex h-[200px] flex-col justify-end overflow-hidden rounded-t-lg p-4 py-2"
       >
         <NuxtImg
           :src="getImageUrl(tournament.thumbnail_path)"
@@ -99,7 +103,7 @@ defineProps<{
     <!--      </div>-->
     <!--    </div>-->
     <template #footer>
-      <UButton block label="Anschauen" size="lg" variant="soft" />
+      <UButton block label="Anschauen" :to="link" size="lg" variant="soft" />
     </template>
   </UCard>
 </template>

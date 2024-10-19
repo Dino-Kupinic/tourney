@@ -78,7 +78,7 @@ function select(row: Tables<"registration">) {
   }
 }
 
-const { data, status, refresh } = useFetch("/api/registrations", {
+const { data, status, refresh } = await useFetch("/api/registrations", {
   transform: (item) => {
     if (!item) return []
     return item.map((item) => ({
@@ -116,7 +116,7 @@ const years = Array.from(
 const classYear = ref<string>(years[0])
 const encodedYear = computed(() => encodeURIComponent(classYear.value))
 
-const { data: classes } = useFetch(`/api/classes/${encodedYear.value}`, {
+const { data: classes } = await useFetch(`/api/classes/${encodedYear.value}`, {
   watch: [classYear],
 })
 
@@ -308,7 +308,7 @@ const onUpdate = async (status: Enums<"registration_status">) => {
             <UFormGroup
               label="Teams"
               name="teams"
-              description="Anzahl an Anmeldungen für jede Klasse"
+              description="Anzahl an Anmeldungen für jede Klasse."
               required
             >
               <UInput v-model="state.teams" type="number" />

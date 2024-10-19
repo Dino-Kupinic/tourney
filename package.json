@@ -8,29 +8,24 @@
   ],
   "scripts": {
     "create:users": "pnpm --filter=tourney-user-creator run create",
-
     "app:start": "pm2 start ecosystem.config.cjs",
     "app:kill": "pm2 kill",
     "app:monitor": "pm2 monit",
     "start:docs": "vitepress preview docs",
-
     "build:docs": "vitepress build docs",
     "build:admin": "pnpm --filter=tourney-admin run build",
     "build:viewer": "pnpm --filter=tourney-viewer run build",
     "build": "pnpm run build:admin && pnpm run build:viewer",
-
     "dev:admin": "pnpm --filter=tourney-admin run dev",
     "dev:viewer": "pnpm --filter=tourney-viewer run dev",
     "dev:core": "pnpm --filter=tourney-core run dev",
     "dev:docs": "vitepress dev docs",
     "dev:admin:host": "pnpm --filter=tourney-admin run dev --host",
     "dev:viewer:host": "pnpm --filter=tourney-viewer run dev --host",
-
     "start:supabase": "cd ./apps/api/supabase && npx supabase start --ignore-health-check",
     "stop:supabase": "cd ./apps/api/supabase && npx supabase stop",
     "types:supabase": "cd ./apps/api/supabase && npx supabase gen types --lang=typescript --local > ../../admin/types/database.types.ts && npx supabase gen types --lang=typescript --local > ../../viewer/types/database.types.ts",
     "schema:supabase": "cd ./apps/api/supabase && supabase db diff -f --local",
-
     "format": "npx prettier . --check",
     "format:write": "npx prettier . --write"
   },
