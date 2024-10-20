@@ -325,6 +325,7 @@ const onUpdate = async (status: Enums<"registration_status">) => {
               >
                 <li
                   v-for="schoolClass in classes"
+                  :key="schoolClass.name"
                   class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
                 >
                   <p>{{ schoolClass.name }}</p>
