@@ -5,8 +5,8 @@ const { tournament } = defineProps<{
   tournament: ParsedJsonTournament
 }>()
 
-const link = computed(() => {
-  return `/tournaments/${tournament.id}`
+const bonus = computed(() => {
+  return tournament.prizes?.bonus ?? "Keine weiteren Preise"
 })
 </script>
 
@@ -76,34 +76,38 @@ const link = computed(() => {
         </div>
       </div>
     </div>
-    <!-- TODO: move to specific tournament view only -->
-
-    <!--    <PageHeading>Regeln</PageHeading>-->
-    <!--    <div-->
-    <!--      class="h-28 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"-->
-    <!--    >-->
-    <!--      <pre class="text text-wrap text-sm">{{ tournament.rules }}</pre>-->
-    <!--    </div>-->
-    <!--    <PageHeading>Preise</PageHeading>-->
-    <!--    <div class="flex flex-col gap-1">-->
-    <!--      <TournamentPrizeRow :place="1">-->
-    <!--        {{ tournament.prizes?.first ?? "Nichts" }}-->
-    <!--      </TournamentPrizeRow>-->
-    <!--      <TournamentPrizeRow :place="2">-->
-    <!--        {{ tournament.prizes?.second ?? "Nichts" }}-->
-    <!--      </TournamentPrizeRow>-->
-    <!--      <TournamentPrizeRow :place="3">-->
-    <!--        {{ tournament.prizes?.third ?? "Nichts" }}-->
-    <!--      </TournamentPrizeRow>-->
-    <!--      <div-->
-    <!--        v-if="tournament.prizes?.bonus"-->
-    <!--        class="h-28 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"-->
-    <!--      >-->
-    <!--        <pre class="text text-wrap text-sm">{{ tournament.prizes?.bonus }}</pre>-->
-    <!--      </div>-->
-    <!--    </div>-->
+    <PageHeading>Regeln</PageHeading>
+    <div
+      class="h-28 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
+    >
+      <pre class="text text-wrap text-sm">{{ tournament.rules }}</pre>
+    </div>
+    <PageHeading>Preise</PageHeading>
+    <div class="flex flex-col gap-1">
+      <TournamentPrizeRow :place="1">
+        {{ tournament.prizes?.first ?? "Nichts" }}
+      </TournamentPrizeRow>
+      <TournamentPrizeRow :place="2">
+        {{ tournament.prizes?.second ?? "Nichts" }}
+      </TournamentPrizeRow>
+      <TournamentPrizeRow :place="3">
+        {{ tournament.prizes?.third ?? "Nichts" }}
+      </TournamentPrizeRow>
+      <div
+        class="h-20 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
+      >
+        <!-- Keep this as one line or else there will be an unnecessary line -->
+        <pre class="text text-wrap text-sm">{{ bonus }}</pre>
+      </div>
+    </div>
     <template #footer>
-      <UButton block label="Anschauen" :to="link" size="lg" variant="soft" />
+      <UButton
+        block
+        label="Anschauen"
+        :to="`/tournaments/${tournament.id}`"
+        size="lg"
+        variant="soft"
+      />
     </template>
   </UCard>
 </template>

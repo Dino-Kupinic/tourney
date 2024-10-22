@@ -3,6 +3,7 @@ import type { FormSubmitEvent } from "#ui/types"
 import type { ParsedJsonTournament } from "~/types/prizes"
 import { z } from "zod"
 import RegistrationItem from "~/components/registration/RegistrationItem.vue"
+import PageHeader from "~/components/layout/PageHeader.vue"
 
 definePageMeta({
   name: "Anmeldung",
@@ -37,8 +38,10 @@ const isOpen = ref<boolean>(false)
 
 <template>
   <div>
-    <PageTitle class="mb-0">Anmeldeformular</PageTitle>
-    <PageDescription>Trage dich hier ein für ein Turnier</PageDescription>
+    <PageHeader
+      title="Anmeldeformular"
+      description="Trage dich hier ein für ein Turnier"
+    />
     <UCard
       :ui="{
         body: {
