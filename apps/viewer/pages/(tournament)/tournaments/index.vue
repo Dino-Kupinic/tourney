@@ -1,6 +1,6 @@
 <script setup lang="ts">
-definePageMeta({
-  name: "Turniere",
+useHead({
+  title: "Turniere",
 })
 
 const { data: tournaments } = await useFetch("/api/tournaments")

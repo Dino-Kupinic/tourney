@@ -1,6 +1,7 @@
 <script setup lang="ts">
-definePageMeta({
-  name: "Dashboard",
+const title = ref<string>("Dashboard")
+useHead({
+  title: () => title.value,
 })
 </script>
 

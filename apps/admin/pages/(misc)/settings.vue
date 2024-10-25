@@ -13,7 +13,7 @@ const onLogout = async () => {
 </script>
 
 <template>
-  <BasePageHeader :title="title"></BasePageHeader>
+  <BasePageHeader :title="title" />
   <main
     class="m-auto mt-4 flex h-full max-w-[600px] flex-col space-y-3 overflow-y-auto p-2"
   >

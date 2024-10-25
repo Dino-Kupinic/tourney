@@ -1,4 +1,9 @@
 export default defineAppConfig({
+  app: {
+    head: {
+      viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+    },
+  },
   ui: {
     primary: "sky",
     gray: "neutral",

@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from "#ui/types"
 import type { ParsedJsonTournament } from "~/types/prizes"
-import { z } from "zod"
-import RegistrationItem from "~/components/registration/RegistrationItem.vue"
-import PageHeader from "~/components/layout/PageHeader.vue"
 
-definePageMeta({
-  name: "Anmeldung",
+useHead({
+  title: "Anmeldung",
 })
 
 const route = useRoute()
@@ -15,23 +11,6 @@ const uuid = route.params.id
 const { data: registration } = await useFetch(`/api/registrations/${uuid}`)
 const { data: tournaments } = await useFetch("/api/tournaments/active")
 const tournament = ref<ParsedJsonTournament>()
-
-const schema = z.object({
-  email: z.string().email("Invalid email"),
-  password: z.string().min(8, "Must be at least 8 characters"),
-})
-
-type Schema = z.output<typeof schema>
-
-const state = reactive({
-  email: undefined,
-  password: undefined,
-})
-
-async function onSubmit(event: FormSubmitEvent<Schema>) {
-  // Do something with data
-  console.log(event.data)
-}
 
 const isOpen = ref<boolean>(false)
 </script>
@@ -44,14 +23,15 @@ const isOpen = ref<boolean>(false)
     />
     <UCard
       :ui="{
+        base: 'max-w-xl',
         body: {
-          padding: 'p-4',
+          padding: 'p-4 sm:p-6',
         },
         header: {
-          padding: 'p-4',
+          padding: 'p-4 sm:p-6',
         },
         footer: {
-          padding: 'p-4',
+          padding: 'p-4 sm:p-6',
         },
       }"
     >
@@ -99,26 +79,42 @@ const isOpen = ref<boolean>(false)
         </div>
       </template>
       <PageHeading>Spieler</PageHeading>
-      <!--      <UForm-->
-      <!--        :schema="schema"-->
-      <!--        :state="state"-->
-      <!--        class="space-y-4"-->
-      <!--        @submit="onSubmit"-->
-      <!--      >-->
-      <!--        <UFormGroup label="Email" name="email">-->
-      <!--          <UInput v-model="state.email" />-->
-      <!--        </UFormGroup>-->
-
-      <!--        <UFormGroup label="Password" name="password">-->
-      <!--          <UInput v-model="state.password" type="password" />-->
-      <!--        </UFormGroup>-->
-
-      <!--        <UButton type="submit"> Submit </UButton>-->
-      <!--      </UForm>-->
+      <FootballForm />
       <PageHeading>Logo</PageHeading>
-      <RegistrationItem class="w-full gap-3 overflow-auto">
-        <div v-for="x in 10" class="h-16 w-16 border bg-red-500"></div>
+      <RegistrationItem class="w-full gap-3 overflow-x-auto">
+        <div
+          v-for="x in 30"
+          :key="x"
+          class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+        >
+          <div>
+            <NuxtImg
+              width="48"
+              height="48"
+              :src="getImageUrl('/logos/star/star.svg')"
+            />
+            <p>Stern</p>
+          </div>
+        </div>
       </RegistrationItem>
+      <PageHeading>Varianten</PageHeading>
+      <RegistrationItem class="w-full gap-3 overflow-x-auto">
+        <div
+          v-for="x in 5"
+          :key="x"
+          class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+        >
+          <div>
+            <NuxtImg
+              width="48"
+              height="48"
+              :src="getImageUrl('/logos/star/star.svg')"
+            />
+            <p>Farbe {{ x }}</p>
+          </div>
+        </div>
+      </RegistrationItem>
+      <UButton label="Anmelden" block size="lg" variant="soft" />
     </UCard>
   </div>
 </template>

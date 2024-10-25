@@ -6,6 +6,10 @@ definePageMeta({
   layout: false,
 })
 
+useHead({
+  title: "Login",
+})
+
 const schema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string(),

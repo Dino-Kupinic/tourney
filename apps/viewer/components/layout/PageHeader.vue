@@ -6,7 +6,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="my-2">
+  <div class="mb-2">
     <PageTitle>{{ title }}</PageTitle>
     <PageDescription>{{ description }}</PageDescription>
   </div>
