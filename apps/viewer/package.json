@@ -10,17 +10,18 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "nuxt": "^3.13.1",
+    "nuxt": "^3.13.2",
+    "puppeteer": "^23.7.1",
     "vue": "latest",
     "vue-router": "latest",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@nuxtjs/device": "^3.2.4",
+    "@nuxtjs/supabase": "^1.4.0",
+    "@supabase/supabase-js": "^2.45.4",
     "@types/k6": "^0.53.1",
     "@vueuse/core": "^11.0.3",
-    "@vueuse/nuxt": "^11.0.3",
-    "@supabase/supabase-js": "^2.45.4",
-    "@nuxtjs/supabase": "^1.4.0"
+    "@vueuse/nuxt": "^11.0.3"
   }
 }

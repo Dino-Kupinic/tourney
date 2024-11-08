@@ -28,12 +28,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     @submit="onSubmit"
   >
     <BasePlayerItem
-      name="Tormann"
-      v-model:first-name="state.email"
-      v-model:last-name="state.email"
-      v-model:school-class="state.email"
-    />
-    <BasePlayerItem
       name="Feldspieler 1"
       v-model:first-name="state.email"
       v-model:last-name="state.email"
@@ -64,13 +58,19 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       v-model:school-class="state.email"
     />
     <BasePlayerItem
-      name="Ersatzspieler 1"
+      name="Feldspieler 6"
       v-model:first-name="state.email"
       v-model:last-name="state.email"
       v-model:school-class="state.email"
     />
     <BasePlayerItem
-      name="Ersatzspieler 2"
+      name="Feldspieler 7"
+      v-model:first-name="state.email"
+      v-model:last-name="state.email"
+      v-model:school-class="state.email"
+    />
+    <BasePlayerItem
+      name="Feldspieler 8"
       v-model:first-name="state.email"
       v-model:last-name="state.email"
       v-model:school-class="state.email"

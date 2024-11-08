@@ -13,6 +13,28 @@ const { data: tournaments } = await useFetch("/api/tournaments/active")
 const tournament = ref<ParsedJsonTournament>()
 
 const isOpen = ref<boolean>(false)
+
+const generatePDF = async () => {
+  try {
+    const response = await fetch("http://localhost:3000/api/pdf/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ url: "http://localhost:3000" }),
+    })
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "generated.pdf"
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  } catch (error) {
+    console.error("Error generating PDF:", error)
+  }
+}
 </script>
 
 <template>
@@ -23,7 +45,7 @@ const isOpen = ref<boolean>(false)
     />
     <UCard
       :ui="{
-        base: 'max-w-xl',
+        base: 'max-w-xl mb-3',
         body: {
           padding: 'p-4 sm:p-6',
         },
@@ -82,39 +104,39 @@ const isOpen = ref<boolean>(false)
       <FootballForm />
       <PageHeading>Logo</PageHeading>
       <RegistrationItem class="w-full gap-3 overflow-x-auto">
-        <div
-          v-for="x in 30"
-          :key="x"
-          class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
-        >
-          <div>
+        <div v-for="x in 20" :key="x">
+          <div
+            class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+          >
             <NuxtImg
               width="48"
               height="48"
               :src="getImageUrl('/logos/star/star.svg')"
             />
-            <p>Stern</p>
           </div>
+          <p class="mt-1 text-wrap text-center text-xs text-gray-500">Stern</p>
         </div>
       </RegistrationItem>
       <PageHeading>Varianten</PageHeading>
       <RegistrationItem class="w-full gap-3 overflow-x-auto">
-        <div
-          v-for="x in 5"
-          :key="x"
-          class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
-        >
-          <div>
+        <div v-for="x in 3" :key="x">
+          <div
+            class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+          >
             <NuxtImg
               width="48"
               height="48"
               :src="getImageUrl('/logos/star/star.svg')"
             />
-            <p>Farbe {{ x }}</p>
           </div>
+          <p class="mt-1 text-wrap text-center text-xs text-gray-500">
+            Farbe {{ x }}
+          </p>
         </div>
       </RegistrationItem>
-      <UButton label="Anmelden" block size="lg" variant="soft" />
+      <UButton label="Anmelden" class="mt-6" block size="lg" variant="soft" />
+      <PageHeading>PDF-Dokument</PageHeading>
+      <UButton label="Runterladen" @click="generatePDF" />
     </UCard>
   </div>
 </template>
