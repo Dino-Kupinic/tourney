@@ -7,6 +7,14 @@ export default defineNuxtConfig({
   supabase: {
     redirect: false,
   },
+  nitro: {
+    serverAssets: [
+      {
+        baseName: "templates",
+        dir: "./templates",
+      },
+    ],
+  },
   components: [
     {
       path: "~/components",

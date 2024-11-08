@@ -21,8 +21,13 @@ const generatePDF = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ url: "http://localhost:3000" }),
+      body: JSON.stringify({
+        name: "John Doe",
+        orderNumber: "12345",
+        total: "99.99",
+      }),
     })
+
     const blob = await response.blob()
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement("a")
@@ -136,7 +141,10 @@ const generatePDF = async () => {
       </RegistrationItem>
       <UButton label="Anmelden" class="mt-6" block size="lg" variant="soft" />
       <PageHeading>PDF-Dokument</PageHeading>
-      <UButton label="Runterladen" @click="generatePDF" />
+      <RegistrationItem>
+        <p></p>
+        <UButton label="Runterladen" @click="generatePDF" />
+      </RegistrationItem>
     </UCard>
   </div>
 </template>

@@ -1,15 +1,20 @@
 import puppeteer from "puppeteer"
+import Handlebars from "handlebars"
 import { H3Event } from "h3"
 
 export default defineEventHandler(async (event: H3Event) => {
-  const { url } = await readBody(event)
+  const { name, orderNumber, total } = await readBody(event)
 
-  if (!url) {
+  if (!name || !orderNumber || !total) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Missing URL parameter in body. What page to download?",
+      statusMessage: "Missing data fields",
     })
   }
+
+  const t = await useStorage("assets:templates").getItem(`pdf-template.html`)
+  const template = Handlebars.compile(t)
+  const html = template({ name, orderNumber, total })
 
   const browser = await puppeteer.launch({
     headless: true,
@@ -18,7 +23,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
   try {
     const page = await browser.newPage()
-    await page.goto(url, {
+    await page.setContent(html, {
       waitUntil: "networkidle2",
     })
 
