@@ -3,7 +3,7 @@ import Handlebars from "handlebars"
 import { H3Event } from "h3"
 
 export default defineEventHandler(async (event: H3Event) => {
-  const { name, orderNumber, total } = await readBody(event)
+  const { name, orderNumber, total, pdfName } = await readBody(event)
 
   if (!name || !orderNumber || !total) {
     throw createError({
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event: H3Event) => {
     event.node.res.setHeader("Content-Type", "application/pdf")
     event.node.res.setHeader(
       "Content-Disposition",
-      'inline; filename="generated.pdf"',
+      `inline; filename="${pdfName}"`,
     )
     return pdfBuffer
   } catch (error) {
