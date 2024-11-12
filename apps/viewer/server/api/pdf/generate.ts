@@ -3,7 +3,8 @@ import Handlebars from "handlebars"
 import { H3Event } from "h3"
 
 export default defineEventHandler(async (event: H3Event) => {
-  const { name, orderNumber, total, pdfName } = await readBody(event)
+  const { pdfName, sport, year, date, schoolClass, players, id } =
+    await readBody(event)
 
   if (!name || !orderNumber || !total) {
     throw createError({

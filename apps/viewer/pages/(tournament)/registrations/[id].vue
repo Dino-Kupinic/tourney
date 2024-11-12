@@ -140,65 +140,73 @@ const generatePDF = async () => {
           </p>
         </div>
       </RegistrationItem>
-      <UButton label="Anmelden" class="my-6" block size="lg" variant="soft" />
-      <PageHeading>Nächsten Schritte</PageHeading>
-      <div class="flex flex-col gap-3">
-        <UAlert
-          icon="i-heroicons-exclamation-triangle"
-          color="yellow"
-          variant="soft"
-          title="Warnung"
-          description="Die Daten können nicht mehr geändert werden. Falls du einen Fehler
-          gemacht hast, wende dich an einen Verantwortlichen für eine Freigabe."
-        />
-        <RegistrationItem class="flex-col gap-3">
-          <div>
-            <strong>1. Runterladen</strong>
-            <p>Lade dir die PDF Datei auf deinem Gerät runter.</p>
-          </div>
-          <div>
-            <strong>2. Bearbeiten</strong>
+      <UButton label="Anmelden" class="mt-6" block size="lg" variant="soft" />
+      <template #footer>
+        <PageHeading>Nächsten Schritte</PageHeading>
+        <div class="flex flex-col gap-3">
+          <UAlert
+            icon="i-heroicons-exclamation-triangle"
+            color="yellow"
+            variant="soft"
+            title="Warnung"
+            description="Die Daten können nicht mehr geändert werden. Falls ihr einen Fehler
+          gemacht habt, wendet euch an einen Verantwortlichen für eine Freigabe."
+          />
+          <RegistrationItem class="flex-col gap-3">
+            <div>
+              <strong>1. Runterladen</strong>
+              <p>Lade dir die PDF Datei auf deinem Gerät runter.</p>
+            </div>
+            <div>
+              <strong>2. Bearbeiten</strong>
+              <p>
+                Öffne die Datei und fülle die Freistellungs-Tabelle aus. Lasse
+                jede Einheit von den jeweiligen Lehrer/-innen unterschreiben.
+              </p>
+            </div>
+            <div>
+              <strong>3. Abgeben</strong>
+              <p>Drucke die Datei aus und gebe sie ab.</p>
+            </div>
+            <UAlert
+              icon="i-heroicons-information-circle"
+              color="blue"
+              variant="soft"
+              title="Information"
+              description="Die Anmeldung ist erst gültig, wenn das Formular abgegeben wurde."
+            />
+          </RegistrationItem>
+          <RegistrationItem class="flex-col">
+            <strong>PDF-Dokument</strong>
             <p>
-              Öffne die Datei und fülle die Freistellungs-Tabelle aus. Lasse
-              jede Einheit von den jeweiligen Lehrer/-innen unterschreiben.
+              Name:
+              <strong>{{ pdfName }}</strong>
             </p>
-          </div>
-          <div>
-            <strong>3. Abgeben</strong>
-            <p>Drucke die Datei aus und gebe sie ab.</p>
-          </div>
-        </RegistrationItem>
-        <UAlert
-          icon="i-heroicons-information-circle"
-          color="blue"
-          variant="soft"
-          title="Information"
-          description="Die Anmeldung ist erst gültig, wenn das Formular abgegeben wurde."
-        />
-        <RegistrationItem class="flex-col">
-          <strong>PDF-Dokument</strong>
-          <p>
-            Name:
-            <strong>{{ pdfName }}</strong>
-          </p>
-          <p>Das Dokument kann so oft wie nötig runtergeladen werden.</p>
-        </RegistrationItem>
-        <UButton
-          block
-          label="Runterladen"
-          size="lg"
-          variant="soft"
-          @click="generatePDF"
-        />
-        <UAlert
-          icon="i-heroicons-exclamation-circle"
-          color="red"
-          variant="soft"
-          title="Probleme beim runterladen?"
-          description="Versuche es mit einem anderen Browser oder Gerät. Ansonsten wende dich
+            <p>Das Dokument kann so oft wie nötig runtergeladen werden.</p>
+          </RegistrationItem>
+          <UButton
+            block
+            label="Download"
+            size="lg"
+            variant="soft"
+            :ui="{
+              gap: {
+                lg: 'gap-x-2',
+              },
+            }"
+            icon="i-heroicons-document-arrow-down"
+            @click="generatePDF"
+          />
+          <UAlert
+            icon="i-heroicons-exclamation-circle"
+            color="red"
+            variant="soft"
+            title="Probleme beim runterladen?"
+            description="Versuche es mit einem anderen Browser oder Gerät. Ansonsten wende dich
           an einen Verantwortlichen."
-        />
-      </div>
+          />
+        </div>
+      </template>
     </UCard>
   </div>
 </template>

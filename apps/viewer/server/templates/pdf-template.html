@@ -3,15 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generated PDF</title>
+  <title>Anmeldung PDF</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { color: #333; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 64px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    tr, td, th {
+      padding: 6px;
+      border: 1px solid black;
+    }
+
+    #info {
+      margin-top: 32px;
+      float: right;
+      font-size: 12px;
+      line-height: 1;
+      width: auto;
+      border: 1px black solid;
+      padding: 8px;
+    }
   </style>
 </head>
 <body>
-<h1>Hello, {{name}}!</h1>
-<p>We are pleased to inform you that your order number {{orderNumber}} has been processed successfully.</p>
-<p>Total: ${{total}}</p>
+<h1>Anmeldung HTL-{{ sport }}turnier {{ year }} </h1>
+<h2>Termin: {{ date }}</h2>
+
+<p>Die Klasse <strong>{{ schoolClass }}</strong> meldet sich hiermit verbindlich zum {{ sport }}-Turnier der HTL Steyr
+  an. Die
+  Teilnahmegebühr beträgt <strong>25€</strong>.
+</p>
+
+<h2>Spielerliste</h2>
+
+<table>
+  <tbody>
+  <tr>
+    <td>1. {{ player1 }}</td>
+    <td>6. {{ player6 }}</td>
+  </tr>
+  <tr>
+    <td>2. {{ player2 }}</td>
+    <td>7. {{ player7 }}</td>
+  </tr>
+  <tr>
+    <td>3. {{ player3 }}</td>
+    <td>8. {{ player8 }}</td>
+  </tr>
+  <tr>
+    <td>4. {{ player4 }}</td>
+    <td>9. {{ player9 }}</td>
+  </tr>
+  <tr>
+    <td>5. {{ player5 }}</td>
+    <td>10. {{ player10 }}</td>
+  </tr>
+  </tbody>
+</table>
+
+<h2>Freistellung</h2>
+
+<table>
+  <thead>
+  <tr>
+    <th>Einheit / Gegenstand</th>
+    <th>Lehrer/-in</th>
+    <th>Unterschrift</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>1.</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2.</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>3.</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>4.</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>5.</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>6.</td>
+    <td></td>
+    <td></td>
+  </tr>
+  </tbody>
+</table>
+
+<p>Die an diesem Tag unterrichtenden Lehrer stimmen der Teilnahme zu.</p>
+<p>
+  Auswahlkriterien der Mannschaften bei mehr als 20 Teams:
+</p>
+<ul>
+  <li>Organisationsklasse und Vorjahressieger haben einen Fixplatz! Danach gleichmäßige Aufteilung auf alle Abteilungen
+    der HTL mit Losentscheid! Falls in einer Abteilung Startplätze übrig bleiben, werden sie den anderen Abteilungen
+    zugelost.
+  </li>
+  <li>Eine ev. Damenmannschaft hat einen fixen Starplatz.</li>
+</ul>
+
+ARGE BSP {{ year }}
+
+<div id="info">
+  <p>Generiert von <code>TOURNEY</code></p>
+  <p>
+    <code>Timestamp: {{ timestamp }}</code>
+  </p>
+  <p>
+    <code>id: {{ id }}</code>
+  </p>
+</div>
+
 </body>
 </html>
