@@ -15,6 +15,16 @@ const tournament = ref<ParsedJsonTournament>()
 const isOpen = ref<boolean>(false)
 const pdfName = ref<string>(`anmeldung_${registration.value?.class?.name}.pdf`)
 
+const downloadPdf = (response: Blob) => {
+  const url = window.URL.createObjectURL(response)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = pdfName.value
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
 const generatePDF = async () => {
   try {
     const payload = {
@@ -32,13 +42,7 @@ const generatePDF = async () => {
       body: JSON.stringify(payload),
     })
 
-    const url = window.URL.createObjectURL(response)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = pdfName.value
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
+    downloadPdf(response)
   } catch (error) {
     throw createError({
       message: "Error generating PDF",
