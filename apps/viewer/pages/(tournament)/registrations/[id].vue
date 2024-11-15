@@ -17,14 +17,19 @@ const pdfName = ref<string>(`anmeldung_${registration.value?.class?.name}.pdf`)
 
 const generatePDF = async () => {
   try {
+    const payload = {
+      pdfName: pdfName.value,
+      id: registration.value?.id,
+      date: tournament.value?.start_date,
+      schoolClass: registration.value?.class?.name,
+      players: new Array(10).fill("Max Mustermann"),
+      year: new Date().getFullYear(),
+      sport: tournament.value?.sport,
+    }
+
     const response = await $fetch<Blob>("/api/pdf/generate", {
       method: "POST",
-      body: JSON.stringify({
-        name: "John Doe",
-        orderNumber: "12345",
-        total: "99.99",
-        pdfName: pdfName.value,
-      }),
+      body: JSON.stringify(payload),
     })
 
     const url = window.URL.createObjectURL(response)
@@ -140,18 +145,18 @@ const generatePDF = async () => {
           </p>
         </div>
       </RegistrationItem>
-      <UButton label="Anmelden" class="mt-6" block size="lg" variant="soft" />
+      <UButton label="Anmelden" class="my-3" block size="lg" variant="soft" />
+      <UAlert
+        icon="i-heroicons-exclamation-triangle"
+        color="yellow"
+        variant="soft"
+        title="Warnung"
+        description="Die Daten können nicht mehr geändert werden. Falls ihr einen Fehler
+          gemacht habt, wendet euch an einen Verantwortlichen für eine Freigabe."
+      />
       <template #footer>
         <PageHeading>Nächsten Schritte</PageHeading>
         <div class="flex flex-col gap-3">
-          <UAlert
-            icon="i-heroicons-exclamation-triangle"
-            color="yellow"
-            variant="soft"
-            title="Warnung"
-            description="Die Daten können nicht mehr geändert werden. Falls ihr einen Fehler
-          gemacht habt, wendet euch an einen Verantwortlichen für eine Freigabe."
-          />
           <RegistrationItem class="flex-col gap-3">
             <div>
               <strong>1. Runterladen</strong>

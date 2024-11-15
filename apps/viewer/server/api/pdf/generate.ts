@@ -1,21 +1,36 @@
 import puppeteer from "puppeteer"
 import Handlebars from "handlebars"
 import { H3Event } from "h3"
+import { useDateFormat } from "@vueuse/core"
 
 export default defineEventHandler(async (event: H3Event) => {
   const { pdfName, sport, year, date, schoolClass, players, id } =
     await readBody(event)
 
-  if (!name || !orderNumber || !total) {
+  if (!sport || !year || !date || !schoolClass || !players || !id) {
     throw createError({
       statusCode: 400,
       statusMessage: "Missing data fields",
     })
   }
+  const timestamp = new Date().toISOString()
+  const formattedDate = useDateFormat(date, "DD.MM.YYYY")
 
   const t = await useStorage("assets:templates").getItem(`pdf-template.html`)
+  Handlebars.registerHelper("getPlayer", function (array, index) {
+    return array[index] || ""
+  })
   const template = Handlebars.compile(t)
-  const html = template({ name, orderNumber, total })
+  const html = template({
+    pdfName,
+    sport,
+    year,
+    date: formattedDate.value,
+    schoolClass,
+    players,
+    timestamp,
+    id,
+  })
 
   const browser = await puppeteer.launch({
     headless: true,
