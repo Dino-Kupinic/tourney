@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { ParsedJsonTournament } from "~/types/prizes"
+import type { Tables } from "~/types/database.types"
+import type { FormPlayer } from "~/types/form"
 
 useHead({
   title: "Anmeldung",
@@ -15,6 +17,9 @@ const tournament = ref<ParsedJsonTournament>()
 const isOpen = ref<boolean>(false)
 const pdfName = ref<string>(`anmeldung_${registration.value?.class?.name}.pdf`)
 
+const formPlayers = ref<FormPlayer[]>()
+const players = ref<Omit<Tables<"player">, "id">[]>()
+
 const downloadPdf = (response: Blob) => {
   const url = window.URL.createObjectURL(response)
   const a = document.createElement("a")
@@ -27,12 +32,16 @@ const downloadPdf = (response: Blob) => {
 
 const generatePDF = async () => {
   try {
+    const formattedPlayers = formPlayers.value?.map((player) => {
+      return `${player.firstName} ${player.lastName}, ${player.schoolClass.name}`
+    })
+
     const payload = {
       pdfName: pdfName.value,
       id: registration.value?.id,
       date: tournament.value?.start_date,
       schoolClass: registration.value?.class?.name,
-      players: new Array(10).fill("Max Mustermann"),
+      players: formattedPlayers,
       year: new Date().getFullYear(),
       sport: tournament.value?.sport,
     }
@@ -50,6 +59,23 @@ const generatePDF = async () => {
     })
   }
 }
+
+const submit = async () => {
+  if (registration.value) {
+    registration.value.status = "Abgesendet"
+    setTimeout(() => {
+      window.scrollBy(0, 512)
+    }, 500)
+  }
+}
+
+const displayPdfDownload: ComputedRef<boolean> = computed(() => {
+  return registration.value?.status === "Abgesendet"
+})
+
+const isFormLocked: ComputedRef<boolean> = computed(() => {
+  return registration.value?.status !== "Ausstehend"
+})
 </script>
 
 <template>
@@ -107,6 +133,7 @@ const generatePDF = async () => {
           <div class="rounded-md bg-gray-50 p-3 dark:bg-gray-800">
             <USelectMenu
               v-model="tournament"
+              :disabled="isFormLocked"
               :options="tournaments ?? []"
               placeholder="Wähle das Turnier"
               option-attribute="name"
@@ -116,7 +143,11 @@ const generatePDF = async () => {
         </div>
       </template>
       <PageHeading>Spieler</PageHeading>
-      <FootballForm is-locked="false" />
+      <FootballForm
+        v-model:players="formPlayers"
+        :default-class="registration?.class"
+        :is-locked="isFormLocked"
+      />
       <PageHeading>Logo</PageHeading>
       <RegistrationItem class="w-full gap-3 overflow-x-auto">
         <div v-for="x in 20" :key="x">
@@ -149,16 +180,23 @@ const generatePDF = async () => {
           </p>
         </div>
       </RegistrationItem>
-      <UButton label="Anmelden" class="my-3" block size="lg" variant="soft" />
       <UAlert
         icon="i-heroicons-exclamation-triangle"
         color="yellow"
         variant="soft"
+        class="my-3"
         title="Warnung"
         description="Die Daten können nicht mehr geändert werden. Falls ihr einen Fehler
           gemacht habt, wendet euch an einen Verantwortlichen für eine Freigabe."
       />
-      <template #footer>
+      <UButton
+        label="Anmelden"
+        @click="submit"
+        block
+        size="lg"
+        variant="soft"
+      />
+      <template #footer v-if="displayPdfDownload">
         <PageHeading>Nächsten Schritte</PageHeading>
         <div class="flex flex-col gap-3">
           <RegistrationItem class="flex-col gap-3">

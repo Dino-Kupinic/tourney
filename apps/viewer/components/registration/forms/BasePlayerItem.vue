@@ -1,13 +1,15 @@
 <script setup lang="ts">
+import type { Tables } from "~/types/database.types"
+
 defineProps<{
   name: string
+  schoolClasses: Tables<"class">[]
 }>()
 
 const firstName = defineModel<string>("firstName")
 const lastName = defineModel<string>("lastName")
 
-// TODO: change to school class obj
-const schoolClass = defineModel<string>("schoolClass")
+const schoolClass = defineModel<Tables<"class">>("schoolClass")
 </script>
 
 <template>
@@ -27,8 +29,11 @@ const schoolClass = defineModel<string>("schoolClass")
         </UFormGroup>
       </div>
       <UFormGroup label="Klasse" name="email" size="lg">
-        <!-- TODO: change to dropdown -->
-        <UInput v-model="schoolClass" />
+        <USelectMenu
+          v-model="schoolClass"
+          :options="schoolClasses ?? []"
+          option-attribute="name"
+        />
       </UFormGroup>
     </div>
   </RegistrationItem>

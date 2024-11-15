@@ -1,25 +1,38 @@
 <script setup lang="ts">
 import { z } from "zod"
 import type { FormSubmitEvent } from "#ui/types"
+import type { Tables } from "~/types/database.types"
+import type { FormPlayer } from "~/types/form"
 
-defineProps<{
-  isLocked: string
+const { isLocked, defaultClass } = defineProps<{
+  isLocked: boolean
+  defaultClass: Tables<"class">
 }>()
 
+const { data: schoolClasses } = await useFetch("/api/classes")
+
+const model = defineModel<FormPlayer[]>("players")
+const playerSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  schoolClass: z.custom<Tables<"class">>(),
+})
+
 const schema = z.object({
-  email: z.string().email("Invalid email"),
-  password: z.string().min(8, "Must be at least 8 characters"),
+  players: z.array(playerSchema).length(10),
 })
 
 type Schema = z.output<typeof schema>
 
 const state = reactive({
-  email: undefined,
-  password: undefined,
+  players: Array.from({ length: 10 }, () => ({
+    firstName: "",
+    lastName: "",
+    schoolClass: defaultClass,
+  })),
 })
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  // Do something with data
   console.log(event.data)
 }
 </script>
@@ -31,55 +44,14 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     class="my-2 space-y-4"
     @submit="onSubmit"
   >
-    <BasePlayerItem
-      name="Feldspieler 1"
-      v-model:first-name="state.email"
-      v-model:last-name="state.email"
-      v-model:school-class="state.email"
-    />
-    <BasePlayerItem
-      name="Feldspieler 2"
-      v-model:first-name="state.email"
-      v-model:last-name="state.email"
-      v-model:school-class="state.email"
-    />
-    <BasePlayerItem
-      name="Feldspieler 3"
-      v-model:first-name="state.email"
-      v-model:last-name="state.email"
-      v-model:school-class="state.email"
-    />
-    <BasePlayerItem
-      name="Feldspieler 4"
-      v-model:first-name="state.email"
-      v-model:last-name="state.email"
-      v-model:school-class="state.email"
-    />
-    <BasePlayerItem
-      name="Feldspieler 5"
-      v-model:first-name="state.email"
-      v-model:last-name="state.email"
-      v-model:school-class="state.email"
-    />
-    <BasePlayerItem
-      name="Feldspieler 6"
-      v-model:first-name="state.email"
-      v-model:last-name="state.email"
-      v-model:school-class="state.email"
-    />
-    <BasePlayerItem
-      name="Feldspieler 7"
-      v-model:first-name="state.email"
-      v-model:last-name="state.email"
-      v-model:school-class="state.email"
-    />
-    <BasePlayerItem
-      name="Feldspieler 8"
-      v-model:first-name="state.email"
-      v-model:last-name="state.email"
-      v-model:school-class="state.email"
-    />
+    <template v-for="(player, index) in state.players" :key="index">
+      <BasePlayerItem
+        :name="'Spieler ' + (index + 1) + (index >= 6 ? ' (Ersatz)' : '')"
+        :schoolClasses="schoolClasses ?? []"
+        v-model:first-name="player.firstName"
+        v-model:last-name="player.lastName"
+        v-model:school-class="player.schoolClass"
+      />
+    </template>
   </UForm>
 </template>
-
-<style scoped></style>
