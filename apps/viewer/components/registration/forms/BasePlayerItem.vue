@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import type { Tables } from "~/types/database.types"
+import { key } from "~/keys/isFormLocked"
 
-defineProps<{
+const { index } = defineProps<{
+  index: number
   name: string
   schoolClasses: Tables<"class">[]
 }>()
 
 const firstName = defineModel<string>("firstName")
 const lastName = defineModel<string>("lastName")
-
 const schoolClass = defineModel<Tables<"class">>("schoolClass")
+
+const isLocked = inject(key)
+
+const fNameInput = `players.${index}.firstName`
+const lNameInput = `players.${index}.lastName`
 </script>
 
 <template>
@@ -21,11 +27,15 @@ const schoolClass = defineModel<Tables<"class">>("schoolClass")
         <strong class="text-base"> {{ name }} </strong>
       </div>
       <div class="flex flex-col gap-3 sm:flex-row">
-        <UFormGroup label="Vorname" name="email" size="lg">
-          <UInput v-model="firstName" placeholder="Max" />
+        <UFormGroup label="Vorname" :name="fNameInput" size="lg">
+          <UInput v-model="firstName" placeholder="Max" :disabled="isLocked" />
         </UFormGroup>
-        <UFormGroup label="Nachname" name="email" size="lg" class="grow">
-          <UInput v-model="lastName" placeholder="Mustermann" />
+        <UFormGroup label="Nachname" :name="lNameInput" size="lg" class="grow">
+          <UInput
+            v-model="lastName"
+            placeholder="Mustermann"
+            :disabled="isLocked"
+          />
         </UFormGroup>
       </div>
       <UFormGroup label="Klasse" name="email" size="lg">
@@ -33,6 +43,7 @@ const schoolClass = defineModel<Tables<"class">>("schoolClass")
           v-model="schoolClass"
           :options="schoolClasses ?? []"
           option-attribute="name"
+          :disabled="isLocked"
         />
       </UFormGroup>
     </div>

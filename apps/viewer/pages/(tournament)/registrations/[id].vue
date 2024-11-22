@@ -2,6 +2,8 @@
 import type { ParsedJsonTournament } from "~/types/prizes"
 import type { Tables } from "~/types/database.types"
 import type { FormPlayer } from "~/types/form"
+import { FootballForm } from "#components"
+import { key } from "~/keys/isFormLocked"
 
 useHead({
   title: "Anmeldung",
@@ -11,6 +13,13 @@ const route = useRoute()
 const uuid = route.params.id
 
 const { data: registration } = await useFetch(`/api/registrations/${uuid}`)
+if (!registration.value) {
+  throw createError({
+    statusCode: 404,
+    message: "Anmeldung nicht gefunden",
+  })
+}
+
 const { data: tournaments } = await useFetch("/api/tournaments/active")
 const tournament = ref<ParsedJsonTournament>()
 
@@ -60,15 +69,6 @@ const generatePDF = async () => {
   }
 }
 
-const submit = async () => {
-  if (registration.value) {
-    registration.value.status = "Abgesendet"
-    setTimeout(() => {
-      window.scrollBy(0, 512)
-    }, 500)
-  }
-}
-
 const displayPdfDownload: ComputedRef<boolean> = computed(() => {
   return registration.value?.status === "Abgesendet"
 })
@@ -76,6 +76,19 @@ const displayPdfDownload: ComputedRef<boolean> = computed(() => {
 const isFormLocked: ComputedRef<boolean> = computed(() => {
   return registration.value?.status !== "Ausstehend"
 })
+provide(key, isFormLocked)
+
+const formRef = useTemplateRef("formRef")
+const submit = async () => {
+  formRef.value?.$.exposed?.submitForm()
+
+  if (registration.value) {
+    registration.value.status = "Abgesendet"
+    setTimeout(() => {
+      window.scrollBy(0, 512)
+    }, 500)
+  }
+}
 </script>
 
 <template>
@@ -142,60 +155,67 @@ const isFormLocked: ComputedRef<boolean> = computed(() => {
           </div>
         </div>
       </template>
-      <PageHeading>Spieler</PageHeading>
-      <FootballForm
-        v-model:players="formPlayers"
-        :default-class="registration?.class"
-        :is-locked="isFormLocked"
-      />
-      <PageHeading>Logo</PageHeading>
-      <RegistrationItem class="w-full gap-3 overflow-x-auto">
-        <div v-for="x in 20" :key="x">
-          <div
-            class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
-          >
-            <NuxtImg
-              width="48"
-              height="48"
-              :src="getImageUrl('/logos/star/star.svg')"
-            />
+      <template v-if="tournament">
+        <PageHeading>Spieler</PageHeading>
+        <FootballForm
+          v-model:players="formPlayers"
+          :default-class="registration?.class"
+          ref="formRef"
+        />
+        <PageHeading>Logo</PageHeading>
+        <RegistrationItem class="w-full gap-3 overflow-x-auto">
+          <div v-for="x in 20" :key="x">
+            <div
+              class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+            >
+              <NuxtImg
+                width="48"
+                height="48"
+                :src="getImageUrl('/logos/star/star.svg')"
+              />
+            </div>
+            <p class="mt-1 text-wrap text-center text-xs text-gray-500">
+              Stern
+            </p>
           </div>
-          <p class="mt-1 text-wrap text-center text-xs text-gray-500">Stern</p>
-        </div>
-      </RegistrationItem>
-      <PageHeading>Varianten</PageHeading>
-      <RegistrationItem class="w-full gap-3 overflow-x-auto">
-        <div v-for="x in 3" :key="x">
-          <div
-            class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
-          >
-            <NuxtImg
-              width="48"
-              height="48"
-              :src="getImageUrl('/logos/star/star.svg')"
-            />
+        </RegistrationItem>
+        <PageHeading>Varianten</PageHeading>
+        <RegistrationItem class="w-full gap-3 overflow-x-auto">
+          <div v-for="x in 3" :key="x">
+            <div
+              class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+            >
+              <NuxtImg
+                width="48"
+                height="48"
+                :src="getImageUrl('/logos/star/star.svg')"
+              />
+            </div>
+            <p class="mt-1 text-wrap text-center text-xs text-gray-500">
+              Farbe {{ x }}
+            </p>
           </div>
-          <p class="mt-1 text-wrap text-center text-xs text-gray-500">
-            Farbe {{ x }}
-          </p>
-        </div>
-      </RegistrationItem>
-      <UAlert
-        icon="i-heroicons-exclamation-triangle"
-        color="yellow"
-        variant="soft"
-        class="my-3"
-        title="Warnung"
-        description="Die Daten können nicht mehr geändert werden. Falls ihr einen Fehler
+        </RegistrationItem>
+        <UAlert
+          icon="i-heroicons-exclamation-triangle"
+          color="yellow"
+          variant="soft"
+          class="my-3"
+          title="Warnung"
+          description="Die Daten können nicht mehr geändert werden. Falls ihr einen Fehler
           gemacht habt, wendet euch an einen Verantwortlichen für eine Freigabe."
-      />
-      <UButton
-        label="Anmelden"
-        @click="submit"
-        block
-        size="lg"
-        variant="soft"
-      />
+        />
+        <UButton
+          label="Anmelden"
+          @click="submit"
+          block
+          size="lg"
+          variant="soft"
+        />
+      </template>
+      <template v-else>
+        <p class="text-center">Es wurde noch kein Turnier ausgewählt.</p>
+      </template>
       <template #footer v-if="displayPdfDownload">
         <PageHeading>Nächsten Schritte</PageHeading>
         <div class="flex flex-col gap-3">
