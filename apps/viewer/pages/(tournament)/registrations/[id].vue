@@ -2,7 +2,6 @@
 import type { ParsedJsonTournament } from "~/types/prizes"
 import type { Tables } from "~/types/database.types"
 import type { FormPlayer } from "~/types/form"
-import { FootballForm } from "#components"
 import { key } from "~/keys/isFormLocked"
 
 useHead({
@@ -22,6 +21,8 @@ if (!registration.value) {
 
 const { data: tournaments } = await useFetch("/api/tournaments/active")
 const tournament = ref<ParsedJsonTournament>()
+
+const { data: logos } = await useFetch("/api/logos")
 
 const isOpen = ref<boolean>(false)
 const pdfName = ref<string>(`anmeldung_${registration.value?.class?.name}.pdf`)
@@ -68,6 +69,22 @@ const generatePDF = async () => {
     })
   }
 }
+
+// TODO: change later
+const playerCount = computed(() => {
+  switch (tournament.value?.sport) {
+    case "Fußball":
+      return 2 // 10
+    case "Basketball":
+      return 3 // 5
+    case "Volleyball":
+      return 4 // 6
+  }
+  throw createError({
+    statusCode: 404,
+    message: "Sport nicht gefunden",
+  })
+})
 
 const displayPdfDownload: ComputedRef<boolean> = computed(() => {
   return registration.value?.status === "Abgesendet"
@@ -157,8 +174,9 @@ const submit = async () => {
       </template>
       <template v-if="tournament">
         <PageHeading>Spieler</PageHeading>
-        <FootballForm
+        <BaseForm
           v-model:players="formPlayers"
+          :player-count="playerCount"
           :default-class="registration?.class"
           ref="formRef"
         />

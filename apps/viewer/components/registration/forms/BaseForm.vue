@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { z } from "zod"
+import { ref, reactive, watch } from "vue"
 import type { Tables } from "~/types/database.types"
 import type { FormPlayer } from "~/types/form"
-import type { UForm } from "#components"
 import type { Form } from "#ui/types"
 
-const { defaultClass } = defineProps<{
+const { playerCount, defaultClass } = defineProps<{
+  playerCount: number
   defaultClass: Tables<"class"> | null | undefined
 }>()
 
@@ -15,36 +16,68 @@ if (defaultClass === undefined || defaultClass === null) {
     message: "Klasse nicht gefunden",
   })
 }
+const validDefaultClass = defaultClass as Tables<"class">
 
 const { data: schoolClasses } = await useFetch("/api/classes")
 
 const model = defineModel<FormPlayer[]>("players")
-const PLAYER_LENGTH = 2
+const PLAYER_LENGTH = ref<number>(playerCount)
 
-const schema = z.object({
-  players: z
-    .array(
-      z.object({
-        firstName: z.string().min(1),
-        lastName: z.string().min(1),
-        schoolClass: z.custom<Tables<"class">>(),
-      }),
-    )
-    .length(PLAYER_LENGTH),
-})
-type Schema = z.output<typeof schema>
-const state = reactive({
-  players: Array.from({ length: PLAYER_LENGTH }, () => ({
+const schema = ref(
+  z.object({
+    players: z
+      .array(
+        z.object({
+          firstName: z.string().min(1),
+          lastName: z.string().min(1),
+          schoolClass: z.custom<Tables<"class">>(),
+        }),
+      )
+      .length(PLAYER_LENGTH.value),
+  }),
+)
+
+function updateStatePlayers(newCount: number) {
+  state.players = Array.from({ length: newCount }, () => ({
     firstName: "",
     lastName: "",
-    schoolClass: defaultClass,
+    schoolClass: validDefaultClass,
+  }))
+}
+
+watch(
+  () => playerCount,
+  (newCount) => {
+    PLAYER_LENGTH.value = newCount
+    schema.value = z.object({
+      players: z
+        .array(
+          z.object({
+            firstName: z.string().min(1),
+            lastName: z.string().min(1),
+            schoolClass: z.custom<Tables<"class">>(),
+          }),
+        )
+        .length(newCount),
+    })
+    updateStatePlayers(newCount)
+  },
+)
+
+type Schema = z.output<typeof schema.value>
+const state = reactive({
+  players: Array.from({ length: PLAYER_LENGTH.value }, () => ({
+    firstName: "",
+    lastName: "",
+    schoolClass: validDefaultClass,
   })),
 })
 
 const form = useTemplateRef<Form<Schema>>("form")
+
 async function submitForm() {
   try {
-    const result = schema.safeParse(state)
+    const result = schema.value.safeParse(state)
     if (!result.success) {
       const formErrors = result.error.errors.map((err) => ({
         path: err.path.join("."),
@@ -61,6 +94,7 @@ async function submitForm() {
     })
   }
 }
+
 defineExpose({ submitForm })
 </script>
 
@@ -68,8 +102,8 @@ defineExpose({ submitForm })
   <UForm :schema="schema" :state="state" class="my-2 space-y-4" ref="form">
     <template v-for="(player, index) in state.players" :key="index">
       <BasePlayerItem
-        :index="index"
-        :name="'Spieler ' + (index + 1) + (index >= 6 ? ' (Ersatz)' : '')"
+        :index
+        :name="'Spieler ' + (index + 1)"
         :schoolClasses="schoolClasses ?? []"
         v-model:first-name="player.firstName"
         v-model:last-name="player.lastName"
