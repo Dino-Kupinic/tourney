@@ -23,6 +23,16 @@ const { data: tournaments } = await useFetch("/api/tournaments/active")
 const tournament = ref<ParsedJsonTournament>()
 
 const { data: logos } = await useFetch("/api/logos")
+if (!logos.value) {
+  throw createError({
+    statusCode: 404,
+    message: "Logos nicht gefunden",
+  })
+}
+const selectedLogo = ref<Tables<"logo"> | null>(logos.value[0])
+const { data: variants } = await useFetch(
+  `/api/logos/variants/${selectedLogo.value?.id}`,
+)
 
 const isOpen = ref<boolean>(false)
 const pdfName = ref<string>(`anmeldung_${registration.value?.class?.name}.pdf`)
@@ -182,18 +192,33 @@ const submit = async () => {
         />
         <PageHeading>Logo</PageHeading>
         <RegistrationItem class="w-full gap-3 overflow-x-auto">
-          <div v-for="x in 20" :key="x">
+          <div
+            v-for="logo in logos"
+            :key="logo.id"
+            class="flex cursor-pointer flex-col items-center"
+            @click="selectedLogo = logo"
+          >
             <div
-              class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+              :class="[
+                'curser-pointer flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border',
+                {
+                  'border-primary-500 shadow-[0_0px_60px_3px_rgba(29,78,216,0.4)]':
+                    selectedLogo?.id === logo.id,
+                  'border-gray-200 dark:border-gray-700':
+                    selectedLogo?.id !== logo.id,
+                },
+              ]"
+              class="bg-white dark:bg-gray-900"
             >
               <NuxtImg
                 width="48"
                 height="48"
-                :src="getImageUrl('/logos/star/star.svg')"
+                :src="getImageUrl(logo.image_path)"
+                class="dark:invert dark:filter"
               />
             </div>
             <p class="mt-1 text-wrap text-center text-xs text-gray-500">
-              Stern
+              {{ logo.name }}
             </p>
           </div>
         </RegistrationItem>
@@ -220,7 +245,7 @@ const submit = async () => {
           variant="soft"
           class="my-3"
           title="Warnung"
-          description="Die Daten können nicht mehr geändert werden. Falls ihr einen Fehler
+          description="Nach der Anmeldung können die Daten nicht mehr geändert werden. Falls ihr einen Fehler
           gemacht habt, wendet euch an einen Verantwortlichen für eine Freigabe."
         />
         <UButton

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { z } from "zod"
-import { ref, reactive, watch } from "vue"
 import type { Tables } from "~/types/database.types"
 import type { FormPlayer } from "~/types/form"
 import type { Form } from "#ui/types"
