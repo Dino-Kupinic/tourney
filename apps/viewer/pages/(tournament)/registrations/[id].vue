@@ -30,9 +30,21 @@ if (!logos.value) {
   })
 }
 const selectedLogo = ref<Tables<"logo"> | null>(logos.value[0])
-const { data: variants } = await useFetch(
-  `/api/logos/variants/${selectedLogo.value?.id}`,
+const url = computed(() =>
+  selectedLogo.value?.id
+    ? `/api/logos/variants/${selectedLogo.value.id}`
+    : `/api/logos/variants/placeholder`,
 )
+const { data: variants } = await useFetch<Tables<"logo_variant">[]>(url, {
+  watch: [selectedLogo],
+})
+if (!variants.value) {
+  throw createError({
+    statusCode: 404,
+    message: "Varianten nicht gefunden",
+  })
+}
+const selectedLogoVariant = ref<Tables<"logo_variant"> | null>()
 
 const isOpen = ref<boolean>(false)
 const pdfName = ref<string>(`anmeldung_${registration.value?.class?.name}.pdf`)
@@ -222,22 +234,45 @@ const submit = async () => {
             </p>
           </div>
         </RegistrationItem>
-        <PageHeading>Varianten</PageHeading>
+
+        <PageHeading>
+          <span> Varianten </span>
+          <code class="text-xs">[OPTIONAL]</code>
+        </PageHeading>
         <RegistrationItem class="w-full gap-3 overflow-x-auto">
-          <div v-for="x in 3" :key="x">
+          <template v-if="variants?.length">
             <div
-              class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+              v-for="variant in variants"
+              :key="variant.id"
+              class="flex cursor-pointer flex-col items-center"
+              @click="selectedLogoVariant = variant"
             >
-              <NuxtImg
-                width="48"
-                height="48"
-                :src="getImageUrl('/logos/star/star.svg')"
-              />
+              <div
+                :class="[
+                  'curser-pointer flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md border',
+                  {
+                    'border-primary-500 shadow-[0_0px_60px_3px_rgba(29,78,216,0.4)]':
+                      selectedLogoVariant?.id === variant.id,
+                    'border-gray-200 dark:border-gray-700':
+                      selectedLogoVariant?.id !== variant.id,
+                  },
+                ]"
+                class="bg-white dark:bg-gray-900"
+              >
+                <NuxtImg
+                  width="48"
+                  height="48"
+                  :src="getImageUrl(variant.image_path)"
+                />
+              </div>
+              <p class="mt-1 text-wrap text-center text-xs text-gray-500">
+                {{ variant.color }}
+              </p>
             </div>
-            <p class="mt-1 text-wrap text-center text-xs text-gray-500">
-              Farbe {{ x }}
-            </p>
-          </div>
+          </template>
+          <template v-else>
+            <p>Keine Varianten für dieses Logo verfügbar</p>
+          </template>
         </RegistrationItem>
         <UAlert
           icon="i-heroicons-exclamation-triangle"

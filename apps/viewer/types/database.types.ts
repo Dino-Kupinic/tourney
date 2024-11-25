@@ -246,6 +246,7 @@ export type Database = {
           group: string
           id: string
           logo_id: string
+          logo_variant_id: string | null
           name: string
           registration_id: string
           tournament_id: string
@@ -255,6 +256,7 @@ export type Database = {
           group: string
           id?: string
           logo_id: string
+          logo_variant_id?: string | null
           name: string
           registration_id: string
           tournament_id: string
@@ -264,6 +266,7 @@ export type Database = {
           group?: string
           id?: string
           logo_id?: string
+          logo_variant_id?: string | null
           name?: string
           registration_id?: string
           tournament_id?: string
@@ -274,6 +277,13 @@ export type Database = {
             columns: ["logo_id"]
             isOneToOne: false
             referencedRelation: "logo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_logo_variant_id_fkey"
+            columns: ["logo_variant_id"]
+            isOneToOne: false
+            referencedRelation: "logo_variant"
             referencedColumns: ["id"]
           },
           {

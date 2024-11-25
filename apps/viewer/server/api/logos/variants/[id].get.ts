@@ -1,5 +1,5 @@
 import { serverSupabaseClient } from "#supabase/server"
-import type { Database } from "~/types/database.types"
+import type { Database, Tables } from "~/types/database.types"
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient<Database>(event)
@@ -12,7 +12,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { data } = await supabase.from("logo_variant").select("*").eq("id", id)
+  const { data } = await supabase
+    .from("logo_variant")
+    .select("*")
+    .eq("logo_id", id)
 
   return data
 })
