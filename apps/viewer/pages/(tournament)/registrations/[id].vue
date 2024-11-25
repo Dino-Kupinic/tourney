@@ -45,6 +45,9 @@ if (!variants.value) {
   })
 }
 const selectedLogoVariant = ref<Tables<"logo_variant"> | null>()
+watch(selectedLogo, () => {
+  selectedLogoVariant.value = null
+})
 
 const isOpen = ref<boolean>(false)
 const pdfName = ref<string>(`anmeldung_${registration.value?.class?.name}.pdf`)
