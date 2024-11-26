@@ -144,6 +144,7 @@ const playerCount = computed(() => {
 
 const formRef = useTemplateRef("formRef")
 const submit = async () => {
+  // @ts-ignore build error
   formRef.value?.$.exposed?.submitForm()
 
   const payload = {

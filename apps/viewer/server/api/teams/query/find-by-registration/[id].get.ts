@@ -1,4 +1,4 @@
-import { Database } from "~/types/database.types"
+import type { Database } from "~/types/database.types"
 import { serverSupabaseClient } from "#supabase/server"
 
 export default defineEventHandler(async (event) => {

@@ -1,8 +1,8 @@
 import { serverSupabaseClient } from "#supabase/server"
 import type { Database, Enums, Tables } from "~/types/database.types"
-import { FormPlayer } from "~/types/form"
-import { PlayerDTO, TeamDTO } from "~/types/dto"
-import { RegistrationWithClass } from "~/types/registration"
+import type { FormPlayer } from "~/types/form"
+import type { PlayerDTO, TeamDTO } from "~/types/dto"
+import type { RegistrationWithClass } from "~/types/registration"
 
 type Body = {
   formPlayers: FormPlayer[]

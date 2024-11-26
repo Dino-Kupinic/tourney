@@ -1,6 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server"
 import type { Database } from "~/types/database.types"
-import { PlayerDTO } from "~/types/dto"
+import type { PlayerDTO } from "~/types/dto"
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient<Database>(event)
