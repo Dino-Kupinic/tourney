@@ -21,10 +21,38 @@ if (!registration.value) {
     message: "Anmeldung nicht gefunden",
   })
 }
+const displayPdfDownload: ComputedRef<boolean> = computed(() => {
+  return registration.value?.status === "Abgesendet"
+})
 
-// TODO: if status is "Abgesendet" then search for which tournament the registration is for and preselect it
+const isFormLocked: ComputedRef<boolean> = computed(() => {
+  return registration.value?.status !== "Ausstehend"
+})
+provide(key, isFormLocked)
+
 const { data: tournaments } = await useFetch("/api/tournaments/active")
 const tournament = ref<ParsedJsonTournament>()
+
+const fetchTeam = async () => {
+  const team = await $fetch<Tables<"team">>(
+    `/api/teams/query/find-by-registration/${registration.value?.id}`,
+  )
+  if (!team) {
+    throw createError({
+      statusCode: 404,
+      message: "Team nicht gefunden",
+    })
+  }
+  associatedTeam.value = team
+  tournament.value = tournaments.value?.find(
+    (t) => t.id === team?.tournament_id,
+  )
+}
+
+const associatedTeam = ref<Tables<"team">>()
+if (isFormLocked.value) {
+  await fetchTeam()
+}
 
 const { data: logos } = await useFetch("/api/logos")
 if (!logos.value) {
@@ -72,16 +100,14 @@ const downloadPdf = (response: Blob) => {
 
 const generatePDF = async () => {
   try {
-    const formattedPlayers = formPlayers.value?.map((player) => {
-      return `${player.firstName} ${player.lastName}, ${player.schoolClass.name}`
-    })
+    await fetchTeam()
 
     const payload = {
       pdfName: pdfName.value,
-      id: registration.value?.id,
+      registration_id: registration.value?.id,
+      team_id: associatedTeam.value?.id,
       date: tournament.value?.start_date,
       schoolClass: registration.value?.class?.name,
-      players: formattedPlayers,
       year: new Date().getFullYear(),
       sport: tournament.value?.sport,
     }
@@ -115,15 +141,6 @@ const playerCount = computed(() => {
     message: "Sport nicht gefunden",
   })
 })
-
-const displayPdfDownload: ComputedRef<boolean> = computed(() => {
-  return registration.value?.status === "Abgesendet"
-})
-
-const isFormLocked: ComputedRef<boolean> = computed(() => {
-  return registration.value?.status !== "Ausstehend"
-})
-provide(key, isFormLocked)
 
 const formRef = useTemplateRef("formRef")
 const submit = async () => {
@@ -214,7 +231,7 @@ const submit = async () => {
           </div>
         </div>
       </template>
-      <template v-if="tournament">
+      <template v-if="tournament && !isFormLocked">
         <PageHeading>Spieler</PageHeading>
         <BaseForm
           v-model:players="formPlayers"
@@ -254,7 +271,6 @@ const submit = async () => {
             </p>
           </div>
         </RegistrationItem>
-
         <PageHeading>
           <span> Varianten </span>
           <code class="text-xs">[OPTIONAL]</code>
@@ -312,7 +328,20 @@ const submit = async () => {
         />
       </template>
       <template v-else>
-        <p class="text-center">Es wurde noch kein Turnier ausgewählt.</p>
+        <template v-if="isFormLocked">
+          <UAlert
+            icon="i-heroicons-exclamation-triangle"
+            color="yellow"
+            variant="soft"
+            class="my-3"
+            title="Warnung"
+            description="Die Anmeldung wurde abgesendet und kann nicht mehr geändert werden. Falls ihr einen Fehler
+          gemacht habt, wendet euch an einen Verantwortlichen für eine Freigabe."
+          />
+        </template>
+        <template v-else>
+          <p class="text-center">Es wurde noch kein Turnier ausgewählt.</p>
+        </template>
       </template>
       <template #footer v-if="displayPdfDownload">
         <PageHeading>Nächsten Schritte</PageHeading>

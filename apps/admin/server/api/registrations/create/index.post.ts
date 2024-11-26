@@ -1,6 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server"
 import type { Database } from "~/types/database.types"
-import { RegistrationDTO } from "~/types/dto"
+import type { RegistrationDTO } from "~/types/dto"
 
 export default defineEventHandler(async (event) => {
   const { expire_date, teams, year } = await readBody<{

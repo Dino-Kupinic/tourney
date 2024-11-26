@@ -2,12 +2,20 @@ import puppeteer from "puppeteer"
 import Handlebars from "handlebars"
 import { H3Event } from "h3"
 import { useDateFormat } from "@vueuse/core"
+import { Tables } from "~/types/database.types"
 
 export default defineEventHandler(async (event: H3Event) => {
-  const { pdfName, sport, year, date, schoolClass, players, id } =
+  const { pdfName, sport, year, date, schoolClass, registration_id, team_id } =
     await readBody(event)
 
-  if (!sport || !year || !date || !schoolClass || !players || !id) {
+  if (
+    !sport ||
+    !year ||
+    !date ||
+    !schoolClass ||
+    !registration_id ||
+    !team_id
+  ) {
     throw createError({
       statusCode: 400,
       statusMessage: "Missing data fields",
@@ -15,6 +23,12 @@ export default defineEventHandler(async (event: H3Event) => {
   }
   const timestamp = new Date().toISOString()
   const formattedDate = useDateFormat(date, "DD.MM.YYYY")
+  const players = await $fetch<Tables<"player">[]>(
+    `/api/players/query/find-by-team/${team_id}`,
+  )
+  const formattedPlayers = players?.map((player) => {
+    return `${player.first_name} ${player.last_name}, ${player.class}`
+  })
 
   const t = await useStorage("assets:templates").getItem(`pdf-template.html`)
   Handlebars.registerHelper("getPlayer", function (array, index) {
@@ -22,14 +36,14 @@ export default defineEventHandler(async (event: H3Event) => {
   })
   const template = Handlebars.compile(t)
   const html = template({
+    date: formattedDate.value,
+    players: formattedPlayers,
+    id: registration_id,
     pdfName,
     sport,
     year,
-    date: formattedDate.value,
     schoolClass,
-    players,
     timestamp,
-    id,
   })
 
   const browser = await puppeteer.launch({
