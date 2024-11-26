@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server"
-import type { Database, Tables } from "~/types/database.types"
+import type { Database } from "~/types/database.types"
+import { RegistrationDTO } from "~/types/dto"
 
 export default defineEventHandler(async (event) => {
   const { expire_date, teams, year } = await readBody<{
@@ -9,8 +10,6 @@ export default defineEventHandler(async (event) => {
   }>(event)
 
   const supabase = await serverSupabaseClient<Database>(event)
-
-  type RegistrationDTO = Omit<Tables<"registration">, "id">
 
   const { data: classes, error: fetchError } = await supabase
     .from("class")
@@ -46,4 +45,6 @@ export default defineEventHandler(async (event) => {
       statusCode: 500,
     })
   }
+
+  setResponseStatus(event, 201)
 })

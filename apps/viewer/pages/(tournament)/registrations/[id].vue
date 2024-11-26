@@ -3,6 +3,7 @@ import type { ParsedJsonTournament } from "~/types/prizes"
 import type { Tables } from "~/types/database.types"
 import type { FormPlayer } from "~/types/form"
 import { key } from "~/keys/isFormLocked"
+import type { RegistrationWithClass } from "~/types/registration"
 
 useHead({
   title: "Anmeldung",
@@ -11,7 +12,9 @@ useHead({
 const route = useRoute()
 const uuid = route.params.id
 
-const { data: registration } = await useFetch(`/api/registrations/${uuid}`)
+const { data: registration, refresh } = await useFetch<RegistrationWithClass>(
+  `/api/registrations/${uuid}`,
+)
 if (!registration.value) {
   throw createError({
     statusCode: 404,
@@ -19,6 +22,7 @@ if (!registration.value) {
   })
 }
 
+// TODO: if status is "Abgesendet" then search for which tournament the registration is for and preselect it
 const { data: tournaments } = await useFetch("/api/tournaments/active")
 const tournament = ref<ParsedJsonTournament>()
 
@@ -30,6 +34,7 @@ if (!logos.value) {
   })
 }
 const selectedLogo = ref<Tables<"logo"> | null>(logos.value[0])
+
 const url = computed(() =>
   selectedLogo.value?.id
     ? `/api/logos/variants/${selectedLogo.value.id}`
@@ -44,6 +49,7 @@ if (!variants.value) {
     message: "Varianten nicht gefunden",
   })
 }
+
 const selectedLogoVariant = ref<Tables<"logo_variant"> | null>()
 watch(selectedLogo, () => {
   selectedLogoVariant.value = null
@@ -53,7 +59,6 @@ const isOpen = ref<boolean>(false)
 const pdfName = ref<string>(`anmeldung_${registration.value?.class?.name}.pdf`)
 
 const formPlayers = ref<FormPlayer[]>()
-const players = ref<Omit<Tables<"player">, "id">[]>()
 
 const downloadPdf = (response: Blob) => {
   const url = window.URL.createObjectURL(response)
@@ -124,12 +129,24 @@ const formRef = useTemplateRef("formRef")
 const submit = async () => {
   formRef.value?.$.exposed?.submitForm()
 
-  if (registration.value) {
-    registration.value.status = "Abgesendet"
-    setTimeout(() => {
-      window.scrollBy(0, 512)
-    }, 500)
+  const payload = {
+    formPlayers: formPlayers.value,
+    logo: selectedLogo.value,
+    logo_variant: selectedLogoVariant.value,
+    tournament: tournament.value,
+    registration: registration.value,
   }
+
+  await $fetch("/api/teams/create", {
+    method: "POST",
+    body: payload,
+  })
+
+  await refresh()
+
+  setTimeout(() => {
+    window.scrollBy(0, 512)
+  }, 500)
 }
 </script>
 

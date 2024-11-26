@@ -243,7 +243,7 @@ export type Database = {
       team: {
         Row: {
           created_at: string
-          group: string
+          group: string | null
           id: string
           logo_id: string
           logo_variant_id: string | null
@@ -253,7 +253,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          group: string
+          group?: string | null
           id?: string
           logo_id: string
           logo_variant_id?: string | null
@@ -263,7 +263,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          group?: string
+          group?: string | null
           id?: string
           logo_id?: string
           logo_variant_id?: string | null
