@@ -56,6 +56,13 @@ const items = (row: Tables<"registration">) =>
         icon: "i-heroicons-information-circle",
       },
       {
+        label: "Link kopieren",
+        icon: "i-heroicons-clipboard-document-check",
+        click: () => onCopyLink(row),
+      },
+    ],
+    [
+      {
         label: "Löschen",
         icon: "i-heroicons-trash",
         click: () => onDelete(),
@@ -97,7 +104,6 @@ const filteredRows = computed(() => {
   if (!search.value) {
     return tableData.value
   }
-
   return tableData.value.filter((item) => {
     return Object.values(item).some((value) => {
       return String(value).toLowerCase().includes(search.value.toLowerCase())
@@ -127,7 +133,6 @@ const schema = z.object({
 })
 
 type Schema = z.output<typeof schema>
-
 const state = reactive({
   expire_date: undefined,
   teams: 1,
@@ -135,33 +140,78 @@ const state = reactive({
 })
 
 const onSubmitCreate = async (event: FormSubmitEvent<Schema>) => {
-  // TODO: error handling
-  schema.parse(state)
-  await $fetch("/api/registrations/create", { method: "POST", body: state })
-  isOpenCreate.value = false
-  await refresh()
+  try {
+    schema.parse(state)
+    await $fetch("/api/registrations/create", { method: "POST", body: state })
+    isOpenCreate.value = false
+    await refresh()
+    displaySuccessNotification(
+      "Anmeldungen erstellt",
+      "Die Anmeldungen wurden erfolgreich erstellt.",
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler beim Erstellen",
+      "Die Anmeldungen konnte nicht erstellt werden.",
+    )
+  }
 }
 
 const registrationIds = computed(() => selectedRows.value.map((row) => row.id))
 const onDelete = async () => {
-  // TODO: error handling
-  await $fetch("/api/registrations/delete", {
-    method: "DELETE",
-    body: registrationIds.value,
-  })
-  isOpenDelete.value = false
-  selectedRows.value = []
-  await refresh()
+  try {
+    await $fetch("/api/registrations/delete", {
+      method: "DELETE",
+      body: registrationIds.value,
+    })
+    isOpenDelete.value = false
+    selectedRows.value = []
+    await refresh()
+    displaySuccessNotification(
+      "Anmeldungen gelöscht",
+      "Die Anmeldungen wurden erfolgreich gelöscht.",
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler beim Löschen",
+      "Die Anmeldungen konnten nicht gelöscht werden.",
+    )
+  }
 }
 
 const onUpdate = async (status: Enums<"registration_status">) => {
-  // TODO: error handling
-  await $fetch("/api/registrations/update", {
-    method: "PUT",
-    body: { registrations: registrationIds.value, status: status },
-  })
-  selectedRows.value = []
-  await refresh()
+  try {
+    await $fetch("/api/registrations/update", {
+      method: "PUT",
+      body: { registrations: registrationIds.value, status: status },
+    })
+    selectedRows.value = []
+    await refresh()
+    displaySuccessNotification(
+      "Anmeldungen aktualisiert",
+      "Die Anmeldungen wurden erfolgreich aktualisiert.",
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler beim Aktualisieren",
+      "Die Anmeldungen konnten nicht aktualisiert werden.",
+    )
+  }
+}
+
+const config = useRuntimeConfig()
+const onCopyLink = async (row: Tables<"registration">) => {
+  const source: string = `${config.public.clientUrl}/registrations/${row.id}`
+  const { text, copy, copied } = useClipboard({ source })
+  await copy()
+  if (copied.value) {
+    displaySuccessNotification("Link kopiert", text.value)
+  } else {
+    displayFailureNotification("Fehler beim Kopieren", text.value)
+  }
 }
 </script>
 
@@ -232,7 +282,7 @@ const onUpdate = async (status: Enums<"registration_status">) => {
       />
 
       <UDropdown
-        v-if="selectedRows.length > 1"
+        v-if="selectedRows.length > 0"
         :items="actions"
         :ui="{ width: 'w-40', item: { padding: 'p-1' } }"
       >

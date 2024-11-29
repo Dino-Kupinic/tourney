@@ -32,7 +32,9 @@ const bonus = computed(() => {
           :src="getImageUrl(tournament.thumbnail_path)"
           class="absolute left-0 top-0 h-full w-full overflow-clip object-cover object-top"
         />
-        <h2 class="z-10 text-3xl font-bold tracking-tight">
+        <h2
+          class="z-10 text-3xl font-bold tracking-tight dark:drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
+        >
           {{ tournament.name }}
         </h2>
       </div>

@@ -15,16 +15,16 @@ const uuid = route.params.id
 const { data: registration, refresh } = await useFetch<RegistrationWithClass>(
   `/api/registrations/${uuid}`,
 )
-if (!registration.value) {
+if (!registration.value || registration.value.hidden) {
   throw createError({
     statusCode: 404,
     message: "Anmeldung nicht gefunden",
   })
 }
+
 const displayPdfDownload: ComputedRef<boolean> = computed(() => {
   return registration.value?.status === "Abgesendet"
 })
-
 const isFormLocked: ComputedRef<boolean> = computed(() => {
   return registration.value?.status !== "Ausstehend"
 })
@@ -37,7 +37,8 @@ const fetchTeam = async () => {
   const team = await $fetch<Tables<"team">>(
     `/api/teams/query/find-by-registration/${registration.value?.id}`,
   )
-  if (!team) {
+
+  if (!team && registration.value?.status !== "Abgelehnt") {
     throw createError({
       statusCode: 404,
       message: "Team nicht gefunden",
@@ -329,7 +330,7 @@ const submit = async () => {
         />
       </template>
       <template v-else>
-        <template v-if="isFormLocked">
+        <template v-if="isFormLocked && registration?.status === 'Abgesendet'">
           <UAlert
             icon="i-heroicons-exclamation-triangle"
             color="yellow"
@@ -338,6 +339,30 @@ const submit = async () => {
             title="Warnung"
             description="Die Anmeldung wurde abgesendet und kann nicht mehr geändert werden. Falls ihr einen Fehler
           gemacht habt, wendet euch an einen Verantwortlichen für eine Freigabe."
+          />
+        </template>
+        <template
+          v-else-if="isFormLocked && registration?.status === 'Abgeschlossen'"
+        >
+          <UAlert
+            icon="i-heroicons-check-circle"
+            color="green"
+            variant="soft"
+            class="my-3"
+            title="Erfolgreich"
+            description="Die Anmeldung wurde erfolgreich abgeschlossen. Viel Erfolg!"
+          />
+        </template>
+        <template
+          v-else-if="isFormLocked && registration?.status === 'Abgelehnt'"
+        >
+          <UAlert
+            icon="i-heroicons-x-circle"
+            color="red"
+            variant="soft"
+            class="my-3"
+            title="Abgelehnt"
+            description="Die Anmeldung wurde abgelehnt. Wende dich an einen Verantwortlichen für weitere Informationen."
           />
         </template>
         <template v-else>

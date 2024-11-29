@@ -7,7 +7,7 @@ import type { RegistrationWithClass } from "~/types/registration"
 type Body = {
   formPlayers: FormPlayer[]
   logo: Tables<"logo">
-  logo_variant: Tables<"logo_variant">
+  logo_variant: Tables<"logo_variant"> | null
   tournament: Tables<"tournament">
   registration: RegistrationWithClass
 }
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   const { formPlayers, logo, logo_variant, registration, tournament } =
     await readBody<Body>(event)
 
-  if (!formPlayers || !logo || !logo_variant || !registration) {
+  if (!formPlayers || !logo || !registration) {
     throw createError({
       statusCode: 400,
       statusMessage: "Missing data fields",
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
   const team: TeamInsert = {
     name: registration.class.name,
     logo_id: logo.id,
-    logo_variant_id: logo_variant.id ?? null,
+    logo_variant_id: logo_variant?.id ?? null,
     tournament_id: tournament.id,
     registration_id: registration.id,
   }

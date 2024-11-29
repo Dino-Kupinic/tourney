@@ -10,4 +10,9 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
+  runtimeConfig: {
+    public: {
+      clientUrl: "",
+    },
+  },
 })
