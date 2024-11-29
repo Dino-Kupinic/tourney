@@ -75,14 +75,12 @@ const columnsTable = computed(() =>
   columns.filter((column) => selectedColumns.value.includes(column)),
 )
 
-const selectedRows = ref<Tables<"registration">[]>([])
-function select(row: Tables<"registration">) {
-  const index = selectedRows.value.findIndex((item) => item.id === row.id)
-  if (index === -1) {
-    selectedRows.value.push(row)
-  } else {
-    selectedRows.value.splice(index, 1)
-  }
+type RegistrationColumn = {
+  id: string
+  name: string
+  class: string
+  expire_date: string
+  status: Enums<"registration_status">
 }
 
 const { data, status, refresh } = await useFetch("/api/registrations", {
@@ -98,6 +96,16 @@ const { data, status, refresh } = await useFetch("/api/registrations", {
   },
 })
 
+const selectedRows = ref<RegistrationColumn[]>([])
+function select(row: RegistrationColumn) {
+  const index = selectedRows.value.findIndex((item) => item.id === row.id)
+  if (index === -1) {
+    selectedRows.value.push(row)
+  } else {
+    selectedRows.value.splice(index, 1)
+  }
+}
+
 const search = ref<string>("")
 const tableData = computed(() => data.value || [])
 const filteredRows = computed(() => {
@@ -111,9 +119,10 @@ const filteredRows = computed(() => {
   })
 })
 
-const isOpenDelete = ref<boolean>(false)
 const sort = ref({ column: "status", direction: "asc" as const })
+const isOpenDelete = ref<boolean>(false)
 const isOpenCreate = ref<boolean>(false)
+const isOpenLinks = ref<boolean>(false)
 const years = Array.from(
   { length: 10 },
   (_, i) =>
@@ -213,6 +222,34 @@ const onCopyLink = async (row: Tables<"registration">) => {
     displayFailureNotification("Fehler beim Kopieren", text.value)
   }
 }
+
+type LinkGroup = Record<string, Link[]>
+type Link = {
+  name: string
+  class: string
+  url: string
+}
+
+const links = ref<LinkGroup>({})
+const groupLinks = () => {
+  return selectedRows.value.reduce(
+    (acc, row) => {
+      const { class: className, name, id } = row
+      if (!acc[className]) {
+        acc[className] = []
+      }
+      const url: string = `${config.public.clientUrl}/registrations/${id}`
+      acc[className].push({ name, url, class: className })
+      return acc
+    },
+    {} as Record<string, Link[]>,
+  )
+}
+
+const generateLinks = () => {
+  links.value = groupLinks()
+  isOpenLinks.value = true
+}
 </script>
 
 <template>
@@ -264,22 +301,30 @@ const onCopyLink = async (row: Tables<"registration">) => {
         </UCard>
       </UModal>
 
-      <UButton
-        v-if="selectedRows.length > 1"
-        @click="isOpenDelete = true"
-        icon="i-heroicons-trash"
-        variant="soft"
-        color="red"
-        size="xs"
-        label="Löschen..."
-      />
-
       <UInput
         v-model="search"
         icon="i-heroicons-magnifying-glass-20-solid"
         placeholder="Suchen..."
         size="xs"
       />
+
+      <template v-if="selectedRows.length > 1">
+        <UButton
+          @click="isOpenDelete = true"
+          icon="i-heroicons-trash"
+          variant="soft"
+          color="red"
+          size="xs"
+          label="Löschen..."
+        />
+        <UButton
+          label="Links exportieren..."
+          icon="i-heroicons-arrow-up-on-square"
+          @click="generateLinks"
+          color="gray"
+          size="xs"
+        />
+      </template>
 
       <UDropdown
         v-if="selectedRows.length > 0"
@@ -328,6 +373,64 @@ const onCopyLink = async (row: Tables<"registration">) => {
         @click="isOpenCreate = true"
         label="Neue Anmeldung..."
       />
+
+      <!-- Link Modal -->
+      <UModal
+        v-model="isOpenLinks"
+        :ui="{ width: 'w-full sm:max-w-2xl' }"
+        prevent-close
+      >
+        <UCard
+          :ui="{
+            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+            body: {
+              padding: 'px-4 py-5 sm:p-6',
+            },
+            header: {
+              padding: 'px-4 py-3 sm:px-6',
+            },
+            footer: {
+              padding: 'px-4 py-3 sm:px-6',
+            },
+          }"
+        >
+          <template #header>
+            <strong> Links </strong>
+          </template>
+
+          <ul
+            class="h-96 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
+          >
+            <li
+              v-for="[className, classLinks] in Object.entries(links)"
+              :key="className"
+              class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
+            >
+              <div class="my-3 flex flex-col gap-3">
+                <strong>{{ className }}</strong>
+                <ul class="space-y-1">
+                  <li v-for="link in classLinks" :key="link.url">
+                    <p class="text-xs">{{ link.name }}</p>
+                    <code class="text-xs">{{ link.url }}</code>
+                  </li>
+                </ul>
+                <div>
+                  <UButton variant="soft" size="xs" label="Kopieren" />
+                </div>
+              </div>
+            </li>
+          </ul>
+
+          <template #footer>
+            <UButton
+              color="gray"
+              size="xs"
+              @click="isOpenLinks = false"
+              label="Fertig"
+            />
+          </template>
+        </UCard>
+      </UModal>
 
       <!-- Create Modal -->
       <UModal v-model="isOpenCreate" :ui="{ width: 'w-full sm:max-w-md' }">
