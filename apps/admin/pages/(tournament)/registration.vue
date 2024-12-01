@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { Enums, Tables } from "~/types/database.types"
+import type { Enums } from "~/types/database.types"
 import { z } from "zod"
-import type { FormSubmitEvent } from "#ui/types"
 
 const title = ref<string>("Anmeldung")
 useHead({
@@ -44,7 +43,7 @@ const actions = [
   ],
 ]
 
-const items = (row: Tables<"registration">) =>
+const items = (row: RegistrationColumn) =>
   ref([
     [
       {
@@ -141,14 +140,13 @@ const schema = z.object({
   year: z.string(),
 })
 
-type Schema = z.output<typeof schema>
 const state = reactive({
   expire_date: undefined,
   teams: 1,
   year: classYear.value,
 })
 
-const onSubmitCreate = async (event: FormSubmitEvent<Schema>) => {
+const onSubmitCreate = async () => {
   try {
     schema.parse(state)
     await $fetch("/api/registrations/create", { method: "POST", body: state })
@@ -212,15 +210,13 @@ const onUpdate = async (status: Enums<"registration_status">) => {
 }
 
 const config = useRuntimeConfig()
-const onCopyLink = async (row: Tables<"registration">) => {
+const onCopyLink = async (row: RegistrationColumn) => {
   const source: string = `${config.public.clientUrl}/registrations/${row.id}`
   const { text, copy, copied } = useClipboard({ source })
   await copy()
-  if (copied.value) {
-    displaySuccessNotification("Link kopiert", text.value)
-  } else {
-    displayFailureNotification("Fehler beim Kopieren", text.value)
-  }
+  copied.value
+    ? displaySuccessNotification("Link kopiert", text.value)
+    : displayFailureNotification("Fehler beim Kopieren", text.value)
 }
 
 type LinkGroup = Record<string, Link[]>
