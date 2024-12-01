@@ -177,6 +177,10 @@ pnpm run build
 pnpm run app:start
 ```
 
+> [!TIP]
+> Didn't work?
+> Try installing pm2 globally with `npm install pm2 -g`.
+
 3. monitor the app
 
 ```bash
