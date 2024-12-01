@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Enums } from "~/types/database.types"
+import type { Link, LinkGroup } from "~/types/link"
 import { z } from "zod"
 
 const title = ref<string>("Anmeldung")
@@ -47,17 +48,19 @@ const items = (row: RegistrationColumn) =>
   ref([
     [
       {
+        label: "Link kopieren",
+        icon: "i-heroicons-clipboard-document-check",
+        click: () => onCopyLink(row),
+      },
+      {
         label: "Editieren",
         icon: "i-heroicons-pencil-square-20-solid",
+        click: () => onEdit(row),
       },
       {
         label: "Info",
         icon: "i-heroicons-information-circle",
-      },
-      {
-        label: "Link kopieren",
-        icon: "i-heroicons-clipboard-document-check",
-        click: () => onCopyLink(row),
+        click: () => onInfo(row),
       },
     ],
     [
@@ -91,6 +94,7 @@ const { data, status, refresh } = await useFetch("/api/registrations", {
       class: item.class?.name,
       expire_date: item.expire_date,
       status: item.status,
+      allow_class_mixing: item.allow_class_mixing,
     }))
   },
 })
@@ -120,7 +124,9 @@ const filteredRows = computed(() => {
 
 const sort = ref({ column: "status", direction: "asc" as const })
 const isOpenDelete = ref<boolean>(false)
+const isOpenEdit = ref<boolean>(false)
 const isOpenCreate = ref<boolean>(false)
+const isOpenInfo = ref<boolean>(false)
 const isOpenLinks = ref<boolean>(false)
 const years = Array.from(
   { length: 10 },
@@ -219,11 +225,23 @@ const onCopyLink = async (row: RegistrationColumn) => {
     : displayFailureNotification("Fehler beim Kopieren", text.value)
 }
 
-type LinkGroup = Record<string, Link[]>
-type Link = {
-  name: string
-  class: string
-  url: string
+const onEdit = async (row: RegistrationColumn) => {
+  isOpenEdit.value = true
+  console.table(row)
+}
+
+const infoDisplay = ref<RegistrationColumn>()
+const onInfo = async (row: RegistrationColumn) => {
+  isOpenInfo.value = true
+  infoDisplay.value = row
+}
+
+const onSubmitEdit = async () => {
+  isOpenEdit.value = false
+  displaySuccessNotification(
+    "Editiert",
+    "Die Anmeldung wurde erfolgreich editiert.",
+  )
 }
 
 const links = ref<LinkGroup>({})
@@ -314,7 +332,7 @@ const generateLinks = () => {
           label="Löschen..."
         />
         <UButton
-          label="Links exportieren..."
+          label="Links exportieren"
           icon="i-heroicons-arrow-up-on-square"
           @click="generateLinks"
           color="gray"
@@ -515,6 +533,80 @@ const generateLinks = () => {
           </template>
         </UCard>
       </UModal>
+
+      <!-- Edit Modal -->
+      <UModal v-model="isOpenEdit" :ui="{ width: 'w-full sm:max-w-md' }">
+        <UCard
+          :ui="{
+            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+            body: {
+              padding: 'px-4 py-5 sm:p-6',
+            },
+            header: {
+              padding: 'px-4 py-3 sm:px-6',
+            },
+            footer: {
+              padding: 'px-4 py-3 sm:px-6',
+            },
+          }"
+        >
+          <template #header>
+            <strong> Editieren </strong>
+          </template>
+
+          <template #footer>
+            <div class="flex items-center gap-2">
+              <UButton
+                variant="soft"
+                size="xs"
+                @click="onSubmitEdit"
+                label="Speichern"
+              />
+              <UButton
+                color="gray"
+                size="xs"
+                @click="isOpenEdit = false"
+                label="Abbrechen"
+              />
+            </div>
+          </template>
+        </UCard>
+      </UModal>
+
+      <!-- Info Modal -->
+      <UModal v-model="isOpenInfo" :ui="{ width: 'w-full sm:max-w-md' }">
+        <UCard
+          :ui="{
+            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+            body: {
+              padding: 'px-4 py-5 sm:p-6',
+            },
+            header: {
+              padding: 'px-4 py-3 sm:px-6',
+            },
+            footer: {
+              padding: 'px-4 py-3 sm:px-6',
+            },
+          }"
+        >
+          <template #header>
+            <strong> Info </strong>
+          </template>
+
+          <pre>{{ infoDisplay }}</pre>
+
+          <template #footer>
+            <div class="flex items-center gap-2">
+              <UButton
+                color="gray"
+                size="xs"
+                @click="isOpenInfo = false"
+                label="Fertig"
+              />
+            </div>
+          </template>
+        </UCard>
+      </UModal>
     </div>
   </BasePageHeader>
   <BasePageContent>
@@ -572,6 +664,19 @@ const generateLinks = () => {
 
       <template #date-data="{ row }">
         <span>{{ useDateFormat(row.expire_date, "DD.MM.YYYY") }}</span>
+      </template>
+
+      <template #allow_class_mixing-data="{ row }">
+        <div>
+          <span v-if="row.allow_class_mixing" class="flex items-center gap-2">
+            <UIcon class="text-green-500" name="i-heroicons-check" size="20" />
+            Ja
+          </span>
+          <span v-else class="flex items-center gap-2">
+            <UIcon class="text-red-500" name="i-heroicons-x-mark" size="20" />
+            Nein
+          </span>
+        </div>
       </template>
 
       <template #actions-data="{ row }">

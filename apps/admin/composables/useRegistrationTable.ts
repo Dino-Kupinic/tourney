@@ -1,5 +1,3 @@
-import type { Tables } from "~/types/database.types"
-
 export const useRegistrationTable = () => {
   const columns = [
     {
@@ -20,6 +18,11 @@ export const useRegistrationTable = () => {
     {
       key: "status",
       label: "Status",
+      sortable: true,
+    },
+    {
+      key: "allow_class_mixing",
+      label: "Mischung",
       sortable: true,
     },
     {

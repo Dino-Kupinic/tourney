@@ -2,7 +2,8 @@
 import type { ParsedJsonTournament } from "~/types/prizes"
 import type { Tables } from "~/types/database.types"
 import type { FormPlayer } from "~/types/form"
-import { key } from "~/keys/isFormLocked"
+import { formLocked } from "~/keys/isFormLocked"
+import { classMixing } from "~/keys/allowClassMixing"
 import type { RegistrationWithClass } from "~/types/registration"
 
 useHead({
@@ -28,7 +29,10 @@ const displayPdfDownload: ComputedRef<boolean> = computed(() => {
 const isFormLocked: ComputedRef<boolean> = computed(() => {
   return registration.value?.status !== "Ausstehend"
 })
-provide(key, isFormLocked)
+provide(formLocked, isFormLocked)
+
+const allowClassMixing = registration.value?.allow_class_mixing
+provide(classMixing, allowClassMixing)
 
 const { data: tournaments } = await useFetch("/api/tournaments/active")
 const tournament = ref<ParsedJsonTournament>()

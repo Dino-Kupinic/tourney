@@ -207,6 +207,7 @@ export type Database = {
       }
       registration: {
         Row: {
+          allow_class_mixing: boolean
           class_id: string
           expire_date: string
           hidden: boolean
@@ -215,6 +216,7 @@ export type Database = {
           status: Database["public"]["Enums"]["registration_status"]
         }
         Insert: {
+          allow_class_mixing?: boolean
           class_id: string
           expire_date: string
           hidden?: boolean
@@ -223,6 +225,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["registration_status"]
         }
         Update: {
+          allow_class_mixing?: boolean
           class_id?: string
           expire_date?: string
           hidden?: boolean
