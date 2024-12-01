@@ -32,6 +32,7 @@ export default defineEventHandler(async (event) => {
       status: "Ausstehend",
       hidden: false,
       name: `Team ${i + 1}`,
+      allow_class_mixing: false,
     })),
   )
 
