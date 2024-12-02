@@ -77,6 +77,23 @@ const columnsTable = computed(() =>
   columns.filter((column) => selectedColumns.value.includes(column)),
 )
 
+const tabItems = [
+  {
+    slot: "multiple",
+    key: "multiple",
+    label: "Mehrfach",
+    icon: "i-heroicons-rectangle-stack",
+    description: "Anmeldungen für alle Klassen erstellen.",
+  },
+  {
+    slot: "single",
+    key: "single",
+    label: "Einzel",
+    icon: "i-heroicons-document",
+    description: "Anmeldung für eine Klasse erstellen.",
+  },
+]
+
 type RegistrationColumn = {
   id: string
   name: string
@@ -141,24 +158,58 @@ const { data: classes } = await useFetch(`/api/classes/${encodedYear.value}`, {
   watch: [classYear],
 })
 
-const creationSchema = z.object({
+const creationSchemaMultiple = z.object({
   expire_date: z.string().date(),
   teams: z.number().min(1, "Mindestens ein Team pro Klasse").default(1),
   year: z.string(),
 })
 
-const creationState = reactive({
+const creationStateMultiple = reactive({
   expire_date: undefined,
   teams: 1,
   year: classYear.value,
 })
 
-const onSubmitCreate = async () => {
+const onSubmitCreateMultiple = async () => {
   try {
-    creationSchema.parse(creationState)
+    creationSchemaMultiple.parse(creationStateMultiple)
     await $fetch("/api/registrations/create", {
       method: "POST",
-      body: creationState,
+      body: creationStateMultiple,
+    })
+    isOpenCreate.value = false
+    await refresh()
+    displaySuccessNotification(
+      "Anmeldungen erstellt",
+      "Die Anmeldungen wurden erfolgreich erstellt.",
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler beim Erstellen",
+      "Die Anmeldungen konnte nicht erstellt werden.",
+    )
+  }
+}
+
+const creationSchemaSingle = z.object({
+  expire_date: z.string().date(),
+  teams: z.number().min(1, "Mindestens ein Team pro Klasse").default(1),
+  year: z.string(),
+})
+
+const creationStateSingle = reactive({
+  expire_date: undefined,
+  teams: 1,
+  year: classYear.value,
+})
+
+const onSubmitCreateSingle = async () => {
+  try {
+    creationSchemaMultiple.parse(creationStateMultiple)
+    await $fetch("/api/registrations/create", {
+      method: "POST",
+      body: creationStateMultiple,
     })
     isOpenCreate.value = false
     await refresh()
@@ -312,6 +363,17 @@ const generateLinks = () => {
   links.value = groupLinks()
   isOpenLinks.value = true
 }
+
+const refreshTable = () => {
+  refresh()
+  displaySuccessNotification("Aktualisiert", "Die Tabelle wurde aktualisiert.")
+}
+
+function onChange(index: number) {
+  const item = tabItems[index]
+
+  alert(`${item.label} was clicked!`)
+}
 </script>
 
 <template>
@@ -426,7 +488,7 @@ const generateLinks = () => {
         color="gray"
         size="xs"
         square
-        @click="refresh"
+        @click="refreshTable"
       />
 
       <UButton
@@ -514,61 +576,91 @@ const generateLinks = () => {
             <strong> Neue Anmeldung </strong>
           </template>
 
-          <UForm
-            :schema="creationSchema"
-            :state="creationState"
-            class="space-y-4"
-            @submit="onSubmitCreate"
+          <UTabs
+            :items="tabItems"
+            class="w-full"
+            @change="onChange"
+            :ui="{ list: { tab: { height: 'h-7' }, height: 'h-9' } }"
           >
-            <UFormGroup
-              label="Teams"
-              name="teams"
-              description="Anzahl an Anmeldungen für jede Klasse."
-              required
-            >
-              <UInput v-model="creationState.teams" type="number" />
-            </UFormGroup>
+            <template #icon="{ item, selected }">
+              <UIcon
+                :name="item.icon"
+                class="me-2 h-4 w-4 flex-shrink-0"
+                :class="[selected && 'text-primary-500 dark:text-primary-400']"
+              />
+            </template>
 
-            <UFormGroup
-              label="Klassen"
-              name="classes"
-              class="grow"
-              description="Für diese Klassen wird ein Link generiert."
-            >
-              <ul
-                class="h-40 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
+            <template #multiple="{ item }">
+              <UForm
+                :schema="creationSchemaMultiple"
+                :state="creationStateMultiple"
+                class="space-y-4 pt-2"
+                @submit="onSubmitCreateMultiple"
               >
-                <li
-                  v-for="schoolClass in classes"
-                  :key="schoolClass.name"
-                  class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
+                <UFormGroup
+                  label="Teams"
+                  name="teams"
+                  description="Anzahl an Anmeldungen für jede Klasse."
+                  required
                 >
-                  <p>{{ schoolClass.name }}</p>
-                  <p>{{ schoolClass.year }}</p>
-                </li>
-              </ul>
-            </UFormGroup>
+                  <UInput v-model="creationStateMultiple.teams" type="number" />
+                </UFormGroup>
 
-            <UFormGroup label="Datensatz">
-              <USelect v-model="classYear" :options="years" />
-            </UFormGroup>
+                <UFormGroup
+                  label="Klassen"
+                  name="classes"
+                  class="grow"
+                  description="Für diese Klassen wird ein Link generiert."
+                >
+                  <ul
+                    class="h-40 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
+                  >
+                    <li
+                      v-for="schoolClass in classes"
+                      :key="schoolClass.name"
+                      class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
+                    >
+                      <p>{{ schoolClass.name }}</p>
+                      <p>{{ schoolClass.year }}</p>
+                    </li>
+                  </ul>
+                </UFormGroup>
 
-            <UFormGroup
-              label="Ablaufdatum"
-              name="date"
-              description="An diesem Datum werden die Anmeldungen automatisch geschlossen."
-              required
-            >
-              <UInput v-model="creationState.expire_date" type="date" />
-            </UFormGroup>
-          </UForm>
+                <UFormGroup label="Datensatz">
+                  <USelect v-model="classYear" :options="years" />
+                </UFormGroup>
+
+                <UFormGroup
+                  label="Ablaufdatum"
+                  name="date"
+                  description="An diesem Datum werden die Anmeldungen automatisch geschlossen."
+                  required
+                >
+                  <UInput
+                    v-model="creationStateMultiple.expire_date"
+                    type="date"
+                  />
+                </UFormGroup>
+              </UForm>
+            </template>
+            <template #single="{ item }">
+              <UForm
+                :schema="creationSchemaSingle"
+                :state="creationSchemaSingle"
+                class="space-y-4 pt-2"
+                @submit="onSubmitCreateSingle"
+              >
+              </UForm>
+            </template>
+          </UTabs>
 
           <template #footer>
             <div class="flex items-center gap-2">
+              <!-- TODO -->
               <UButton
                 variant="soft"
                 size="xs"
-                @click="onSubmitCreate"
+                @click="onSubmitCreateMultiple"
                 label="Erstellen"
               />
               <UButton
