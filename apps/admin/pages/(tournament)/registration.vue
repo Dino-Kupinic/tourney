@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Enums } from "~/types/database.types"
+import type { Enums, Tables } from "~/types/database.types"
 import type { Link, LinkGroup } from "~/types/link"
 import { z } from "zod"
 
@@ -194,14 +194,18 @@ const onSubmitCreateMultiple = async () => {
 
 const creationSchemaSingle = z.object({
   expire_date: z.string().date(),
-  teams: z.number().min(1, "Mindestens ein Team pro Klasse").default(1),
+  name: z.string(),
+  class: z.custom<Tables<"class">>(),
   year: z.string(),
+  allow_class_mixing: z.boolean(),
 })
 
 const creationStateSingle = reactive({
   expire_date: undefined,
-  teams: 1,
+  name: "Team_1",
   year: classYear.value,
+  class: undefined,
+  allow_class_mixing: false,
 })
 
 const onSubmitCreateSingle = async () => {
@@ -369,10 +373,11 @@ const refreshTable = () => {
   displaySuccessNotification("Aktualisiert", "Die Tabelle wurde aktualisiert.")
 }
 
+type TabKey = "multiple" | "single"
+const currentTab = ref<TabKey>(tabItems[0].key as TabKey)
 function onChange(index: number) {
   const item = tabItems[index]
-
-  alert(`${item.label} was clicked!`)
+  currentTab.value = item.key as TabKey
 }
 </script>
 
@@ -650,17 +655,69 @@ function onChange(index: number) {
                 class="space-y-4 pt-2"
                 @submit="onSubmitCreateSingle"
               >
+                <UFormGroup
+                  label="Name"
+                  name="name"
+                  description="Der Name der Anmeldung."
+                  required
+                >
+                  <UInput v-model="creationStateSingle.name" />
+                </UFormGroup>
+
+                <UFormGroup
+                  label="Klasse"
+                  name="class"
+                  description="Die Klasse der Anmeldung."
+                  required
+                >
+                  <USelectMenu
+                    v-model="creationStateSingle.class"
+                    :options="[]"
+                    option-attribute="name"
+                  />
+                </UFormGroup>
+
+                <UFormGroup label="Datensatz">
+                  <USelect v-model="classYear" :options="years" />
+                </UFormGroup>
+
+                <UFormGroup
+                  label="Ablaufdatum"
+                  name="date"
+                  description="An diesem Datum wird die Anmeldung automatisch geschlossen."
+                  required
+                >
+                  <UInput
+                    v-model="creationStateSingle.expire_date"
+                    type="date"
+                  />
+                </UFormGroup>
+
+                <UFormGroup
+                  label="Klassenmischung erlauben"
+                  name="allow_class_mixing"
+                  description="Schüler können sich in anderen Klassen anmelden."
+                  :ui="{
+                    wrapper:
+                      'flex items-center justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-800 gap-3',
+                  }"
+                >
+                  <UToggle v-model="creationStateSingle.allow_class_mixing" />
+                </UFormGroup>
               </UForm>
             </template>
           </UTabs>
 
           <template #footer>
             <div class="flex items-center gap-2">
-              <!-- TODO -->
               <UButton
                 variant="soft"
                 size="xs"
-                @click="onSubmitCreateMultiple"
+                @click="
+                  currentTab === 'multiple'
+                    ? onSubmitCreateMultiple
+                    : onSubmitCreateSingle
+                "
                 label="Erstellen"
               />
               <UButton
