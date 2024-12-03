@@ -154,9 +154,12 @@ const years = Array.from(
 const classYear = ref<string>(years[0])
 const encodedYear = computed(() => encodeURIComponent(classYear.value))
 
-const { data: classes } = await useFetch(`/api/classes/${encodedYear.value}`, {
-  watch: [classYear],
-})
+const { data: classes } = await useFetch(
+  () => `/api/classes/${encodedYear.value}`,
+  {
+    watch: [classYear],
+  },
+)
 
 const creationSchemaMultiple = z.object({
   expire_date: z.string().date(),
@@ -620,14 +623,25 @@ function onChange(index: number) {
                   <ul
                     class="h-40 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
                   >
-                    <li
-                      v-for="schoolClass in classes"
-                      :key="schoolClass.name"
-                      class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
-                    >
-                      <p>{{ schoolClass.name }}</p>
-                      <p>{{ schoolClass.year }}</p>
-                    </li>
+                    <template v-if="classes?.length">
+                      <li
+                        v-for="schoolClass in classes"
+                        :key="schoolClass.name"
+                        class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
+                      >
+                        <p>{{ schoolClass.name }}</p>
+                        <p>{{ schoolClass.year }}</p>
+                      </li>
+                    </template>
+                    <template v-else>
+                      <div
+                        class="flex h-full w-full items-center justify-center"
+                      >
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                          Keine Klassen für {{ classYear }} gefunden.
+                        </p>
+                      </div>
+                    </template>
                   </ul>
                 </UFormGroup>
 
