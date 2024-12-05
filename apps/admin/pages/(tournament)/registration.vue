@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Enums } from "~/types/database.types"
+import type { Enums, Tables } from "~/types/database.types"
 import type { Link, LinkGroup } from "~/types/link"
 import { z } from "zod"
 
@@ -77,6 +77,23 @@ const columnsTable = computed(() =>
   columns.filter((column) => selectedColumns.value.includes(column)),
 )
 
+const tabItems = [
+  {
+    slot: "multiple",
+    key: "multiple",
+    label: "Mehrfach",
+    icon: "i-heroicons-rectangle-stack",
+    description: "Anmeldungen für alle Klassen erstellen.",
+  },
+  {
+    slot: "single",
+    key: "single",
+    label: "Einzel",
+    icon: "i-heroicons-document",
+    description: "Anmeldung für eine Klasse erstellen.",
+  },
+]
+
 type RegistrationColumn = {
   id: string
   name: string
@@ -137,28 +154,31 @@ const years = Array.from(
 const classYear = ref<string>(years[0])
 const encodedYear = computed(() => encodeURIComponent(classYear.value))
 
-const { data: classes } = await useFetch(`/api/classes/${encodedYear.value}`, {
-  watch: [classYear],
-})
+const { data: classes } = await useFetch(
+  () => `/api/classes/${encodedYear.value}`,
+  {
+    watch: [classYear],
+  },
+)
 
-const creationSchema = z.object({
+const creationSchemaMultiple = z.object({
   expire_date: z.string().date(),
   teams: z.number().min(1, "Mindestens ein Team pro Klasse").default(1),
   year: z.string(),
 })
 
-const creationState = reactive({
+const creationStateMultiple = reactive({
   expire_date: undefined,
   teams: 1,
   year: classYear.value,
 })
 
-const onSubmitCreate = async () => {
+const onSubmitCreateMultiple = async () => {
   try {
-    creationSchema.parse(creationState)
-    await $fetch("/api/registrations/create", {
+    creationSchemaMultiple.parse(creationStateMultiple)
+    await $fetch("/api/registrations/create/multiple", {
       method: "POST",
-      body: creationState,
+      body: creationStateMultiple,
     })
     isOpenCreate.value = false
     await refresh()
@@ -171,6 +191,45 @@ const onSubmitCreate = async () => {
     displayFailureNotification(
       "Fehler beim Erstellen",
       "Die Anmeldungen konnte nicht erstellt werden.",
+    )
+  }
+}
+
+const creationSchemaSingle = z.object({
+  expire_date: z.string().date(),
+  name: z.string(),
+  schoolClass: z.custom<Tables<"class">>(),
+  year: z.string(),
+  allow_class_mixing: z.boolean().optional(),
+})
+
+const creationStateSingle = reactive({
+  expire_date: undefined,
+  name: "Team 1",
+  year: classYear.value,
+  schoolClass: undefined,
+  allow_class_mixing: false,
+})
+
+const onSubmitCreateSingle = async () => {
+  try {
+    creationSchemaSingle.parse(creationStateSingle)
+    console.table(creationStateSingle)
+    await $fetch("/api/registrations/create/single", {
+      method: "POST",
+      body: creationStateSingle,
+    })
+    isOpenCreate.value = false
+    await refresh()
+    displaySuccessNotification(
+      "Anmeldung erstellt",
+      "Die Anmeldung wurden erfolgreich erstellt.",
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler beim Erstellen",
+      "Die Anmeldung konnte nicht erstellt werden.",
     )
   }
 }
@@ -312,6 +371,27 @@ const generateLinks = () => {
   links.value = groupLinks()
   isOpenLinks.value = true
 }
+
+const refreshTable = () => {
+  refresh()
+  displaySuccessNotification("Aktualisiert", "Die Tabelle wurde aktualisiert.")
+}
+
+type TabKey = "multiple" | "single"
+const currentTab = ref<TabKey>(tabItems[0].key as TabKey)
+function onChange(index: number) {
+  const item = tabItems[index]
+  currentTab.value = item.key as TabKey
+}
+
+const onSubmitCreate = async () => {
+  if (currentTab.value === "multiple") {
+    await onSubmitCreateMultiple()
+  } else {
+    await onSubmitCreateSingle()
+    currentTab.value = "multiple"
+  }
+}
 </script>
 
 <template>
@@ -426,7 +506,7 @@ const generateLinks = () => {
         color="gray"
         size="xs"
         square
-        @click="refresh"
+        @click="refreshTable"
       />
 
       <UButton
@@ -514,54 +594,144 @@ const generateLinks = () => {
             <strong> Neue Anmeldung </strong>
           </template>
 
-          <UForm
-            :schema="creationSchema"
-            :state="creationState"
-            class="space-y-4"
-            @submit="onSubmitCreate"
+          <UTabs
+            :items="tabItems"
+            class="w-full"
+            @change="onChange"
+            :ui="{ list: { tab: { height: 'h-7' }, height: 'h-9' } }"
           >
-            <UFormGroup
-              label="Teams"
-              name="teams"
-              description="Anzahl an Anmeldungen für jede Klasse."
-              required
-            >
-              <UInput v-model="creationState.teams" type="number" />
-            </UFormGroup>
+            <template #icon="{ item, selected }">
+              <UIcon
+                :name="item.icon"
+                class="me-2 h-4 w-4 flex-shrink-0"
+                :class="[selected && 'text-primary-500 dark:text-primary-400']"
+              />
+            </template>
 
-            <UFormGroup
-              label="Klassen"
-              name="classes"
-              class="grow"
-              description="Für diese Klassen wird ein Link generiert."
-            >
-              <ul
-                class="h-40 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
+            <template #multiple="{ item }">
+              <UForm
+                :schema="creationSchemaMultiple"
+                :state="creationStateMultiple"
+                class="space-y-4 pt-2"
+                @submit="onSubmitCreateMultiple"
               >
-                <li
-                  v-for="schoolClass in classes"
-                  :key="schoolClass.name"
-                  class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
+                <UFormGroup
+                  label="Teams"
+                  name="teams"
+                  description="Anzahl an Anmeldungen für jede Klasse."
+                  required
                 >
-                  <p>{{ schoolClass.name }}</p>
-                  <p>{{ schoolClass.year }}</p>
-                </li>
-              </ul>
-            </UFormGroup>
+                  <UInput v-model="creationStateMultiple.teams" type="number" />
+                </UFormGroup>
 
-            <UFormGroup label="Datensatz">
-              <USelect v-model="classYear" :options="years" />
-            </UFormGroup>
+                <UFormGroup
+                  label="Klassen"
+                  name="classes"
+                  class="grow"
+                  description="Für diese Klassen wird ein Link generiert."
+                >
+                  <ul
+                    class="h-40 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
+                  >
+                    <template v-if="classes?.length">
+                      <li
+                        v-for="schoolClass in classes"
+                        :key="schoolClass.name"
+                        class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
+                      >
+                        <p>{{ schoolClass.name }}</p>
+                        <p>{{ schoolClass.year }}</p>
+                      </li>
+                    </template>
+                    <template v-else>
+                      <div
+                        class="flex h-full w-full items-center justify-center"
+                      >
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                          Keine Klassen für {{ classYear }} gefunden.
+                        </p>
+                      </div>
+                    </template>
+                  </ul>
+                </UFormGroup>
 
-            <UFormGroup
-              label="Ablaufdatum"
-              name="date"
-              description="An diesem Datum werden die Anmeldungen automatisch geschlossen."
-              required
-            >
-              <UInput v-model="creationState.expire_date" type="date" />
-            </UFormGroup>
-          </UForm>
+                <UFormGroup label="Datensatz">
+                  <USelect v-model="classYear" :options="years" />
+                </UFormGroup>
+
+                <UFormGroup
+                  label="Ablaufdatum"
+                  name="date"
+                  description="An diesem Datum werden die Anmeldungen automatisch geschlossen."
+                  required
+                >
+                  <UInput
+                    v-model="creationStateMultiple.expire_date"
+                    type="date"
+                  />
+                </UFormGroup>
+              </UForm>
+            </template>
+            <template #single="{ item }">
+              <UForm
+                :schema="creationSchemaSingle"
+                :state="creationSchemaSingle"
+                class="space-y-4 pt-2"
+                @submit="onSubmitCreateSingle"
+              >
+                <UFormGroup
+                  label="Name"
+                  name="name"
+                  description="Der Name der Anmeldung."
+                  required
+                >
+                  <UInput v-model="creationStateSingle.name" />
+                </UFormGroup>
+
+                <UFormGroup
+                  label="Klasse"
+                  name="class"
+                  description="Die Klasse der Anmeldung."
+                  required
+                >
+                  <USelectMenu
+                    v-model="creationStateSingle.schoolClass"
+                    placeholder="Klasse auswählen"
+                    :options="classes ?? []"
+                    option-attribute="name"
+                  />
+                </UFormGroup>
+
+                <UFormGroup label="Datensatz">
+                  <USelect v-model="classYear" :options="years" />
+                </UFormGroup>
+
+                <UFormGroup
+                  label="Ablaufdatum"
+                  name="date"
+                  description="An diesem Datum wird die Anmeldung automatisch geschlossen."
+                  required
+                >
+                  <UInput
+                    v-model="creationStateSingle.expire_date"
+                    type="date"
+                  />
+                </UFormGroup>
+
+                <UFormGroup
+                  label="Klassenmischung erlauben"
+                  name="allow_class_mixing"
+                  description="Schüler können sich in anderen Klassen anmelden."
+                  :ui="{
+                    wrapper:
+                      'flex items-center justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-800 gap-3',
+                  }"
+                >
+                  <UToggle v-model="creationStateSingle.allow_class_mixing" />
+                </UFormGroup>
+              </UForm>
+            </template>
+          </UTabs>
 
           <template #footer>
             <div class="flex items-center gap-2">
