@@ -176,7 +176,7 @@ const creationStateMultiple = reactive({
 const onSubmitCreateMultiple = async () => {
   try {
     creationSchemaMultiple.parse(creationStateMultiple)
-    await $fetch("/api/registrations/create", {
+    await $fetch("/api/registrations/create/multiple", {
       method: "POST",
       body: creationStateMultiple,
     })
@@ -198,37 +198,38 @@ const onSubmitCreateMultiple = async () => {
 const creationSchemaSingle = z.object({
   expire_date: z.string().date(),
   name: z.string(),
-  class: z.custom<Tables<"class">>(),
+  schoolClass: z.custom<Tables<"class">>(),
   year: z.string(),
-  allow_class_mixing: z.boolean(),
+  allow_class_mixing: z.boolean().optional(),
 })
 
 const creationStateSingle = reactive({
   expire_date: undefined,
-  name: "Team_1",
+  name: "Team 1",
   year: classYear.value,
-  class: undefined,
+  schoolClass: undefined,
   allow_class_mixing: false,
 })
 
 const onSubmitCreateSingle = async () => {
   try {
-    creationSchemaMultiple.parse(creationStateMultiple)
-    await $fetch("/api/registrations/create", {
+    creationSchemaSingle.parse(creationStateSingle)
+    console.table(creationStateSingle)
+    await $fetch("/api/registrations/create/single", {
       method: "POST",
-      body: creationStateMultiple,
+      body: creationStateSingle,
     })
     isOpenCreate.value = false
     await refresh()
     displaySuccessNotification(
-      "Anmeldungen erstellt",
-      "Die Anmeldungen wurden erfolgreich erstellt.",
+      "Anmeldung erstellt",
+      "Die Anmeldung wurden erfolgreich erstellt.",
     )
   } catch (err) {
     console.error(err)
     displayFailureNotification(
       "Fehler beim Erstellen",
-      "Die Anmeldungen konnte nicht erstellt werden.",
+      "Die Anmeldung konnte nicht erstellt werden.",
     )
   }
 }
@@ -381,6 +382,15 @@ const currentTab = ref<TabKey>(tabItems[0].key as TabKey)
 function onChange(index: number) {
   const item = tabItems[index]
   currentTab.value = item.key as TabKey
+}
+
+const onSubmitCreate = async () => {
+  if (currentTab.value === "multiple") {
+    await onSubmitCreateMultiple()
+  } else {
+    await onSubmitCreateSingle()
+    currentTab.value = "multiple"
+  }
 }
 </script>
 
@@ -685,8 +695,9 @@ function onChange(index: number) {
                   required
                 >
                   <USelectMenu
-                    v-model="creationStateSingle.class"
-                    :options="[]"
+                    v-model="creationStateSingle.schoolClass"
+                    placeholder="Klasse auswählen"
+                    :options="classes ?? []"
                     option-attribute="name"
                   />
                 </UFormGroup>
@@ -727,11 +738,7 @@ function onChange(index: number) {
               <UButton
                 variant="soft"
                 size="xs"
-                @click="
-                  currentTab === 'multiple'
-                    ? onSubmitCreateMultiple
-                    : onSubmitCreateSingle
-                "
+                @click="onSubmitCreate"
                 label="Erstellen"
               />
               <UButton
