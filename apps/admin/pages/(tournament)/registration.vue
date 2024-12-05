@@ -214,7 +214,6 @@ const creationStateSingle = reactive({
 const onSubmitCreateSingle = async () => {
   try {
     creationSchemaSingle.parse(creationStateSingle)
-    console.table(creationStateSingle)
     await $fetch("/api/registrations/create/single", {
       method: "POST",
       body: creationStateSingle,
