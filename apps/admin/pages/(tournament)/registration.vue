@@ -258,6 +258,15 @@ const onDelete = async () => {
 
 const onUpdate = async (status: Enums<"registration_status">) => {
   try {
+    const rowsToRevert = selectedRows.value.filter(
+      (row) => row.status !== "Ausstehend" && status === "Ausstehend",
+    )
+    if (rowsToRevert.length > 0) {
+      await $fetch("/api/registrations/update/revert", {
+        method: "PUT",
+        body: { registrations: rowsToRevert.map((row) => row.id) },
+      })
+    }
     await $fetch("/api/registrations/update", {
       method: "PUT",
       body: { registrations: registrationIds.value, status: status },
@@ -291,7 +300,6 @@ const editSchema = z.object({
   id: z.string(),
   expire_date: z.string().date(),
   name: z.string(),
-  status: z.custom<Enums<"registration_status">>(),
   allow_class_mixing: z.boolean(),
   class: z.string(),
 })
@@ -300,16 +308,9 @@ const editState = reactive({
   id: "",
   expire_date: "",
   name: "",
-  status: "",
   allow_class_mixing: false,
   class: "",
 })
-const statusOptions: Enums<"registration_status">[] = [
-  "Ausstehend",
-  "Abgesendet",
-  "Abgeschlossen",
-  "Abgelehnt",
-]
 
 const onEdit = async (row: RegistrationColumn) => {
   isOpenEdit.value = true
@@ -317,7 +318,6 @@ const onEdit = async (row: RegistrationColumn) => {
   editState.id = row.id
   editState.expire_date = row.expire_date
   editState.name = row.name
-  editState.status = row.status
   editState.allow_class_mixing = row.allow_class_mixing
   editState.class = row.class
 }
@@ -783,14 +783,6 @@ const onSubmitCreate = async () => {
               description="An diesem Datum wird die Anmeldung automatisch geschlossen."
             >
               <UInput v-model="editState.expire_date" type="date" />
-            </UFormGroup>
-
-            <UFormGroup
-              label="Status"
-              name="status"
-              description="Der Status der Anmeldung."
-            >
-              <USelect v-model="editState.status" :options="statusOptions" />
             </UFormGroup>
 
             <UFormGroup
