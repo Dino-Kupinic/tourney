@@ -350,25 +350,54 @@ const onSubmitEdit = async () => {
   }
 }
 
+const linksSchema = z.object({
+  active: z.boolean().optional(),
+  beginning: z.string().optional(),
+  end: z.string().optional(),
+})
+
+const linksState = reactive({
+  active: false,
+  beginning: "",
+  end: "",
+})
+
 const links = ref<LinkGroup>({})
 const groupLinks = () => {
-  return selectedRows.value.reduce(
-    (acc, row) => {
-      const { class: className, name, id } = row
-      if (!acc[className]) {
-        acc[className] = []
-      }
-      const url: string = `${config.public.clientUrl}/registrations/${id}`
-      acc[className].push({ name, url, class: className })
-      return acc
-    },
-    {} as Record<string, Link[]>,
-  )
+  return selectedRows.value.reduce((acc, row) => {
+    const { class: className, name, id } = row
+    const url: string = `${config.public.clientUrl}/registrations/${id}`
+
+    if (!acc[className]) {
+      acc[className] = { links: [], sent: false }
+    }
+
+    acc[className].links.push({ name, url, class: className })
+    return acc
+  }, {} as LinkGroup)
 }
 
 const generateLinks = () => {
   links.value = groupLinks()
   isOpenLinks.value = true
+}
+
+const onCopyEmail = async (classLinks: { links: Link[]; sent: boolean }) => {
+  let source: string
+  const links = classLinks.links
+    .map((link) => `${link.name}\n${link.url}`)
+    .join("\n\n")
+  if (linksState.active) {
+    source = `${linksState.beginning}\n\n${links}\n\n${linksState.end}`
+  } else {
+    source = links
+  }
+  const { text, copy, copied } = useClipboard({ source })
+  await copy()
+  const description = text.value.slice(0, 150) + "\n... (Nachricht gekürzt)"
+  copied.value
+    ? displaySuccessNotification("E-Mail kopiert", description)
+    : displayFailureNotification("Fehler beim Kopieren", description)
 }
 
 const refreshTable = () => {
@@ -518,7 +547,7 @@ const onSubmitCreate = async () => {
       <!-- Link Modal -->
       <UModal
         v-model="isOpenLinks"
-        :ui="{ width: 'w-full sm:max-w-2xl' }"
+        :ui="{ width: 'w-full sm:max-w-5xl' }"
         prevent-close
       >
         <UCard
@@ -536,31 +565,106 @@ const onSubmitCreate = async () => {
           }"
         >
           <template #header>
-            <strong> Links </strong>
+            <strong> Export </strong>
           </template>
 
-          <ul
-            class="h-96 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
-          >
-            <li
-              v-for="[className, classLinks] in Object.entries(links)"
-              :key="className"
-              class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
-            >
-              <div class="my-3 flex flex-col gap-3">
-                <strong>{{ className }}</strong>
-                <ul class="space-y-1">
-                  <li v-for="link in classLinks" :key="link.url">
-                    <p class="text-xs">{{ link.name }}</p>
-                    <code class="text-xs">{{ link.url }}</code>
-                  </li>
-                </ul>
-                <div>
-                  <UButton variant="soft" size="xs" label="Kopieren" />
-                </div>
+          <strong>Anleitung</strong>
+          <p>
+            Die ausgewählten Anmeldungen wurden nach Klasse gruppiert. Kopieren
+            Sie den Textinhalt pro Klasse und verschicken Sie diesen per Mail an
+            die Klassenmail (z.b. <code>1ahitn@htl-steyr.ac.at</code> ).
+          </p>
+          <div class="mt-3 flex gap-3">
+            <div class="flex grow flex-col gap-1">
+              <strong>Klassenlinks</strong>
+              <ul
+                class="h-96 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
+              >
+                <li
+                  v-for="[className, classLinks] in Object.entries(links)"
+                  :key="className"
+                  class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
+                >
+                  <div class="my-3 flex w-full flex-col gap-3">
+                    <div class="flex items-center gap-2">
+                      <strong class="text-lg">{{ className }}</strong>
+                      <UIcon
+                        v-if="classLinks.sent"
+                        name="i-heroicons-check-circle"
+                        class="text-green-500"
+                        size="24"
+                      />
+                    </div>
+                    <ul
+                      class="space-y-1 rounded-md bg-gray-100 p-3 shadow-sm dark:bg-gray-800"
+                    >
+                      <li v-for="link in classLinks.links" :key="link.url">
+                        <p class="text-xs">{{ link.name }}</p>
+                        <code class="text-xs">{{ link.url }}</code>
+                      </li>
+                    </ul>
+                    <div class="flex justify-between">
+                      <UButton
+                        variant="soft"
+                        size="xs"
+                        icon="i-heroicons-clipboard-document-check"
+                        label="Kopieren"
+                        @click="onCopyEmail(classLinks)"
+                      />
+                      <UButton
+                        variant="soft"
+                        color="green"
+                        size="xs"
+                        icon="i-heroicons-check"
+                        label="Abgesendet"
+                        @click="classLinks.sent = !classLinks.sent"
+                      />
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="flex flex-col gap-1">
+              <strong>Einstellungen</strong>
+              <div
+                class="h-full w-80 rounded-md border border-gray-200 p-3 shadow-sm dark:border-gray-800"
+              >
+                <UForm
+                  :state="linksState"
+                  :schema="linksSchema"
+                  class="space-y-2"
+                >
+                  <UFormGroup
+                    label="Aktivieren"
+                    :ui="{
+                      wrapper:
+                        'flex items-center justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-800 gap-3',
+                    }"
+                  >
+                    <UToggle v-model="linksState.active" />
+                  </UFormGroup>
+                  <UFormGroup label="Einleitungstext">
+                    <UTextarea
+                      placeholder="Liebe Schülerinnen und Schüler, ..."
+                      color="gray"
+                      :rows="6"
+                      v-model="linksState.beginning"
+                      :disabled="!linksState.active"
+                    />
+                  </UFormGroup>
+                  <UFormGroup label="Abschlusstext">
+                    <UTextarea
+                      placeholder="Mit freundlichen Grüßen"
+                      color="gray"
+                      :rows="5"
+                      v-model="linksState.end"
+                      :disabled="!linksState.active"
+                    />
+                  </UFormGroup>
+                </UForm>
               </div>
-            </li>
-          </ul>
+            </div>
+          </div>
 
           <template #footer>
             <UButton
