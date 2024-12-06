@@ -1,9 +1,17 @@
-CREATE OR REPLACE FUNCTION update_registration_status()
-  RETURNS VOID AS
-$$
-BEGIN
-  UPDATE public.registration
-  SET status = 'Abgelehnt'::public.registration_status
-  WHERE expire_date = CURRENT_DATE;
-END;
-$$ LANGUAGE plpgsql;
+-- Uncomment the function and create it in the dashboard and create the cron job in supabase too
+
+-- CREATE OR REPLACE FUNCTION update_registration_status()
+--   RETURNS VOID AS
+-- $$
+-- BEGIN
+--   UPDATE public.registration
+--   SET status = 'Abgelehnt'::public.registration_status
+--   WHERE expire_date = CURRENT_DATE;
+-- END;
+-- $$ LANGUAGE plpgsql;
+--
+-- SELECT cron.schedule(
+--   'check_expire_date',
+--   '0 0 * * *',
+--   $$SELECT update_registration_status();$$
+-- );
