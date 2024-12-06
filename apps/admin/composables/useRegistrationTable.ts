@@ -13,7 +13,7 @@ export const useRegistrationTable = () => {
     {
       key: "date",
       label: "Ablaufdatum",
-      sortable: false,
+      sortable: true,
     },
     {
       key: "status",
