@@ -18,6 +18,11 @@ export default defineNuxtConfig({
   devServer: {
     port: 3001,
   },
+  runtimeConfig: {
+    public: {
+      testBaseURL: process.env.NUXT_PUBLIC_TEST_HOST,
+    },
+  },
   components: [
     {
       path: "~/components",

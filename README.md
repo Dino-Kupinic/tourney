@@ -163,6 +163,16 @@ If it works, great! You can now log in in the admin dashboard with the created u
 > These policies are subject to change.
 > Please refer to the latest documentation.
 
+## 🧪 Testing
+
+1. install playwright browsers
+
+```bash
+npx playwright install
+```
+
+// WIP
+
 ## 🚀 Deployment
 
 1. build the app

@@ -37,6 +37,7 @@ useHead({
       <div class="my-12 flex justify-center">
         <UButton
           label="Los geht's"
+          data-testid="continue-button"
           size="xl"
           variant="soft"
           to="/tournaments"
@@ -56,7 +57,9 @@ useHead({
       <p>Entwickelt von Dino Kupinic</p>
       <p>Projekt betreut von Prof. Mag. Peter Rathgeb</p>
       <br />
-      <p>Copyright © 2024 - {{ new Date().getFullYear() }} HTBLA Steyr</p>
+      <p data-testid="copyright">
+        Copyright © 2024 - {{ new Date().getFullYear() }} HTBLA Steyr
+      </p>
     </div>
   </div>
 </template>

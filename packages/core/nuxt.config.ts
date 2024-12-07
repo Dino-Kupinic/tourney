@@ -8,7 +8,13 @@ const currentDir = dirname(fileURLToPath(import.meta.url))
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
-  modules: ["@nuxt/ui", "@nuxt/fonts", "@nuxt/test-utils", "@nuxt/image"],
+  modules: [
+    "@nuxt/ui",
+    "@nuxt/fonts",
+    "@nuxt/test-utils",
+    "@nuxt/test-utils/module",
+    "@nuxt/image",
+  ],
   css: [join(currentDir, "./assets/base.css")],
   runtimeConfig: {
     public: {

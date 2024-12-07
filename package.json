@@ -28,6 +28,7 @@
     "stop:supabase": "cd ./apps/api/supabase && npx supabase stop",
     "types:supabase": "cd ./apps/api/supabase && npx supabase gen types --lang=typescript --local > ../../admin/types/database.types.ts && npx supabase gen types --lang=typescript --local > ../../viewer/types/database.types.ts",
     "schema:supabase": "cd ./apps/api/supabase && supabase db diff -f --local",
+    "test": "pnpm --filter=tourney-viewer run test && pnpm --filter=tourney-admin run test",
     "format": "npx prettier . --check",
     "format:write": "npx prettier . --write"
   },
