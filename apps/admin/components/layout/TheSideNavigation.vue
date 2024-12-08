@@ -85,7 +85,9 @@ const profileLinks: VerticalNavigationLink[] = [
       :ui="{
         wrapper: 'mr-2 grow',
         badge: {
+          // @ts-ignore
           color: 'red',
+          // @ts-ignore
           variant: 'subtle',
         },
       }"
@@ -95,7 +97,9 @@ const profileLinks: VerticalNavigationLink[] = [
       :ui="{
         wrapper: 'mr-2',
         badge: {
+          // @ts-ignore
           color: 'primary',
+          // @ts-ignore
           variant: 'subtle',
         },
       }"

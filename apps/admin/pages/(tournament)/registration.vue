@@ -2,106 +2,12 @@
 import type { Enums, Tables } from "~/types/database.types"
 import type { Link, LinkGroup } from "~/types/link"
 import { z } from "zod"
+import type { RegistrationColumn } from "~/types/registration"
 
 const title = ref<string>("Anmeldung")
 useHead({
   title: () => title.value,
 })
-
-const { columns } = useRegistrationTable()
-const actions = [
-  [
-    {
-      key: "in_progress",
-      label: "Ausstehend",
-      icon: "i-heroicons-arrow-path",
-      click: () => onUpdate("Ausstehend"),
-    },
-  ],
-  [
-    {
-      key: "submitted",
-      label: "Abgesendet",
-      icon: "i-heroicons-envelope",
-      click: () => onUpdate("Abgesendet"),
-    },
-  ],
-  [
-    {
-      key: "completed",
-      label: "Abgeschlossen",
-      icon: "i-heroicons-check",
-      click: () => onUpdate("Abgeschlossen"),
-    },
-  ],
-  [
-    {
-      key: "discarded",
-      label: "Abgelehnt",
-      icon: "i-heroicons-no-symbol",
-      click: () => onUpdate("Abgelehnt"),
-    },
-  ],
-]
-
-const items = (row: RegistrationColumn) =>
-  ref([
-    [
-      {
-        label: "Link kopieren",
-        icon: "i-heroicons-clipboard-document-check",
-        click: () => onCopyLink(row),
-      },
-      {
-        label: "Editieren",
-        icon: "i-heroicons-pencil-square-20-solid",
-        click: () => onEdit(row),
-      },
-      {
-        label: "Info",
-        icon: "i-heroicons-information-circle",
-        click: () => onInfo(row),
-      },
-    ],
-    [
-      {
-        label: "Löschen",
-        icon: "i-heroicons-trash",
-        click: () => onDelete(),
-      },
-    ],
-  ])
-
-const selectedColumns = ref(columns)
-const columnsTable = computed(() =>
-  columns.filter((column) => selectedColumns.value.includes(column)),
-)
-
-const tabItems = [
-  {
-    slot: "multiple",
-    key: "multiple",
-    label: "Mehrfach",
-    icon: "i-heroicons-rectangle-stack",
-    description: "Anmeldungen für alle Klassen erstellen.",
-  },
-  {
-    slot: "single",
-    key: "single",
-    label: "Einzel",
-    icon: "i-heroicons-document",
-    description: "Anmeldung für eine Klasse erstellen.",
-  },
-]
-
-type RegistrationColumn = {
-  id: string
-  name: string
-  class: string
-  expire_date: string
-  status: Enums<"registration_status">
-  allow_class_mixing: boolean
-}
 
 const { data, status, refresh } = await useFetch("/api/registrations", {
   transform: (item) => {
@@ -141,11 +47,13 @@ const filteredRows = computed(() => {
 })
 
 const sort = ref({ column: "status", direction: "asc" as const })
+
 const isOpenDelete = ref<boolean>(false)
 const isOpenEdit = ref<boolean>(false)
 const isOpenCreate = ref<boolean>(false)
 const isOpenInfo = ref<boolean>(false)
 const isOpenLinks = ref<boolean>(false)
+
 const years = Array.from(
   { length: 10 },
   (_, i) =>
@@ -405,6 +313,19 @@ const refreshTable = () => {
   displaySuccessNotification("Aktualisiert", "Die Tabelle wurde aktualisiert.")
 }
 
+const { items, actions, columns, tabItems } = useRegistrationTable(
+  onUpdate,
+  onCopyLink,
+  onEdit,
+  onInfo,
+  onDelete,
+)
+
+const selectedColumns = ref(columns)
+const columnsTable = computed(() =>
+  columns.filter((column) => selectedColumns.value.includes(column)),
+)
+
 type TabKey = "multiple" | "single"
 const currentTab = ref<TabKey>(tabItems[0].key as TabKey)
 function onChange(index: number) {
@@ -424,8 +345,7 @@ const onSubmitCreate = async () => {
 
 <template>
   <BasePageHeader :title="title">
-    <!-- Filters -->
-    <div class="ml-4 flex items-center gap-2">
+    <ToolbarContainer>
       <!-- Delete Modal -->
       <UModal v-model="isOpenDelete" :ui="{ width: 'w-full sm:max-w-md' }">
         <UCard
@@ -471,12 +391,7 @@ const onSubmitCreate = async () => {
         </UCard>
       </UModal>
 
-      <UInput
-        v-model="search"
-        icon="i-heroicons-magnifying-glass-20-solid"
-        placeholder="Suchen..."
-        size="xs"
-      />
+      <SearchInput v-model="search" />
 
       <template v-if="selectedRows.length > 1">
         <UButton
@@ -510,24 +425,7 @@ const onSubmitCreate = async () => {
         />
       </UDropdown>
 
-      <USelectMenu
-        v-model="selectedColumns"
-        :options="columns"
-        multiple
-        v-slot="{ open }"
-      >
-        <UButton color="gray" size="xs" class="w-32 flex-1 justify-between">
-          <div class="flex items-center gap-1">
-            <UIcon name="i-heroicons-view-columns" class="h-4 w-4" />
-            Spalten
-          </div>
-          <UIcon
-            name="i-heroicons-chevron-right-20-solid"
-            class="h-4 w-4 text-gray-400 transition-transform dark:text-gray-500"
-            :class="[open && 'rotate-90 transform']"
-          />
-        </UButton>
-      </USelectMenu>
+      <ColumnsDropdown :columns="columns" v-model="selectedColumns" />
 
       <UButton
         icon="i-heroicons-arrow-path"
@@ -955,7 +853,7 @@ const onSubmitCreate = async () => {
           </template>
         </UCard>
       </UModal>
-    </div>
+    </ToolbarContainer>
   </BasePageHeader>
   <BasePageContent>
     <!-- Table -->
