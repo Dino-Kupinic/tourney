@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   if (id === undefined) {
     throw createError({
-      message: "Registration id missing",
+      message: "Tournament id missing",
       statusCode: 400,
     })
   }

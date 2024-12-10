@@ -8,7 +8,8 @@ const avatar = createAvatar(glass, {
   seed: name.value,
 })
 const svg = avatar.toDataUri()
-const liveTournaments = ref<number>(3)
+const { data } = await useFetch("/api/tournaments/live/count")
+const liveTournaments = ref<number>(data.value ?? 0)
 
 const navigationLinks: VerticalNavigationLink[][] = [
   [

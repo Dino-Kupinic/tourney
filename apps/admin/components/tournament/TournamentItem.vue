@@ -7,6 +7,35 @@ const { tournament } = defineProps<{
 
 const { getUserById, formatUsername } = useUser()
 const user = await getUserById(tournament.last_edited_by_id)
+const { data } = await useFetch(`/api/tournaments/${tournament.id}/teams`)
+
+const items = [
+  [
+    {
+      label: "Editieren",
+      icon: "i-heroicons-pencil-square-20-solid",
+      click: () => {
+        console.log("Edit")
+      },
+    },
+    {
+      label: "Info",
+      icon: "i-heroicons-information-circle",
+      click: () => {
+        console.log("Info")
+      },
+    },
+  ],
+  [
+    {
+      label: "Löschen",
+      icon: "i-heroicons-trash",
+      click: () => {
+        console.log("Delete")
+      },
+    },
+  ],
+]
 </script>
 
 <template>
@@ -19,14 +48,19 @@ const user = await getUserById(tournament.last_edited_by_id)
       >
         <div class="flex items-center justify-between">
           <TournamentLiveDisplay :is-live="tournament.is_live" />
-          <UDropdown :ui="{ width: 'w-auto' }" class="m-1">
-            <UButton
-              color="gray"
-              icon="i-heroicons-ellipsis-horizontal-20-solid"
-              size="2xs"
-              square
-            />
-          </UDropdown>
+          <ClientOnly>
+            <UDropdown :items="items" :ui="{ width: 'w-auto' }" class="m-1">
+              <UButton
+                color="gray"
+                icon="i-heroicons-ellipsis-horizontal-20-solid"
+                size="2xs"
+                square
+              />
+            </UDropdown>
+            <template #fallback>
+              <USkeleton class="m-1 h-6 w-6 bg-gray-200 dark:bg-gray-700" />
+            </template>
+          </ClientOnly>
         </div>
         <p class="pr-6 text-2xl font-bold tracking-tight">
           {{ tournament.name }}
@@ -74,18 +108,17 @@ const user = await getUserById(tournament.last_edited_by_id)
             </div>
           </div>
         </div>
-        <p class="text-semibold my-2">Teams</p>
         <div
-          class="flex flex-col gap-2 rounded-md bg-gray-50 p-2 px-3 dark:bg-gray-800"
+          class="mt-3 flex flex-col gap-2 rounded-md bg-gray-50 p-2 px-3 dark:bg-gray-800"
         >
           <div class="flex justify-between">
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-clipboard-document-list" />
-              <p>31 Teams</p>
+              <p>{{ data?.teams }} Teams</p>
             </div>
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-users" />
-              <p>92 Schüler</p>
+              <p>{{ data?.students }} Schüler</p>
             </div>
           </div>
           <UDivider
@@ -104,7 +137,7 @@ const user = await getUserById(tournament.last_edited_by_id)
                 class="text-orange-500"
                 size="16"
               />
-              <p class="font-mono">20</p>
+              <p class="font-mono">{{ data?.pending }}</p>
             </div>
             <div
               class="flex grow items-center justify-center space-x-1 rounded-md bg-white px-2 py-1 dark:bg-gray-900"
@@ -114,7 +147,7 @@ const user = await getUserById(tournament.last_edited_by_id)
                 class="text-green-500"
                 size="16"
               />
-              <p class="font-mono">10</p>
+              <p class="font-mono">{{ data?.accepted }}</p>
             </div>
             <div
               class="flex grow items-center justify-center space-x-1 rounded-md bg-white px-2 py-1 dark:bg-gray-900"
@@ -124,7 +157,7 @@ const user = await getUserById(tournament.last_edited_by_id)
                 class="text-red-500"
                 size="16"
               />
-              <p class="font-mono">1</p>
+              <p class="font-mono">{{ data?.rejected }}</p>
             </div>
           </div>
         </div>
