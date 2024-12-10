@@ -59,6 +59,11 @@ const navigationLinks: VerticalNavigationLink[][] = [
       icon: "i-heroicons-queue-list",
       to: "/logs",
     },
+    {
+      label: "Verwaltung",
+      icon: "i-heroicons-squares-2x2",
+      to: "/management",
+    },
   ],
 ]
 

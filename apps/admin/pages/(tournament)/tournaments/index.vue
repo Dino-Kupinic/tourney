@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import TournamentItem from "~/components/tournament/TournamentItem.vue"
-import TournamentGrid from "~/components/tournament/TournamentGrid.vue"
-
 const title = ref<string>("Turniere")
 useHead({
   title: () => title.value,
@@ -10,7 +7,12 @@ useHead({
 const sortOptions = ["Sortiert nach Jahr", "Sortiert nach Sport"]
 const selected = ref<string>(sortOptions[0])
 
-const { data } = await useFetch("/api/tournaments")
+const { data, refresh } = await useFetch("/api/tournaments")
+
+const refreshTournaments = () => {
+  refresh()
+  displaySuccessNotification("Aktualisiert", "Turniere wurden aktualisiert")
+}
 </script>
 
 <template>
@@ -23,7 +25,13 @@ const { data } = await useFetch("/api/tournaments")
         size="xs"
         class="w-40"
       />
-      <UButton square icon="i-ic-round-question-mark" size="xs" color="white" />
+      <UButton
+        icon="i-heroicons-arrow-path"
+        color="gray"
+        size="xs"
+        square
+        @click="refreshTournaments"
+      />
       <UButton size="xs" variant="soft" label="Neues Turnier..." />
     </ToolbarContainer>
   </BasePageHeader>
