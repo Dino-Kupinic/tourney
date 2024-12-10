@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import type { ParsedJsonTournament } from "~/types/prizes"
 
-defineProps<{
+const { tournament } = defineProps<{
   tournament: ParsedJsonTournament
 }>()
+
+const { getUserById, formatUsername } = useUser()
+const user = await getUserById(tournament.last_edited_by_id)
 </script>
 
 <template>
@@ -126,7 +129,10 @@ defineProps<{
           </div>
         </div>
         <div class="mt-3 text-right text-xs text-gray-500">
-          <p>Zuletzt geändert von Dino</p>
+          <p>
+            Zuletzt geändert von
+            {{ formatUsername(user?.email) }}
+          </p>
           <p>
             Erstellt am {{ useDateFormat(tournament.created_at, "DD.MM.YYYY") }}
           </p>
