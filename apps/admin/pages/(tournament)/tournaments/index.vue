@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { z } from "zod"
+import type { Enums } from "~/types/database.types"
+
 const title = ref<string>("Turniere")
 useHead({
   title: () => title.value,
@@ -12,6 +15,80 @@ const { data, refresh } = await useFetch("/api/tournaments")
 const refreshTournaments = () => {
   refresh()
   displaySuccessNotification("Aktualisiert", "Turniere wurden aktualisiert")
+}
+
+const isOpenCreate = ref<boolean>(false)
+const years = Array.from({ length: 15 }, (_, i) => new Date().getFullYear() + i)
+const sports: Enums<"sport_type">[] = ["Fußball", "Basketball", "Volleyball"]
+
+const prizesJsonSchema = z.object({
+  first: z.string(),
+  second: z.string(),
+  third: z.string(),
+  bonus: z.string(),
+})
+
+const creationSchema = z.object({
+  name: z.string(),
+  rules: z.string().optional(),
+  start_date: z.string().date(),
+  from: z.string().time(),
+  to: z.string().time(),
+  year: z.number(),
+  sport: z.custom<Enums<"sport_type">>(),
+  prizes: z
+    .string()
+    .optional()
+    .refine((val) => {
+      try {
+        const parsed = JSON.parse(val || "{}")
+        return prizesJsonSchema.safeParse(parsed).success
+      } catch {
+        return false
+      }
+    }, "Invalid prizes JSON"),
+  thumbnail_path: z.string(),
+  location: z.string(),
+})
+
+const creationState = reactive({
+  name: undefined,
+  rules: undefined,
+  start_date: undefined,
+  from: undefined,
+  to: undefined,
+  year: years[0],
+  sport: undefined,
+  prizes: {
+    first: undefined,
+    second: undefined,
+    third: undefined,
+    bonus: undefined,
+  },
+  thumbnail_path: undefined,
+  location: "Sportplatz",
+})
+
+const onSubmitCreate = async () => {
+  try {
+    creationSchema.parse(creationState)
+    // await $fetch("/api/registrations/create/single", {
+    //   method: "POST",
+    //   body: creationState,
+    // })
+    // isOpenCreate.value = false
+    await refresh()
+    displaySuccessNotification(
+      "Anmeldung erstellt",
+      "Die Anmeldung wurden erfolgreich erstellt.",
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler beim Erstellen",
+      "Die Anmeldung konnte nicht erstellt werden.",
+    )
+  }
 }
 </script>
 
@@ -32,14 +109,169 @@ const refreshTournaments = () => {
         square
         @click="refreshTournaments"
       />
-      <UButton size="xs" variant="soft" label="Neues Turnier..." />
+      <UButton
+        size="xs"
+        variant="soft"
+        @click="isOpenCreate = true"
+        label="Neues Turnier..."
+      />
+      <!-- Create Modal -->
+      <UModal v-model="isOpenCreate" :ui="{ width: 'w-full sm:max-w-4xl' }">
+        <UCard
+          :ui="{
+            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+            body: {
+              padding: 'px-4 py-5 sm:p-6',
+            },
+            header: {
+              padding: 'px-4 py-3 sm:px-6',
+            },
+            footer: {
+              padding: 'px-4 py-3 sm:px-6',
+            },
+          }"
+        >
+          <template #header>
+            <strong> Neues Turnier </strong>
+          </template>
+          <UForm
+            :schema="creationSchema"
+            :state="creationSchema"
+            class="pt-2"
+            @submit="onSubmitCreate"
+          >
+            <div class="flex h-full w-full justify-between gap-6">
+              <div class="flex w-[28rem] flex-col gap-3">
+                <div class="flex space-x-3">
+                  <UFormGroup label="Name" name="name" class="grow" required>
+                    <UInput v-model="creationState.name" />
+                  </UFormGroup>
+                  <UFormGroup label="Sportart" name="sport" required>
+                    <USelect
+                      v-model="creationState.sport"
+                      placeholder="Sport auswählen"
+                      :options="sports"
+                      class="w-40"
+                    />
+                  </UFormGroup>
+                </div>
+
+                <div class="flex space-x-3">
+                  <UFormGroup class="grow" label="Ort" name="location" required>
+                    <UInput v-model="creationState.location" />
+                  </UFormGroup>
+                  <UFormGroup label="Jahr" name="year" required>
+                    <USelect
+                      v-model="creationState.year"
+                      placeholder="Jahr auswählen"
+                      :options="years"
+                      class="w-40"
+                    />
+                  </UFormGroup>
+                </div>
+
+                <UFormGroup label="Regeln" name="rules">
+                  <UTextarea
+                    v-model="creationState.rules"
+                    :rows="3"
+                    placeholder="Lorem Ipsum..."
+                  />
+                </UFormGroup>
+
+                <div
+                  class="flex flex-col gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
+                >
+                  <UFormGroup
+                    label="Startdatum"
+                    name="start_date"
+                    description="An diesem Datum findet das Turnier statt."
+                    required
+                  >
+                    <UInput v-model="creationState.start_date" type="date" />
+                  </UFormGroup>
+
+                  <div class="flex space-x-3">
+                    <UFormGroup label="Von" name="from" required class="grow">
+                      <UInput v-model="creationState.from" type="time" />
+                    </UFormGroup>
+
+                    <UFormGroup label="Bis" name="to" required class="grow">
+                      <UInput v-model="creationState.to" type="time" />
+                    </UFormGroup>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3">
+                <UFormGroup
+                  label="Vorschaubild"
+                  name="thumbnail_path"
+                  description="Ein Bild für das Turnier."
+                  required
+                >
+                  <UInput v-model="creationState.thumbnail_path" />
+                </UFormGroup>
+                <UFormGroup label="Preise">
+                  <div
+                    class="flex flex-col gap-3 rounded-md bg-gray-50 p-3 dark:bg-gray-800"
+                  >
+                    <UFormGroup label="Erster Platz" name="prizes.first">
+                      <UInput
+                        v-model="creationState.prizes.first"
+                        placeholder="Pokal"
+                      />
+                    </UFormGroup>
+                    <div class="flex space-x-3">
+                      <UFormGroup label="Zweiter Platz" name="prizes.second">
+                        <UInput
+                          v-model="creationState.prizes.second"
+                          placeholder="Silver Medaille"
+                        />
+                      </UFormGroup>
+                      <UFormGroup label="Dritter Platz" name="prizes.third">
+                        <UInput
+                          v-model="creationState.prizes.third"
+                          placeholder="Bronze Medaille"
+                        />
+                      </UFormGroup>
+                    </div>
+                    <UFormGroup label="Sonstiges" name="prizes.bonus">
+                      <UTextarea
+                        v-model="creationState.prizes.bonus"
+                        :rows="5"
+                        placeholder="Eis, Frankfurter, etc."
+                      />
+                    </UFormGroup>
+                  </div>
+                </UFormGroup>
+              </div>
+            </div>
+          </UForm>
+
+          <template #footer>
+            <div class="flex items-center gap-2">
+              <UButton
+                variant="soft"
+                size="xs"
+                @click="onSubmitCreate"
+                label="Erstellen"
+              />
+              <UButton
+                color="gray"
+                size="xs"
+                @click="isOpenCreate = false"
+                label="Abbrechen"
+              />
+            </div>
+          </template>
+        </UCard>
+      </UModal>
     </ToolbarContainer>
   </BasePageHeader>
   <BasePageContent>
     <div class="h-full overflow-auto p-6 pb-24">
       <div class="flex flex-col gap-3">
         <div>
-          <UBadge label="2025" variant="subtle" size="md" />
+          <UBadge label="2024" variant="subtle" size="md" />
         </div>
         <TournamentGrid>
           <TournamentItem v-for="tournament in data" :tournament />

@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server"
 import type { Database } from "~/types/database.types"
+import type { TournamentTeamSummary } from "~/types/tournament"
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient<Database>(event)
@@ -65,5 +66,5 @@ export default defineEventHandler(async (event) => {
     students: studentCount,
     teams: teamsData.length,
     ...teamStatuses,
-  }
+  } as TournamentTeamSummary
 })

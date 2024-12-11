@@ -3,6 +3,7 @@ import type { Enums, Tables } from "~/types/database.types"
 import type { Link, LinkGroup } from "~/types/link"
 import { z } from "zod"
 import type { RegistrationColumn } from "~/types/registration"
+import ModalInfo from "~/components/modal/ModalInfo.vue"
 
 const title = ref<string>("Anmeldung")
 useHead({
@@ -820,39 +821,9 @@ const onSubmitCreate = async () => {
       </UModal>
 
       <!-- Info Modal -->
-      <UModal v-model="isOpenInfo" :ui="{ width: 'w-full sm:max-w-md' }">
-        <UCard
-          :ui="{
-            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-            body: {
-              padding: 'px-4 py-5 sm:p-6',
-            },
-            header: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-            footer: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-          }"
-        >
-          <template #header>
-            <strong> Info </strong>
-          </template>
-
-          <pre>{{ infoDisplay }}</pre>
-
-          <template #footer>
-            <div class="flex items-center gap-2">
-              <UButton
-                color="gray"
-                size="xs"
-                @click="isOpenInfo = false"
-                label="Fertig"
-              />
-            </div>
-          </template>
-        </UCard>
-      </UModal>
+      <ModalInfo v-model="isOpenInfo">
+        <pre>{{ infoDisplay }}</pre>
+      </ModalInfo>
     </ToolbarContainer>
   </BasePageHeader>
   <BasePageContent>
