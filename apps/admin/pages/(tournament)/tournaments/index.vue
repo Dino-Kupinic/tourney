@@ -10,7 +10,7 @@ useHead({
 const sortOptions = ["Sortiert nach Jahr", "Sortiert nach Sport"]
 const selected = ref<string>(sortOptions[0])
 
-const { data, refresh } = await useFetch("/api/tournaments")
+const { data: tournaments, refresh } = await useFetch("/api/tournaments")
 
 const refreshTournaments = () => {
   refresh()
@@ -18,14 +18,15 @@ const refreshTournaments = () => {
 }
 
 const isOpenCreate = ref<boolean>(false)
+
 const years = Array.from({ length: 15 }, (_, i) => new Date().getFullYear() + i)
 const sports: Enums<"sport_type">[] = ["Fußball", "Basketball", "Volleyball"]
 
-const prizesJsonSchema = z.object({
-  first: z.string(),
-  second: z.string(),
-  third: z.string(),
-  bonus: z.string(),
+const client = useSupabaseClient()
+const { data } = await client.storage.from("images").list("tournament")
+const thumbnails = computed(() => {
+  const temp = data?.filter((image) => image.name !== ".emptyFolderPlaceholder")
+  return temp?.map((image) => `/tournament/${image.name}`)
 })
 
 const creationSchema = z.object({
@@ -36,17 +37,12 @@ const creationSchema = z.object({
   to: z.string().time(),
   year: z.number(),
   sport: z.custom<Enums<"sport_type">>(),
-  prizes: z
-    .string()
-    .optional()
-    .refine((val) => {
-      try {
-        const parsed = JSON.parse(val || "{}")
-        return prizesJsonSchema.safeParse(parsed).success
-      } catch {
-        return false
-      }
-    }, "Invalid prizes JSON"),
+  prizes: z.object({
+    first: z.string(),
+    second: z.string(),
+    third: z.string(),
+    bonus: z.string(),
+  }),
   thumbnail_path: z.string(),
   location: z.string(),
 })
@@ -60,10 +56,10 @@ const creationState = reactive({
   year: years[0],
   sport: undefined,
   prizes: {
-    first: undefined,
-    second: undefined,
-    third: undefined,
-    bonus: undefined,
+    first: "",
+    second: "",
+    third: "",
+    bonus: "",
   },
   thumbnail_path: undefined,
   location: "Sportplatz",
@@ -71,6 +67,7 @@ const creationState = reactive({
 
 const onSubmitCreate = async () => {
   try {
+    console.log(creationState)
     creationSchema.parse(creationState)
     // await $fetch("/api/registrations/create/single", {
     //   method: "POST",
@@ -79,14 +76,14 @@ const onSubmitCreate = async () => {
     // isOpenCreate.value = false
     await refresh()
     displaySuccessNotification(
-      "Anmeldung erstellt",
-      "Die Anmeldung wurden erfolgreich erstellt.",
+      "Turnier erstellt",
+      "Das Turnier wurde erfolgreich erstellt.",
     )
   } catch (err) {
     console.error(err)
     displayFailureNotification(
       "Fehler beim Erstellen",
-      "Die Anmeldung konnte nicht erstellt werden.",
+      "Das Turnier konnte nicht erstellt werden.",
     )
   }
 }
@@ -139,12 +136,16 @@ const onSubmitCreate = async () => {
             :state="creationSchema"
             class="pt-2"
             @submit="onSubmitCreate"
+            :validate-on="['submit']"
           >
             <div class="flex h-full w-full justify-between gap-6">
               <div class="flex w-[28rem] flex-col gap-3">
                 <div class="flex space-x-3">
                   <UFormGroup label="Name" name="name" class="grow" required>
-                    <UInput v-model="creationState.name" />
+                    <UInput
+                      v-model="creationState.name"
+                      placeholder="Fußballturnier 2024/25"
+                    />
                   </UFormGroup>
                   <UFormGroup label="Sportart" name="sport" required>
                     <USelect
@@ -173,7 +174,7 @@ const onSubmitCreate = async () => {
                 <UFormGroup label="Regeln" name="rules">
                   <UTextarea
                     v-model="creationState.rules"
-                    :rows="3"
+                    :rows="4"
                     placeholder="Lorem Ipsum..."
                   />
                 </UFormGroup>
@@ -192,11 +193,19 @@ const onSubmitCreate = async () => {
 
                   <div class="flex space-x-3">
                     <UFormGroup label="Von" name="from" required class="grow">
-                      <UInput v-model="creationState.from" type="time" />
+                      <UInput
+                        v-model="creationState.from"
+                        type="time"
+                        :step="2"
+                      />
                     </UFormGroup>
 
                     <UFormGroup label="Bis" name="to" required class="grow">
-                      <UInput v-model="creationState.to" type="time" />
+                      <UInput
+                        v-model="creationState.to"
+                        type="time"
+                        :step="2"
+                      />
                     </UFormGroup>
                   </div>
                 </div>
@@ -208,8 +217,27 @@ const onSubmitCreate = async () => {
                   description="Ein Bild für das Turnier."
                   required
                 >
-                  <UInput v-model="creationState.thumbnail_path" />
+                  <USelectMenu
+                    v-model="creationState.thumbnail_path"
+                    :options="thumbnails"
+                    placeholder="Bild auswählen"
+                  >
+                    <template #option="{ option }">
+                      <span class="font-mono text-xs">{{ option }}</span>
+                    </template>
+                  </USelectMenu>
                 </UFormGroup>
+                <p class="text-xs text-gray-500">
+                  Keine Bilder? Lade eins hoch in
+                  <NuxtLink to="/gallery">
+                    <span class="text-primary-500">Galerie</span>
+                    <UIcon
+                      name="i-heroicons-arrow-up-right"
+                      class="text-primary-500 ml-0.5 pt-1"
+                      size="10"
+                    />
+                  </NuxtLink>
+                </p>
                 <UFormGroup label="Preise">
                   <div
                     class="flex flex-col gap-3 rounded-md bg-gray-50 p-3 dark:bg-gray-800"
@@ -274,7 +302,7 @@ const onSubmitCreate = async () => {
           <UBadge label="2024" variant="subtle" size="md" />
         </div>
         <TournamentGrid>
-          <TournamentItem v-for="tournament in data" :tournament />
+          <TournamentItem v-for="tournament in tournaments" :tournament />
         </TournamentGrid>
       </div>
       <UDivider class="my-6" />
