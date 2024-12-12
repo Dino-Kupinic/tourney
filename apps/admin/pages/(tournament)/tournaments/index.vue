@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { z } from "zod"
 import type { Enums } from "~/types/database.types"
+import type { Form } from "#ui/types"
 
 const title = ref<string>("Turniere")
 useHead({
@@ -18,8 +19,6 @@ const refreshTournaments = () => {
 }
 
 const isOpenCreate = ref<boolean>(false)
-
-const years = Array.from({ length: 15 }, (_, i) => new Date().getFullYear() + i)
 const sports: Enums<"sport_type">[] = ["Fußball", "Basketball", "Volleyball"]
 
 const client = useSupabaseClient()
@@ -31,7 +30,7 @@ const thumbnails = computed(() => {
 
 const creationSchema = z.object({
   name: z.string(),
-  rules: z.string().optional(),
+  rules: z.string(),
   start_date: z.string().date(),
   from: z.string().time(),
   to: z.string().time(),
@@ -49,11 +48,11 @@ const creationSchema = z.object({
 
 const creationState = reactive({
   name: undefined,
-  rules: undefined,
+  rules: "",
   start_date: undefined,
   from: undefined,
   to: undefined,
-  year: years[0],
+  year: 0,
   sport: undefined,
   prizes: {
     first: "",
@@ -65,15 +64,25 @@ const creationState = reactive({
   location: "Sportplatz",
 })
 
+watch(
+  () => creationState.start_date,
+  (value: unknown) => {
+    creationState.year = new Date(value as string).getFullYear()
+  },
+)
+
 const onSubmitCreate = async () => {
   try {
-    console.log(creationState)
     creationSchema.parse(creationState)
-    // await $fetch("/api/registrations/create/single", {
-    //   method: "POST",
-    //   body: creationState,
-    // })
-    // isOpenCreate.value = false
+    const { id } = useUser()
+    await $fetch("/api/tournaments/create", {
+      method: "POST",
+      body: {
+        ...creationState,
+        last_edited_by_id: id.value,
+      },
+    })
+    isOpenCreate.value = false
     await refresh()
     displaySuccessNotification(
       "Turnier erstellt",
@@ -136,7 +145,8 @@ const onSubmitCreate = async () => {
             :state="creationSchema"
             class="pt-2"
             @submit="onSubmitCreate"
-            :validate-on="['submit']"
+            :validate-on="[]"
+            ref="formRef"
           >
             <div class="flex h-full w-full justify-between gap-6">
               <div class="flex w-[28rem] flex-col gap-3">
@@ -157,19 +167,9 @@ const onSubmitCreate = async () => {
                   </UFormGroup>
                 </div>
 
-                <div class="flex space-x-3">
-                  <UFormGroup class="grow" label="Ort" name="location" required>
-                    <UInput v-model="creationState.location" />
-                  </UFormGroup>
-                  <UFormGroup label="Jahr" name="year" required>
-                    <USelect
-                      v-model="creationState.year"
-                      placeholder="Jahr auswählen"
-                      :options="years"
-                      class="w-40"
-                    />
-                  </UFormGroup>
-                </div>
+                <UFormGroup class="grow" label="Ort" name="location" required>
+                  <UInput v-model="creationState.location" />
+                </UFormGroup>
 
                 <UFormGroup label="Regeln" name="rules">
                   <UTextarea

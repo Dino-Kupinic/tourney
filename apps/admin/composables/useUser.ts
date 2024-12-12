@@ -4,6 +4,7 @@ export const useUser = () => {
   const supabase = useSupabaseClient<Database>()
   const session = useSupabaseSession()
 
+  const id = ref<string>(session.value?.user.id ?? "")
   const name = ref<string>(formatUsername(session.value?.user.email))
   const email = ref<string>(session.value?.user.email ?? "Unknown")
   const role = ref<string>(session.value?.user.user_metadata.role)
@@ -44,6 +45,7 @@ export const useUser = () => {
   }
 
   return {
+    id,
     name,
     email,
     role,
