@@ -29,10 +29,32 @@ const items = [
     {
       label: "Löschen",
       icon: "i-heroicons-trash",
-      click: () => "",
+      click: () => (isOpenDelete.value = true),
     },
   ],
 ]
+
+const isOpenDelete = ref<boolean>(false)
+const emit = defineEmits(["refresh"])
+const onDelete = async () => {
+  try {
+    await $fetch(`/api/tournaments/delete/${tournament.id}`, {
+      method: "DELETE",
+    })
+    isOpenDelete.value = false
+    emit("refresh")
+    displaySuccessNotification(
+      "Turnier gelöscht",
+      "Das Turnier wurde erfolgreich gelöscht.",
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler beim Löschen",
+      "Das Turnier konnte nicht gelöscht werden.",
+    )
+  }
+}
 </script>
 
 <template>
@@ -42,6 +64,17 @@ const items = [
     <ModalInfo v-model="isOpenInfo">
       <pre class="overflow-auto">{{ tournament }}</pre>
     </ModalInfo>
+    <ModalDelete v-model="isOpenDelete" @delete="onDelete">
+      <p>Möchtest du das Turnier wirklich löschen?</p>
+      <UAlert
+        icon="i-heroicons-exclamation-triangle"
+        color="red"
+        variant="soft"
+        class="mt-3"
+        title="Achtung"
+        description="Alle zugehörigen Daten werden entgültig gelöscht (Teams, Spieler, ...)!"
+      />
+    </ModalDelete>
     <div
       class="flex h-32 flex-col justify-between rounded-t-md bg-gray-100 p-2 dark:bg-gray-800"
     >
@@ -66,7 +99,7 @@ const items = [
           </template>
         </ClientOnly>
       </div>
-      <p class="pr-6 text-2xl font-bold tracking-tight">
+      <p class="line-clamp-2 pr-6 text-2xl font-bold tracking-tight">
         {{ tournament.name }}
       </p>
     </div>

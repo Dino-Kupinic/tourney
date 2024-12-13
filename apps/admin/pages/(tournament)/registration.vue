@@ -4,6 +4,7 @@ import type { Link, LinkGroup } from "~/types/link"
 import { z } from "zod"
 import type { RegistrationColumn } from "~/types/registration"
 import ModalInfo from "~/components/modal/ModalInfo.vue"
+import ModalDelete from "~/components/modal/ModalDelete.vue"
 
 const title = ref<string>("Anmeldung")
 useHead({
@@ -348,49 +349,12 @@ const onSubmitCreate = async () => {
   <BasePageHeader :title="title">
     <ToolbarContainer>
       <!-- Delete Modal -->
-      <UModal v-model="isOpenDelete" :ui="{ width: 'w-full sm:max-w-md' }">
-        <UCard
-          :ui="{
-            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-            body: {
-              padding: 'px-4 py-5 sm:p-6',
-            },
-            header: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-            footer: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-          }"
-        >
-          <template #header>
-            <strong> Anmeldungen löschen </strong>
-          </template>
-
-          <p>
-            Möchten Sie wirklich
-            <strong>{{ selectedRows.length }}</strong> Anmeldungen löschen?
-          </p>
-
-          <template #footer>
-            <div class="flex items-center gap-2">
-              <UButton
-                variant="soft"
-                size="xs"
-                color="red"
-                @click="onDelete"
-                label="Löschen"
-              />
-              <UButton
-                color="gray"
-                size="xs"
-                @click="isOpenDelete = false"
-                label="Abbrechen"
-              />
-            </div>
-          </template>
-        </UCard>
-      </UModal>
+      <ModalDelete v-model="isOpenDelete" @delete="onDelete">
+        <p>
+          Möchten Sie wirklich
+          <strong>{{ selectedRows.length }}</strong> Anmeldungen löschen?
+        </p>
+      </ModalDelete>
 
       <SearchInput v-model="search" />
 

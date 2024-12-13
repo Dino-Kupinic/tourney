@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { z } from "zod"
 import type { Enums } from "~/types/database.types"
-import type { Form } from "#ui/types"
 
 const title = ref<string>("Turniere")
 useHead({
@@ -302,7 +301,11 @@ const onSubmitCreate = async () => {
           <UBadge label="2024" variant="subtle" size="md" />
         </div>
         <TournamentGrid>
-          <TournamentItem v-for="tournament in tournaments" :tournament />
+          <TournamentItem
+            v-for="tournament in tournaments"
+            :tournament
+            @refresh="refresh"
+          />
         </TournamentGrid>
       </div>
       <UDivider class="my-6" />
