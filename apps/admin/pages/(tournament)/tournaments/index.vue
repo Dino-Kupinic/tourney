@@ -7,10 +7,21 @@ useHead({
   title: () => title.value,
 })
 
-const sortOptions = ["Sortiert nach Jahr", "Sortiert nach Sport"]
-const selected = ref<string>(sortOptions[0])
-
-const { data: tournaments, refresh } = await useFetch("/api/tournaments")
+const { data: groupedTournaments, refresh } = await useFetch(
+  "/api/tournaments",
+  {
+    transform: (data) =>
+      data?.reduce<Record<number, typeof data>>((acc, curr) => {
+        const year = curr.year
+        if (acc[year]) {
+          acc[year].push(curr)
+        } else {
+          acc[year] = [curr]
+        }
+        return acc
+      }, {}),
+  },
+)
 
 const refreshTournaments = () => {
   refresh()
@@ -101,12 +112,6 @@ const onSubmitCreate = async () => {
   <BasePageHeader :title="title">
     <ToolbarContainer>
       <SearchInput />
-      <USelectMenu
-        v-model="selected"
-        :options="sortOptions"
-        size="xs"
-        class="w-40"
-      />
       <UButton
         icon="i-heroicons-arrow-path"
         color="gray"
@@ -296,19 +301,24 @@ const onSubmitCreate = async () => {
   </BasePageHeader>
   <BasePageContent>
     <div class="h-full overflow-auto p-6 pb-24">
-      <div class="flex flex-col gap-3">
+      <div
+        class="flex flex-col gap-3"
+        v-for="(tournaments, year) in groupedTournaments"
+        :key="year"
+      >
         <div>
-          <UBadge label="2024" variant="subtle" size="md" />
+          <UBadge :label="year" variant="subtle" size="md" />
         </div>
         <TournamentGrid>
           <TournamentItem
             v-for="tournament in tournaments"
+            :key="tournament.id"
             :tournament
             @refresh="refresh"
           />
         </TournamentGrid>
+        <UDivider class="my-6" />
       </div>
-      <UDivider class="my-6" />
     </div>
   </BasePageContent>
 </template>
