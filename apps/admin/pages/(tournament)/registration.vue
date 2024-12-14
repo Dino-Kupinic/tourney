@@ -717,7 +717,6 @@ const onSubmitCreate = async () => {
     </ToolbarContainer>
   </BasePageHeader>
   <BasePageContent>
-    <!-- Table -->
     <UTable
       v-model="selectedRows"
       v-model:sort="sort"

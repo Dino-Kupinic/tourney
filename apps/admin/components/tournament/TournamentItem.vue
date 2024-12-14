@@ -171,7 +171,7 @@ const onDelete = async () => {
           <TournamentTeamStatus :data="data" />
         </div>
         <div class="mt-3 text-right text-xs text-gray-500">
-          <p>
+          <p class="truncate">
             Zuletzt geändert von
             {{ formatUsername(user?.email) }}
           </p>

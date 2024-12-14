@@ -10,6 +10,10 @@ attendees.
 > [!CAUTION]
 > tourney is still in development. You will find bugs and broken/unfinished features.
 
+## ⏳ Activity
+
+![Alt](https://repobeats.axiom.co/api/embed/bd1b64dfb166474122230a0f147ea9f77e408ad1.svg "Repobeats analytics image")
+
 ## ♻️ Release Cycle
 
 tourney follows the [Semantic Versioning](https://semver.org/) guidelines.
