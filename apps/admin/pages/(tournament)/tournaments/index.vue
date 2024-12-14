@@ -13,15 +13,43 @@ const { data: groupedTournaments, refresh } = await useFetch(
     transform: (data) =>
       data?.reduce<Record<number, typeof data>>((acc, curr) => {
         const year = curr.year
-        if (acc[year]) {
-          acc[year].push(curr)
-        } else {
-          acc[year] = [curr]
+        if (!acc[year]) {
+          acc[year] = []
         }
+        acc[year].push(curr)
         return acc
       }, {}),
   },
 )
+
+const sortedTournaments = computed(() => {
+  const tournaments = groupedTournaments.value
+  if (!tournaments) {
+    return []
+  }
+
+  return Object.entries(tournaments)
+    .map(([year, items]) => ({
+      year: Number(year),
+      tournaments: items,
+    }))
+    .sort((a, b) => b.year - a.year)
+})
+
+const search = ref<string>("")
+const filteredTournaments = computed(() => {
+  const query = search.value.toLowerCase()
+  if (!query) return sortedTournaments.value
+
+  return sortedTournaments.value
+    .map((group) => {
+      const filteredItems = group.tournaments.filter((tournament) =>
+        tournament.name.toLowerCase().includes(query),
+      )
+      return { ...group, tournaments: filteredItems }
+    })
+    .filter((group) => group.tournaments.length > 0)
+})
 
 const refreshTournaments = () => {
   refresh()
@@ -111,7 +139,7 @@ const onSubmitCreate = async () => {
 <template>
   <BasePageHeader :title="title">
     <ToolbarContainer>
-      <SearchInput />
+      <SearchInput v-model="search" placeholder="Namen suchen..." />
       <UButton
         icon="i-heroicons-arrow-path"
         color="gray"
@@ -158,7 +186,7 @@ const onSubmitCreate = async () => {
                   <UFormGroup label="Name" name="name" class="grow" required>
                     <UInput
                       v-model="creationState.name"
-                      placeholder="Fußballturnier 2024/25"
+                      placeholder="Fußball Turnier 2024/25"
                     />
                   </UFormGroup>
                   <UFormGroup label="Sportart" name="sport" required>
@@ -301,24 +329,34 @@ const onSubmitCreate = async () => {
   </BasePageHeader>
   <BasePageContent>
     <div class="h-full overflow-auto p-6 pb-24">
-      <div
-        class="flex flex-col gap-3"
-        v-for="(tournaments, year) in groupedTournaments"
-        :key="year"
-      >
-        <div>
-          <UBadge :label="year" variant="subtle" size="md" />
+      <template v-if="filteredTournaments.length">
+        <div
+          class="flex flex-col gap-3"
+          v-for="item in filteredTournaments"
+          :key="item.year"
+        >
+          <div>
+            <UBadge :label="item.year" variant="subtle" size="md" />
+          </div>
+          <TournamentGrid>
+            <TournamentItem
+              v-for="tournament in item.tournaments"
+              :key="tournament.id"
+              :tournament
+              @refresh="refresh"
+            />
+          </TournamentGrid>
+          <UDivider class="my-6" />
         </div>
-        <TournamentGrid>
-          <TournamentItem
-            v-for="tournament in tournaments"
-            :key="tournament.id"
-            :tournament
-            @refresh="refresh"
-          />
-        </TournamentGrid>
-        <UDivider class="my-6" />
-      </div>
+      </template>
+      <template v-else>
+        <EmptyState
+          v-model="search"
+          title="Keine Turniere"
+          description="Mit Turnieren kannst du deine Sportveranstaltungen verwalten.
+              Erstelle ein neues Turnier, um zu beginnen."
+        />
+      </template>
     </div>
   </BasePageContent>
 </template>

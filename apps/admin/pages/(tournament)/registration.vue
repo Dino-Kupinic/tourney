@@ -873,21 +873,11 @@ const onSubmitCreate = async () => {
       </template>
 
       <template #empty-state>
-        <div class="mt-64 flex w-full items-center justify-center">
-          <div class="max-w-96 space-y-3">
-            <UIcon
-              name="i-heroicons-ticket"
-              size="24"
-              class="text-gray-500 dark:text-gray-400"
-            />
-            <p class="text-base font-semibold tracking-tight">
-              Keine Anmeldungen
-            </p>
-            <p class="text-sm text-gray-700 dark:text-gray-500">
-              Mit Anmeldungen können sich Klassen bei Turnieren registrieren.
-            </p>
-          </div>
-        </div>
+        <EmptyState
+          v-model="search"
+          title="Keine Anmeldungen"
+          description="Mit Anmeldungen können sich Klassen bei Turnieren registrieren."
+        />
       </template>
     </UTable>
   </BasePageContent>
