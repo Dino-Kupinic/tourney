@@ -165,7 +165,6 @@ const onSubmitCreate = async () => {
           class="pt-2"
           @submit="onSubmitCreate"
           :validate-on="[]"
-          ref="formRef"
         >
           <div class="flex h-full w-full justify-between gap-6">
             <div class="flex w-[28rem] flex-col gap-3">
