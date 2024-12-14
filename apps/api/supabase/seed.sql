@@ -60,27 +60,27 @@ VALUES ('1AHITN', '2024/25'),
        ('4AFMBZ', '2024/25');
 
 -- LOGOS
-INSERT INTO public.logos (name, image_path)
-VALUES ('Wolf', '/logos/wolf-head.svg'),
-       ('Paladin', '/logos/closed-barbute.svg'),
-       ('Wyvern', '/logos/wyvern.svg'),
-       ('Engel', '/logos/angel-outfit.svg'),
-       ('Klaue', '/logos/bird-claw.svg'),
-       ('Krone', '/logos/crowned-skull.svg'),
-       ('Flügel', '/logos/curly-wing.svg'),
-       ('Schädel', '/logos/desert-skull.svg'),
-       ('Drache', '/logos/dragon-head.svg'),
-       ('Herz', '/logos/heartburn.svg'),
-       ('Bison', '/logos/bison.svg'),
-       ('Pferd', '/logos/horse-head.svg'),
-       ('Spinne', '/logos/mite.svg'),
-       ('Giftgas', '/logos/poison-gas.svg'),
-       ('Schwert', '/logos/relic-blade.svg'),
-       ('Hai', '/logos/shark-jaws.svg'),
-       ('Feuer', '/logos/small-fire.svg'),
-       ('Turm', '/logos/stone-tower.svg'),
-       ('Tiger', '/logos/tiger-head.svg'),
-       ('Tornado', '/logos/whirlwind.svg');
+INSERT INTO "public"."logo" ("id", "name", "image_path")
+VALUES ('00e6f81c-b06b-4390-a1a4-7062883e708b', 'Spinne', '/logos/mite.svg'),
+       ('01a8ae40-0f45-48dd-9df2-496071f32095', 'Hai', '/logos/shark-jaws.svg'),
+       ('0e1dc401-29cd-4949-94bf-f9b8833bfb51', 'Tiger', '/logos/tiger-head.svg'),
+       ('1036a5f4-3a7c-410e-b46f-82300b867603', 'Tornado', '/logos/whirlwind.svg'),
+       ('3b7d96d7-29ee-42b1-abb1-ad5b1a4da69f', 'Wolf', '/logos/wolf-head.svg'),
+       ('3d2289fb-042f-487c-a62d-989e0c08957f', 'Bison', '/logos/bison.svg'),
+       ('44e5f640-50c7-42df-8d39-fee97ecbbf1f', 'Herz', '/logos/heartburn.svg'),
+       ('5327dfe6-1dca-4ee4-801c-72e1c6a6eb99', 'Krone', '/logos/crowned-skull.svg'),
+       ('5d9e070b-28aa-4be9-b6a1-3b647a709124', 'Schädel', '/logos/desert-skull.svg'),
+       ('5eb74ea0-8668-429e-981a-51f2d50d2fc0', 'Paladin', '/logos/closed-barbute.svg'),
+       ('61d4ec76-77df-4458-b694-e47e79d123d3', 'Flügel', '/logos/curly-wing.svg'),
+       ('621316ea-a2d9-44c4-96fe-d9e80d0a7ba9', 'Wyvern', '/logos/wyvern.svg'),
+       ('888c459b-6a27-4b1e-bf4a-460072f8a2ba', 'Schwert', '/logos/relic-blade.svg'),
+       ('8db73609-4a95-4b66-aaf0-6dbee2d24a68', 'Drache', '/logos/dragon-head.svg'),
+       ('908a5d67-86db-40e3-a6e4-e55b205974f4', 'Turm', '/logos/stone-tower.svg'),
+       ('b0ed5200-fccf-48c5-b14b-64c28250b518', 'Feuer', '/logos/small-fire.svg'),
+       ('d89129a6-6325-40e7-b074-398455aeee75', 'Schild', '/logos/checked-shield.svg'),
+       ('e208994e-90f7-4328-99a3-34e95f91dbe8', 'Pferd', '/logos/horse-head.svg'),
+       ('e6320a62-ef27-4744-a6a3-62d4dbf826cb', 'Engel', '/logos/angel-outfit.svg'),
+       ('eed808b8-2bd2-4cd9-8100-5f4df404b909', 'Klaue', '/logos/bird-claw.svg');
 
 -- VARIANTS
 -- TODO: remove id, this was just exported but whatever

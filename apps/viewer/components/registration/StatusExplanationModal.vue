@@ -31,7 +31,7 @@ const isOpen = defineModel<boolean>()
           <UBadge label="Abgelehnt" color="red" variant="subtle" />
           <p>
             Ungültig oder das Turnier hat zu viele Teams und ein paar Teams
-            müssen entfernt werden.
+            müssen entfernt werden. Oder das Ablaufdatum wurde überschritten.
           </p>
         </div>
       </div>
