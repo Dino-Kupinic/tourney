@@ -1,107 +1,13 @@
 <script setup lang="ts">
 import type { Enums, Tables } from "~/types/database.types"
 import type { Link, LinkGroup } from "~/types/link"
+import type { RegistrationColumn } from "~/types/registration"
 import { z } from "zod"
 
 const title = ref<string>("Anmeldung")
 useHead({
   title: () => title.value,
 })
-
-const { columns } = useRegistrationTable()
-const actions = [
-  [
-    {
-      key: "in_progress",
-      label: "Ausstehend",
-      icon: "i-heroicons-arrow-path",
-      click: () => onUpdate("Ausstehend"),
-    },
-  ],
-  [
-    {
-      key: "submitted",
-      label: "Abgesendet",
-      icon: "i-heroicons-envelope",
-      click: () => onUpdate("Abgesendet"),
-    },
-  ],
-  [
-    {
-      key: "completed",
-      label: "Abgeschlossen",
-      icon: "i-heroicons-check",
-      click: () => onUpdate("Abgeschlossen"),
-    },
-  ],
-  [
-    {
-      key: "discarded",
-      label: "Abgelehnt",
-      icon: "i-heroicons-no-symbol",
-      click: () => onUpdate("Abgelehnt"),
-    },
-  ],
-]
-
-const items = (row: RegistrationColumn) =>
-  ref([
-    [
-      {
-        label: "Link kopieren",
-        icon: "i-heroicons-clipboard-document-check",
-        click: () => onCopyLink(row),
-      },
-      {
-        label: "Editieren",
-        icon: "i-heroicons-pencil-square-20-solid",
-        click: () => onEdit(row),
-      },
-      {
-        label: "Info",
-        icon: "i-heroicons-information-circle",
-        click: () => onInfo(row),
-      },
-    ],
-    [
-      {
-        label: "Löschen",
-        icon: "i-heroicons-trash",
-        click: () => onDelete(),
-      },
-    ],
-  ])
-
-const selectedColumns = ref(columns)
-const columnsTable = computed(() =>
-  columns.filter((column) => selectedColumns.value.includes(column)),
-)
-
-const tabItems = [
-  {
-    slot: "multiple",
-    key: "multiple",
-    label: "Mehrfach",
-    icon: "i-heroicons-rectangle-stack",
-    description: "Anmeldungen für alle Klassen erstellen.",
-  },
-  {
-    slot: "single",
-    key: "single",
-    label: "Einzel",
-    icon: "i-heroicons-document",
-    description: "Anmeldung für eine Klasse erstellen.",
-  },
-]
-
-type RegistrationColumn = {
-  id: string
-  name: string
-  class: string
-  expire_date: string
-  status: Enums<"registration_status">
-  allow_class_mixing: boolean
-}
 
 const { data, status, refresh } = await useFetch("/api/registrations", {
   transform: (item) => {
@@ -141,11 +47,13 @@ const filteredRows = computed(() => {
 })
 
 const sort = ref({ column: "status", direction: "asc" as const })
+
 const isOpenDelete = ref<boolean>(false)
 const isOpenEdit = ref<boolean>(false)
 const isOpenCreate = ref<boolean>(false)
 const isOpenInfo = ref<boolean>(false)
 const isOpenLinks = ref<boolean>(false)
+
 const years = Array.from(
   { length: 10 },
   (_, i) =>
@@ -405,6 +313,19 @@ const refreshTable = () => {
   displaySuccessNotification("Aktualisiert", "Die Tabelle wurde aktualisiert.")
 }
 
+const { items, actions, columns, tabItems } = useRegistrationTable(
+  onUpdate,
+  onCopyLink,
+  onEdit,
+  onInfo,
+  onDelete,
+)
+
+const selectedColumns = ref(columns)
+const columnsTable = computed(() =>
+  columns.filter((column) => selectedColumns.value.includes(column)),
+)
+
 type TabKey = "multiple" | "single"
 const currentTab = ref<TabKey>(tabItems[0].key as TabKey)
 function onChange(index: number) {
@@ -424,59 +345,15 @@ const onSubmitCreate = async () => {
 
 <template>
   <BasePageHeader :title="title">
-    <!-- Filters -->
-    <div class="ml-4 flex items-center gap-2">
-      <!-- Delete Modal -->
-      <UModal v-model="isOpenDelete" :ui="{ width: 'w-full sm:max-w-md' }">
-        <UCard
-          :ui="{
-            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-            body: {
-              padding: 'px-4 py-5 sm:p-6',
-            },
-            header: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-            footer: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-          }"
-        >
-          <template #header>
-            <strong> Anmeldungen löschen </strong>
-          </template>
+    <ToolbarContainer>
+      <ModalDelete v-model="isOpenDelete" @delete="onDelete">
+        <p>
+          Möchten Sie wirklich
+          <strong>{{ selectedRows.length }}</strong> Anmeldungen löschen?
+        </p>
+      </ModalDelete>
 
-          <p>
-            Möchten Sie wirklich
-            <strong>{{ selectedRows.length }}</strong> Anmeldungen löschen?
-          </p>
-
-          <template #footer>
-            <div class="flex items-center gap-2">
-              <UButton
-                variant="soft"
-                size="xs"
-                color="red"
-                @click="onDelete"
-                label="Löschen"
-              />
-              <UButton
-                color="gray"
-                size="xs"
-                @click="isOpenDelete = false"
-                label="Abbrechen"
-              />
-            </div>
-          </template>
-        </UCard>
-      </UModal>
-
-      <UInput
-        v-model="search"
-        icon="i-heroicons-magnifying-glass-20-solid"
-        placeholder="Suchen..."
-        size="xs"
-      />
+      <SearchInput v-model="search" />
 
       <template v-if="selectedRows.length > 1">
         <UButton
@@ -510,24 +387,7 @@ const onSubmitCreate = async () => {
         />
       </UDropdown>
 
-      <USelectMenu
-        v-model="selectedColumns"
-        :options="columns"
-        multiple
-        v-slot="{ open }"
-      >
-        <UButton color="gray" size="xs" class="w-32 flex-1 justify-between">
-          <div class="flex items-center gap-1">
-            <UIcon name="i-heroicons-view-columns" class="h-4 w-4" />
-            Spalten
-          </div>
-          <UIcon
-            name="i-heroicons-chevron-right-20-solid"
-            class="h-4 w-4 text-gray-400 transition-transform dark:text-gray-500"
-            :class="[open && 'rotate-90 transform']"
-          />
-        </UButton>
-      </USelectMenu>
+      <ColumnsDropdown :columns="columns" v-model="selectedColumns" />
 
       <UButton
         icon="i-heroicons-arrow-path"
@@ -677,288 +537,186 @@ const onSubmitCreate = async () => {
         </UCard>
       </UModal>
 
-      <!-- Create Modal -->
-      <UModal v-model="isOpenCreate" :ui="{ width: 'w-full sm:max-w-md' }">
-        <UCard
-          :ui="{
-            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-            body: {
-              padding: 'px-4 py-5 sm:p-6',
-            },
-            header: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-            footer: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-          }"
+      <ModalCreate
+        title="Neues Anmeldung"
+        v-model="isOpenCreate"
+        @create="onSubmitCreate"
+        modal-width="sm:max-w-md"
+      >
+        <UTabs
+          :items="tabItems"
+          class="w-full"
+          @change="onChange"
+          :ui="{ list: { tab: { height: 'h-7' }, height: 'h-9' } }"
         >
-          <template #header>
-            <strong> Neue Anmeldung </strong>
+          <template #icon="{ item, selected }">
+            <UIcon
+              :name="item.icon"
+              class="me-2 h-4 w-4 flex-shrink-0"
+              :class="[selected && 'text-primary-500 dark:text-primary-400']"
+            />
           </template>
 
-          <UTabs
-            :items="tabItems"
-            class="w-full"
-            @change="onChange"
-            :ui="{ list: { tab: { height: 'h-7' }, height: 'h-9' } }"
-          >
-            <template #icon="{ item, selected }">
-              <UIcon
-                :name="item.icon"
-                class="me-2 h-4 w-4 flex-shrink-0"
-                :class="[selected && 'text-primary-500 dark:text-primary-400']"
-              />
-            </template>
-
-            <template #multiple="{ item }">
-              <UForm
-                :schema="creationSchemaMultiple"
-                :state="creationStateMultiple"
-                class="space-y-4 pt-2"
-                @submit="onSubmitCreateMultiple"
-              >
-                <UFormGroup
-                  label="Teams"
-                  name="teams"
-                  description="Anzahl an Anmeldungen für jede Klasse."
-                  required
-                >
-                  <UInput v-model="creationStateMultiple.teams" type="number" />
-                </UFormGroup>
-
-                <UFormGroup
-                  label="Klassen"
-                  name="classes"
-                  class="grow"
-                  description="Für diese Klassen wird ein Link generiert."
-                >
-                  <ul
-                    class="h-40 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
-                  >
-                    <template v-if="classes?.length">
-                      <li
-                        v-for="schoolClass in classes"
-                        :key="schoolClass.name"
-                        class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
-                      >
-                        <p>{{ schoolClass.name }}</p>
-                        <p>{{ schoolClass.year }}</p>
-                      </li>
-                    </template>
-                    <template v-else>
-                      <div
-                        class="flex h-full w-full items-center justify-center"
-                      >
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                          Keine Klassen für {{ classYear }} gefunden.
-                        </p>
-                      </div>
-                    </template>
-                  </ul>
-                </UFormGroup>
-
-                <UFormGroup label="Datensatz">
-                  <USelect v-model="classYear" :options="years" />
-                </UFormGroup>
-
-                <UFormGroup
-                  label="Ablaufdatum"
-                  name="date"
-                  description="An diesem Datum werden die Anmeldungen automatisch geschlossen."
-                  required
-                >
-                  <UInput
-                    v-model="creationStateMultiple.expire_date"
-                    type="date"
-                  />
-                </UFormGroup>
-              </UForm>
-            </template>
-            <template #single="{ item }">
-              <UForm
-                :schema="creationSchemaSingle"
-                :state="creationSchemaSingle"
-                class="space-y-4 pt-2"
-                @submit="onSubmitCreateSingle"
-              >
-                <UFormGroup
-                  label="Name"
-                  name="name"
-                  description="Der Name der Anmeldung."
-                  required
-                >
-                  <UInput v-model="creationStateSingle.name" />
-                </UFormGroup>
-
-                <UFormGroup
-                  label="Klasse"
-                  name="class"
-                  description="Die Klasse der Anmeldung."
-                  required
-                >
-                  <USelectMenu
-                    v-model="creationStateSingle.schoolClass"
-                    placeholder="Klasse auswählen"
-                    :options="classes ?? []"
-                    option-attribute="name"
-                  />
-                </UFormGroup>
-
-                <UFormGroup label="Datensatz">
-                  <USelect v-model="classYear" :options="years" />
-                </UFormGroup>
-
-                <UFormGroup
-                  label="Ablaufdatum"
-                  name="date"
-                  description="An diesem Datum wird die Anmeldung automatisch geschlossen."
-                  required
-                >
-                  <UInput
-                    v-model="creationStateSingle.expire_date"
-                    type="date"
-                  />
-                </UFormGroup>
-
-                <UFormGroup
-                  label="Klassenmischung erlauben"
-                  name="allow_class_mixing"
-                  description="Schüler können sich in anderen Klassen anmelden."
-                  :ui="{
-                    wrapper:
-                      'flex items-center justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-800 gap-3',
-                  }"
-                >
-                  <UToggle v-model="creationStateSingle.allow_class_mixing" />
-                </UFormGroup>
-              </UForm>
-            </template>
-          </UTabs>
-
-          <template #footer>
-            <div class="flex items-center gap-2">
-              <UButton
-                variant="soft"
-                size="xs"
-                @click="onSubmitCreate"
-                label="Erstellen"
-              />
-              <UButton
-                color="gray"
-                size="xs"
-                @click="isOpenCreate = false"
-                label="Abbrechen"
-              />
-            </div>
-          </template>
-        </UCard>
-      </UModal>
-
-      <!-- Edit Modal -->
-      <UModal v-model="isOpenEdit" :ui="{ width: 'w-full sm:max-w-md' }">
-        <UCard
-          :ui="{
-            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-            body: {
-              padding: 'px-4 py-5 sm:p-6',
-            },
-            header: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-            footer: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-          }"
-        >
-          <template #header>
-            <strong> Editieren </strong>
-          </template>
-
-          <UForm
-            :schema="editSchema"
-            :state="editState"
-            class="space-y-4"
-            @submit="onSubmitEdit"
-          >
-            <UFormGroup
-              label="Ablaufdatum"
-              name="date"
-              description="An diesem Datum wird die Anmeldung automatisch geschlossen."
+          <template #multiple="{ item }">
+            <UForm
+              :schema="creationSchemaMultiple"
+              :state="creationStateMultiple"
+              class="space-y-4 pt-2"
+              @submit="onSubmitCreateMultiple"
             >
-              <UInput v-model="editState.expire_date" type="date" />
-            </UFormGroup>
+              <UFormGroup
+                label="Teams"
+                name="teams"
+                description="Anzahl an Anmeldungen für jede Klasse."
+                required
+              >
+                <UInput v-model="creationStateMultiple.teams" type="number" />
+              </UFormGroup>
 
-            <UFormGroup
-              label="Klassenmischung erlauben"
-              name="allow_class_mixing"
-              description="Schüler können sich in anderen Klassen anmelden."
-              :ui="{
-                wrapper:
-                  'flex items-center justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-800 gap-3',
-              }"
+              <UFormGroup
+                label="Klassen"
+                name="classes"
+                class="grow"
+                description="Für diese Klassen wird ein Link generiert."
+              >
+                <ul
+                  class="h-40 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
+                >
+                  <template v-if="classes?.length">
+                    <li
+                      v-for="schoolClass in classes"
+                      :key="schoolClass.name"
+                      class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
+                    >
+                      <p>{{ schoolClass.name }}</p>
+                      <p>{{ schoolClass.year }}</p>
+                    </li>
+                  </template>
+                  <template v-else>
+                    <div class="flex h-full w-full items-center justify-center">
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Keine Klassen für {{ classYear }} gefunden.
+                      </p>
+                    </div>
+                  </template>
+                </ul>
+              </UFormGroup>
+
+              <UFormGroup label="Datensatz">
+                <USelect v-model="classYear" :options="years" />
+              </UFormGroup>
+
+              <UFormGroup
+                label="Ablaufdatum"
+                name="date"
+                description="An diesem Datum werden die Anmeldungen automatisch geschlossen."
+                required
+              >
+                <UInput
+                  v-model="creationStateMultiple.expire_date"
+                  type="date"
+                />
+              </UFormGroup>
+            </UForm>
+          </template>
+          <template #single="{ item }">
+            <UForm
+              :schema="creationSchemaSingle"
+              :state="creationSchemaSingle"
+              class="space-y-4 pt-2"
+              @submit="onSubmitCreateSingle"
             >
-              <UToggle v-model="editState.allow_class_mixing" />
-            </UFormGroup>
-          </UForm>
+              <UFormGroup
+                label="Name"
+                name="name"
+                description="Der Name der Anmeldung."
+                required
+              >
+                <UInput v-model="creationStateSingle.name" />
+              </UFormGroup>
 
-          <template #footer>
-            <div class="flex items-center gap-2">
-              <UButton
-                variant="soft"
-                size="xs"
-                @click="onSubmitEdit"
-                label="Speichern"
-              />
-              <UButton
-                color="gray"
-                size="xs"
-                @click="isOpenEdit = false"
-                label="Abbrechen"
-              />
-            </div>
+              <UFormGroup
+                label="Klasse"
+                name="class"
+                description="Die Klasse der Anmeldung."
+                required
+              >
+                <USelectMenu
+                  v-model="creationStateSingle.schoolClass"
+                  placeholder="Klasse auswählen"
+                  :options="classes ?? []"
+                  option-attribute="name"
+                />
+              </UFormGroup>
+
+              <UFormGroup label="Datensatz">
+                <USelect v-model="classYear" :options="years" />
+              </UFormGroup>
+
+              <UFormGroup
+                label="Ablaufdatum"
+                name="date"
+                description="An diesem Datum wird die Anmeldung automatisch geschlossen."
+                required
+              >
+                <UInput v-model="creationStateSingle.expire_date" type="date" />
+              </UFormGroup>
+
+              <UFormGroup
+                label="Klassenmischung erlauben"
+                name="allow_class_mixing"
+                description="Schüler können sich in anderen Klassen anmelden."
+                :ui="{
+                  wrapper:
+                    'flex items-center justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-800 gap-3',
+                }"
+              >
+                <UToggle v-model="creationStateSingle.allow_class_mixing" />
+              </UFormGroup>
+            </UForm>
           </template>
-        </UCard>
-      </UModal>
+        </UTabs>
+      </ModalCreate>
 
-      <!-- Info Modal -->
-      <UModal v-model="isOpenInfo" :ui="{ width: 'w-full sm:max-w-md' }">
-        <UCard
-          :ui="{
-            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-            body: {
-              padding: 'px-4 py-5 sm:p-6',
-            },
-            header: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-            footer: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-          }"
+      <ModalEdit
+        v-model="isOpenEdit"
+        modal-width="sm:max-w-md"
+        @edit="onSubmitEdit"
+      >
+        <UForm
+          :schema="editSchema"
+          :state="editState"
+          class="space-y-4"
+          @submit="onSubmitEdit"
         >
-          <template #header>
-            <strong> Info </strong>
-          </template>
+          <UFormGroup
+            label="Ablaufdatum"
+            name="date"
+            description="An diesem Datum wird die Anmeldung automatisch geschlossen."
+          >
+            <UInput v-model="editState.expire_date" type="date" />
+          </UFormGroup>
 
-          <pre>{{ infoDisplay }}</pre>
+          <UFormGroup
+            label="Klassenmischung erlauben"
+            name="allow_class_mixing"
+            description="Schüler können sich in anderen Klassen anmelden."
+            :ui="{
+              wrapper:
+                'flex items-center justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-800 gap-3',
+            }"
+          >
+            <UToggle v-model="editState.allow_class_mixing" />
+          </UFormGroup>
+        </UForm>
+      </ModalEdit>
 
-          <template #footer>
-            <div class="flex items-center gap-2">
-              <UButton
-                color="gray"
-                size="xs"
-                @click="isOpenInfo = false"
-                label="Fertig"
-              />
-            </div>
-          </template>
-        </UCard>
-      </UModal>
-    </div>
+      <ModalInfo v-model="isOpenInfo">
+        <pre>{{ infoDisplay }}</pre>
+      </ModalInfo>
+    </ToolbarContainer>
   </BasePageHeader>
   <BasePageContent>
-    <!-- Table -->
     <UTable
       v-model="selectedRows"
       v-model:sort="sort"
@@ -1040,21 +798,11 @@ const onSubmitCreate = async () => {
       </template>
 
       <template #empty-state>
-        <div class="mt-64 flex w-full items-center justify-center">
-          <div class="max-w-96 space-y-3">
-            <UIcon
-              name="i-heroicons-ticket"
-              size="24"
-              class="text-gray-500 dark:text-gray-400"
-            />
-            <p class="text-base font-semibold tracking-tight">
-              Keine Anmeldungen
-            </p>
-            <p class="text-sm text-gray-700 dark:text-gray-500">
-              Mit Anmeldungen können sich Klassen bei Turnieren registrieren.
-            </p>
-          </div>
-        </div>
+        <EmptyState
+          v-model="search"
+          title="Keine Anmeldungen"
+          description="Mit Anmeldungen können sich Klassen bei Turnieren registrieren."
+        />
       </template>
     </UTable>
   </BasePageContent>
