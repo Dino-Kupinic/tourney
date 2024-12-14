@@ -153,178 +153,143 @@ const onSubmitCreate = async () => {
         @click="isOpenCreate = true"
         label="Neues Turnier..."
       />
-      <!-- Create Modal -->
-      <UModal v-model="isOpenCreate" :ui="{ width: 'w-full sm:max-w-4xl' }">
-        <UCard
-          :ui="{
-            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-            body: {
-              padding: 'px-4 py-5 sm:p-6',
-            },
-            header: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-            footer: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-          }"
+      <ModalCreate
+        title="Neues Turnier"
+        v-model="isOpenCreate"
+        @create="onSubmitCreate"
+        modal-width="sm:max-w-4xl"
+      >
+        <UForm
+          :schema="creationSchema"
+          :state="creationSchema"
+          class="pt-2"
+          @submit="onSubmitCreate"
+          :validate-on="[]"
+          ref="formRef"
         >
-          <template #header>
-            <strong> Neues Turnier </strong>
-          </template>
-          <UForm
-            :schema="creationSchema"
-            :state="creationSchema"
-            class="pt-2"
-            @submit="onSubmitCreate"
-            :validate-on="[]"
-            ref="formRef"
-          >
-            <div class="flex h-full w-full justify-between gap-6">
-              <div class="flex w-[28rem] flex-col gap-3">
-                <div class="flex space-x-3">
-                  <UFormGroup label="Name" name="name" class="grow" required>
-                    <UInput
-                      v-model="creationState.name"
-                      placeholder="Fußball Turnier 2024/25"
-                    />
-                  </UFormGroup>
-                  <UFormGroup label="Sportart" name="sport" required>
-                    <USelect
-                      v-model="creationState.sport"
-                      placeholder="Sport auswählen"
-                      :options="sports"
-                      class="w-40"
-                    />
-                  </UFormGroup>
-                </div>
-
-                <UFormGroup class="grow" label="Ort" name="location" required>
-                  <UInput v-model="creationState.location" />
-                </UFormGroup>
-
-                <UFormGroup label="Regeln" name="rules">
-                  <UTextarea
-                    v-model="creationState.rules"
-                    :rows="4"
-                    placeholder="Lorem Ipsum..."
+          <div class="flex h-full w-full justify-between gap-6">
+            <div class="flex w-[28rem] flex-col gap-3">
+              <div class="flex space-x-3">
+                <UFormGroup label="Name" name="name" class="grow" required>
+                  <UInput
+                    v-model="creationState.name"
+                    placeholder="Fußball Turnier 2024/25"
                   />
                 </UFormGroup>
-
-                <div
-                  class="flex flex-col gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
-                >
-                  <UFormGroup
-                    label="Startdatum"
-                    name="start_date"
-                    description="An diesem Datum findet das Turnier statt."
-                    required
-                  >
-                    <UInput v-model="creationState.start_date" type="date" />
-                  </UFormGroup>
-
-                  <div class="flex space-x-3">
-                    <UFormGroup label="Von" name="from" required class="grow">
-                      <UInput
-                        v-model="creationState.from"
-                        type="time"
-                        :step="2"
-                      />
-                    </UFormGroup>
-
-                    <UFormGroup label="Bis" name="to" required class="grow">
-                      <UInput
-                        v-model="creationState.to"
-                        type="time"
-                        :step="2"
-                      />
-                    </UFormGroup>
-                  </div>
-                </div>
+                <UFormGroup label="Sportart" name="sport" required>
+                  <USelect
+                    v-model="creationState.sport"
+                    placeholder="Sport auswählen"
+                    :options="sports"
+                    class="w-40"
+                  />
+                </UFormGroup>
               </div>
-              <div class="flex flex-col gap-3">
+
+              <UFormGroup class="grow" label="Ort" name="location" required>
+                <UInput v-model="creationState.location" />
+              </UFormGroup>
+
+              <UFormGroup label="Regeln" name="rules">
+                <UTextarea
+                  v-model="creationState.rules"
+                  :rows="4"
+                  placeholder="Lorem Ipsum..."
+                />
+              </UFormGroup>
+
+              <div
+                class="flex flex-col gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
+              >
                 <UFormGroup
-                  label="Vorschaubild"
-                  name="thumbnail_path"
-                  description="Ein Bild für das Turnier."
+                  label="Startdatum"
+                  name="start_date"
+                  description="An diesem Datum findet das Turnier statt."
                   required
                 >
-                  <USelectMenu
-                    v-model="creationState.thumbnail_path"
-                    :options="thumbnails"
-                    placeholder="Bild auswählen"
-                  >
-                    <template #option="{ option }">
-                      <span class="font-mono text-xs">{{ option }}</span>
-                    </template>
-                  </USelectMenu>
+                  <UInput v-model="creationState.start_date" type="date" />
                 </UFormGroup>
-                <p class="text-xs text-gray-500">
-                  Keine Bilder? Lade eins hoch in
-                  <NuxtLink to="/gallery">
-                    <span class="text-primary-500">Galerie</span>
-                    <UIcon
-                      name="i-heroicons-arrow-up-right"
-                      class="text-primary-500 ml-0.5 pt-1"
-                      size="10"
+
+                <div class="flex space-x-3">
+                  <UFormGroup label="Von" name="from" required class="grow">
+                    <UInput
+                      v-model="creationState.from"
+                      type="time"
+                      :step="2"
                     />
-                  </NuxtLink>
-                </p>
-                <UFormGroup label="Preise">
-                  <div
-                    class="flex flex-col gap-3 rounded-md bg-gray-50 p-3 dark:bg-gray-800"
-                  >
-                    <UFormGroup label="Erster Platz" name="prizes.first">
+                  </UFormGroup>
+
+                  <UFormGroup label="Bis" name="to" required class="grow">
+                    <UInput v-model="creationState.to" type="time" :step="2" />
+                  </UFormGroup>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col gap-3">
+              <UFormGroup
+                label="Vorschaubild"
+                name="thumbnail_path"
+                description="Ein Bild für das Turnier."
+                required
+              >
+                <USelectMenu
+                  v-model="creationState.thumbnail_path"
+                  :options="thumbnails"
+                  placeholder="Bild auswählen"
+                >
+                  <template #option="{ option }">
+                    <span class="font-mono text-xs">{{ option }}</span>
+                  </template>
+                </USelectMenu>
+              </UFormGroup>
+              <p class="text-xs text-gray-500">
+                Keine Bilder? Lade eins hoch in
+                <NuxtLink to="/gallery">
+                  <span class="text-primary-500">Galerie</span>
+                  <UIcon
+                    name="i-heroicons-arrow-up-right"
+                    class="text-primary-500 ml-0.5 pt-1"
+                    size="10"
+                  />
+                </NuxtLink>
+              </p>
+              <UFormGroup label="Preise">
+                <div
+                  class="flex flex-col gap-3 rounded-md bg-gray-50 p-3 dark:bg-gray-800"
+                >
+                  <UFormGroup label="Erster Platz" name="prizes.first">
+                    <UInput
+                      v-model="creationState.prizes.first"
+                      placeholder="Pokal"
+                    />
+                  </UFormGroup>
+                  <div class="flex space-x-3">
+                    <UFormGroup label="Zweiter Platz" name="prizes.second">
                       <UInput
-                        v-model="creationState.prizes.first"
-                        placeholder="Pokal"
+                        v-model="creationState.prizes.second"
+                        placeholder="Silver Medaille"
                       />
                     </UFormGroup>
-                    <div class="flex space-x-3">
-                      <UFormGroup label="Zweiter Platz" name="prizes.second">
-                        <UInput
-                          v-model="creationState.prizes.second"
-                          placeholder="Silver Medaille"
-                        />
-                      </UFormGroup>
-                      <UFormGroup label="Dritter Platz" name="prizes.third">
-                        <UInput
-                          v-model="creationState.prizes.third"
-                          placeholder="Bronze Medaille"
-                        />
-                      </UFormGroup>
-                    </div>
-                    <UFormGroup label="Sonstiges" name="prizes.bonus">
-                      <UTextarea
-                        v-model="creationState.prizes.bonus"
-                        :rows="5"
-                        placeholder="Eis, Frankfurter, etc."
+                    <UFormGroup label="Dritter Platz" name="prizes.third">
+                      <UInput
+                        v-model="creationState.prizes.third"
+                        placeholder="Bronze Medaille"
                       />
                     </UFormGroup>
                   </div>
-                </UFormGroup>
-              </div>
+                  <UFormGroup label="Sonstiges" name="prizes.bonus">
+                    <UTextarea
+                      v-model="creationState.prizes.bonus"
+                      :rows="5"
+                      placeholder="Eis, Frankfurter, etc."
+                    />
+                  </UFormGroup>
+                </div>
+              </UFormGroup>
             </div>
-          </UForm>
-
-          <template #footer>
-            <div class="flex items-center gap-2">
-              <UButton
-                variant="soft"
-                size="xs"
-                @click="onSubmitCreate"
-                label="Erstellen"
-              />
-              <UButton
-                color="gray"
-                size="xs"
-                @click="isOpenCreate = false"
-                label="Abbrechen"
-              />
-            </div>
-          </template>
-        </UCard>
-      </UModal>
+          </div>
+        </UForm>
+      </ModalCreate>
     </ToolbarContainer>
   </BasePageHeader>
   <BasePageContent>
