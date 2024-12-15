@@ -9,6 +9,16 @@ const { getUserById, formatUsername } = useUser()
 const user = await getUserById(tournament.last_edited_by_id)
 const { data } = await useFetch(`/api/tournaments/${tournament.id}/teams`)
 
+const maxTeams = computed(() => {
+  switch (tournament.sport) {
+    case "Fußball":
+      return 20
+    case "Basketball":
+    case "Volleyball":
+      return 10
+  }
+})
+
 const isOpenInfo = ref<boolean>(false)
 const items = [
   [
@@ -153,8 +163,7 @@ const onDelete = async () => {
           <div class="flex justify-between">
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-clipboard-document-list" />
-              <p v-if="data.teams === 1">{{ data?.teams }} Team</p>
-              <p v-else>{{ data?.teams }} Teams</p>
+              <p>{{ data?.teams }}/{{ maxTeams }} Teams</p>
             </div>
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-users" />
