@@ -30,8 +30,20 @@ const links = [
     </ToolbarContainer>
   </BasePageHeader>
   <BasePageContent>
-    {{ route.params.id }}
+    <div class="flex h-full w-full">
+      <div class="w-1/2 border-r border-gray-200 dark:border-gray-700">a</div>
+      <div class="w-1/2">
+        <ClientOnly>
+          <TournamentFlow />
+          <template #fallback>
+            <div
+              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
+            >
+              <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
+            </div>
+          </template>
+        </ClientOnly>
+      </div>
+    </div>
   </BasePageContent>
 </template>
-
-<style scoped></style>
