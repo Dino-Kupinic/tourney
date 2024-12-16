@@ -8,6 +8,8 @@ type LogoVariantDTO = Omit<Tables<"logo_variant">, "id">
 type TournamentDTO = Omit<Tables<"tournament">, "id">
 type ClassDTO = Omit<Tables<"class">, "id">
 type MatchDTO = Omit<Tables<"match">, "id">
+type GroupDTO = Omit<Tables<"group">, "id">
+type ResultDTO = Omit<Tables<"result">, "id">
 
 export type {
   RegistrationDTO,
@@ -18,4 +20,6 @@ export type {
   ClassDTO,
   TeamDTO,
   MatchDTO,
+  GroupDTO,
+  ResultDTO,
 }

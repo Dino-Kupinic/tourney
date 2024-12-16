@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  type TeamInsert = Omit<TeamDTO, "group">
+  type TeamInsert = Omit<TeamDTO, "group_id">
   const team: TeamInsert = {
     name: registration.class.name,
     logo_id: logo.id,
