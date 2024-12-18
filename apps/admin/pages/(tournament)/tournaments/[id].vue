@@ -6,9 +6,10 @@ useHead({
   title: () => title.value,
 })
 const route = useRoute()
-const { data: tournament } = await useFetch<ParsedJsonTournament | null>(
-  `/api/tournaments/${route.params.id}`,
-)
+const { data: tournament, refresh } =
+  await useFetch<ParsedJsonTournament | null>(
+    `/api/tournaments/${route.params.id}`,
+  )
 if (!tournament.value) {
   throw createError({
     statusCode: 404,
@@ -43,6 +44,47 @@ const { data: groups } = await useFetch(
   `/api/tournaments/${tournament.value.id}/groups`,
 )
 console.log(groups.value)
+
+const isOpenLive = defineModel<boolean>()
+
+const isTournamentLive: ComputedRef<boolean> = computed(() => {
+  return tournament.value?.is_live!
+})
+const is_live = useState<boolean>("is_live", () => isTournamentLive.value)
+watch(isTournamentLive, () => {
+  is_live.value = isTournamentLive.value
+})
+const liveLabel = computed(() => {
+  return is_live.value ? "Offline gehen..." : "Live gehen..."
+})
+
+const onSetLive = async () => {
+  try {
+    await $fetch(`/api/tournaments/${tournament.value?.id}/live`, {
+      method: "PUT",
+      body: {
+        is_live: !isTournamentLive.value,
+      },
+    })
+    isOpenLive.value = false
+    await refresh()
+    displaySuccessNotification(
+      "Erfolgreich",
+      `Das Turnier ist jetzt ${tournament.value?.is_live ? "live" : "offline"}.`,
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler",
+      "Das Turnier konnte nicht live gesetzt werden.",
+    )
+  }
+}
+
+const refreshTournament = () => {
+  refresh()
+  displaySuccessNotification("Aktualisiert", "Die Daten wurde aktualisiert.")
+}
 </script>
 
 <template>
@@ -56,7 +98,13 @@ console.log(groups.value)
         />
       </div>
       <div class="flex items-center space-x-2">
-        <UButton icon="i-heroicons-arrow-path" color="gray" size="xs" square />
+        <UButton
+          icon="i-heroicons-arrow-path"
+          color="gray"
+          size="xs"
+          square
+          @click="refreshTournament"
+        />
         <UButton
           icon="i-heroicons-pencil-square"
           label="Bearbeiten"
@@ -72,13 +120,14 @@ console.log(groups.value)
           size="xs"
         />
         <UButton
-          v-if="!tournament?.is_live"
-          label="Live gehen..."
+          :label="liveLabel"
           icon="i-heroicons-signal"
           color="red"
           variant="soft"
           size="xs"
+          @click="isOpenLive = true"
         />
+        <ModalLive v-model="isOpenLive" @live="onSetLive" />
       </div>
     </ToolbarContainer>
   </BasePageHeader>
@@ -186,6 +235,7 @@ console.log(groups.value)
                         "
                         :ui="{ rounded: 'rounded-full' }"
                         variant="subtle"
+                        size="xs"
                         :label="team.name"
                       />
                     </div>

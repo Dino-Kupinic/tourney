@@ -5,88 +5,90 @@ import { Background } from "@vue-flow/background"
 import { MiniMap } from "@vue-flow/minimap"
 import { ControlButton, Controls } from "@vue-flow/controls"
 
-// these are our nodes
-const nodes = ref<Node[]>([
-  // an input node, specified by using `type: 'input'`
+const nodes = ref([
   {
     id: "1",
     type: "input",
-    position: { x: 250, y: 5 },
-    // all nodes can have a data object containing any data you want to pass to the node
-    // a label can property can be used for default nodes
-    data: { label: "Node 1" },
+    data: { label: "node" },
+    position: { x: 250, y: 0 },
   },
-
-  // default node, you can omit `type: 'default'` as it's the fallback type
   {
     id: "2",
+    data: { label: "parent node" },
     position: { x: 100, y: 100 },
-    data: { label: "Node 2" },
+    style: {
+      backgroundColor: "rgba(16, 185, 129, 0.5)",
+      width: "200px",
+      height: "200px",
+    },
   },
-
-  // An output node, specified by using `type: 'output'`
   {
-    id: "3",
-    type: "output",
-    position: { x: 400, y: 200 },
-    data: { label: "Node 3" },
+    id: "2a",
+    data: { label: "child node" },
+    position: { x: 10, y: 50 },
+    parentNode: "2",
   },
-
-  // this is a custom node
-  // we set it by using a custom type name we choose, in this example `special`
-  // the name can be freely chosen, there are no restrictions as long as it's a string
   {
     id: "4",
-    type: "special", // <-- this is the custom node type name
-    position: { x: 400, y: 200 },
-    data: {
-      label: "Node 4",
-      hello: "world",
+    data: { label: "parent node" },
+    position: { x: 320, y: 175 },
+    style: {
+      backgroundColor: "rgba(16, 185, 129, 0.5)",
+      width: "400px",
+      height: "300px",
     },
   },
-])
-
-// these are our edges
-const edges = ref<Edge[]>([
-  // default bezier edge
-  // consists of an edge id, source node id and target node id
   {
-    id: "e1->2",
-    source: "1",
-    target: "2",
+    id: "4a",
+    data: { label: "child node" },
+    position: { x: 15, y: 65 },
+    extent: "parent",
+    parentNode: "4",
   },
-
-  // set `animated: true` to create an animated edge path
   {
-    id: "e2->3",
-    source: "2",
-    target: "3",
-    animated: true,
-  },
-
-  // a custom edge, specified by using a custom type name
-  // we choose `type: 'special'` for this example
-  {
-    id: "e3->4",
-    type: "special",
-    source: "3",
-    target: "4",
-
-    // all edges can have a data object containing any data you want to pass to the edge
-    data: {
-      hello: "world",
+    id: "4b",
+    data: { label: "nested parent node" },
+    position: { x: 15, y: 120 },
+    style: {
+      backgroundColor: "rgba(139, 92, 246, 0.5)",
+      height: "150px",
+      width: "270px",
     },
+    parentNode: "4",
+  },
+  {
+    id: "4b1",
+    data: { label: "nested child node" },
+    position: { x: 20, y: 40 },
+    parentNode: "4b",
+  },
+  {
+    id: "4b2",
+    data: { label: "nested child node" },
+    position: { x: 100, y: 100 },
+    parentNode: "4b",
+  },
+  {
+    id: "4c",
+    data: { label: "child node" },
+    position: { x: 200, y: 65 },
+    parentNode: "4",
+  },
+  {
+    id: "999",
+    type: "input",
+    data: { label: "Drag me to extend area!" },
+    position: { x: 20, y: 100 },
+    class: "light",
+    expandParent: true,
+    parentNode: "2",
   },
 ])
-
-const { onInit, onNodeDragStop, onConnect, addEdges, setViewport, toObject } =
-  useVueFlow()
 </script>
 
 <template>
   <VueFlow
     :nodes="nodes"
-    :edges="edges"
     class="bg-gray-100 dark:bg-gray-800"
     :default-viewport="{ zoom: 1.5 }"
     :min-zoom="0.2"
