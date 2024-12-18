@@ -42,6 +42,7 @@ const links = [
 const { data: groups } = await useFetch(
   `/api/tournaments/${tournament.value.id}/groups`,
 )
+console.log(groups.value)
 </script>
 
 <template>
@@ -178,9 +179,14 @@ const { data: groups } = await useFetch(
                       <UBadge
                         v-for="(team, teamIndex) in group.teams"
                         :key="teamIndex"
+                        :color="
+                          team.registration?.status === 'Abgesendet'
+                            ? 'orange'
+                            : 'green'
+                        "
+                        :ui="{ rounded: 'rounded-full' }"
+                        variant="subtle"
                         :label="team.name"
-                        color="gray"
-                        variant="solid"
                       />
                     </div>
                   </td>
@@ -188,6 +194,7 @@ const { data: groups } = await useFetch(
               </tbody>
             </table>
           </div>
+          <strong>Teams</strong>
         </div>
       </div>
       <div class="w-1/2">
