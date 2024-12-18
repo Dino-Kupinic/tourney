@@ -39,12 +39,9 @@ const links = [
   },
 ]
 
-const groups = ref([
-  { name: "Gruppe A", teams: ["1AHITN", "4AHITN", "5AHITN"] },
-  { name: "Gruppe B", teams: ["2AHITN", "3AHITN", "1AHEL"] },
-  { name: "Gruppe C", teams: ["2AHEL", "4AHEL", "1BHEL", "3BHEL"] },
-  { name: "Gruppe D", teams: ["3AHEL", "5AHEL", "2BHEL", "4BHEL"] },
-])
+const { data: groups } = await useFetch(
+  `/api/tournaments/${tournament.value.id}/groups`,
+)
 </script>
 
 <template>
@@ -159,12 +156,12 @@ const groups = ref([
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody v-if="groups">
                 <tr
                   v-for="(group, groupIndex) in groups"
                   :key="groupIndex"
                   :class="[
-                    groupIndex === groups.length - 1
+                    groupIndex === groups?.length - 1
                       ? 'last:rounded-bl-md last:rounded-br-md'
                       : '',
                   ]"
@@ -181,7 +178,7 @@ const groups = ref([
                       <UBadge
                         v-for="(team, teamIndex) in group.teams"
                         :key="teamIndex"
-                        :label="team"
+                        :label="team.name"
                         color="gray"
                         variant="solid"
                       />

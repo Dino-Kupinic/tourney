@@ -78,12 +78,35 @@ export default defineEventHandler(async (event) => {
     group_teams,
   }
 
-  const { error } = await supabase.from("tournament").insert(tournament)
+  const { data, error: tournamentError } = await supabase
+    .from("tournament")
+    .insert(tournament)
+    .select()
 
-  if (error) {
+  if (tournamentError) {
     throw createError({
       statusCode: 500,
-      statusMessage: error.message,
+      statusMessage: tournamentError.message,
+    })
+  }
+
+  let groupNames: string[]
+  tournament.sport === "Fußball"
+    ? (groupNames = ["Gruppe A", "Gruppe B", "Gruppe C", "Gruppe D"])
+    : (groupNames = ["Gruppe A", "Gruppe B"])
+  const groupInserts = groupNames.map((name) => ({
+    tournament_id: data?.[0].id,
+    name,
+  }))
+
+  const { error: groupError } = await supabase
+    .from("group")
+    .insert(groupInserts)
+
+  if (groupError) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: groupError.message,
     })
   }
 
