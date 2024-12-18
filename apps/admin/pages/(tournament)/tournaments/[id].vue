@@ -39,34 +39,6 @@ const links = [
   },
 ]
 
-const columns = [
-  {
-    key: "group_a",
-    label: "Gruppe A",
-  },
-  {
-    key: "group_b",
-    label: "Gruppe B",
-  },
-  {
-    key: "group_c",
-    label: "Gruppe C",
-  },
-  {
-    key: "group_c",
-    label: "Gruppe C",
-  },
-]
-
-const teams = [
-  {
-    group_a: "1AHITN",
-    group_b: "2AHITN",
-    group_c: "3AHITN",
-    group_d: "4AHITN",
-  },
-]
-
 const groups = ref([
   { name: "Gruppe A", teams: ["1AHITN", "4AHITN", "5AHITN"] },
   { name: "Gruppe B", teams: ["2AHITN", "3AHITN", "1AHEL"] },
@@ -78,7 +50,13 @@ const groups = ref([
 <template>
   <BasePageHeader class="pl-0">
     <ToolbarContainer class="flex w-full items-center justify-between">
-      <UBreadcrumb :links="links" />
+      <div class="flex items-center gap-2">
+        <UBreadcrumb :links="links" />
+        <TournamentLiveDisplay
+          v-if="tournament"
+          :is-live="tournament.is_live"
+        />
+      </div>
       <div class="flex items-center space-x-2">
         <UButton icon="i-heroicons-arrow-path" color="gray" size="xs" square />
         <UButton
@@ -87,6 +65,21 @@ const groups = ref([
           color="gray"
           size="xs"
           square
+        />
+        <UButton
+          v-if="!tournament?.is_live"
+          label="Gruppen neu mischen..."
+          icon="i-heroicons-table-cells"
+          variant="soft"
+          size="xs"
+        />
+        <UButton
+          v-if="!tournament?.is_live"
+          label="Live gehen..."
+          icon="i-heroicons-signal"
+          color="red"
+          variant="soft"
+          size="xs"
         />
       </div>
     </ToolbarContainer>
@@ -97,11 +90,11 @@ const groups = ref([
         class="flex w-1/2 flex-col overflow-auto border-r border-gray-200 dark:border-gray-700"
       >
         <div
-          class="flex h-auto w-full gap-3 border-b border-gray-200 bg-gray-100 p-3 px-6 dark:border-gray-700 dark:bg-gray-800"
+          class="flex h-auto w-full gap-3 border-b border-gray-200 bg-gray-100 p-3 px-6 dark:border-gray-800 dark:bg-gray-900"
         >
           <div
             v-if="tournament"
-            class="flex w-auto grow items-center gap-1 rounded-md bg-gray-50 p-3 pr-3 dark:bg-gray-700"
+            class="flex w-auto grow items-center gap-1 rounded-md bg-gray-50 p-3 pr-3 dark:bg-gray-800"
           >
             <div class="flex flex-col">
               <TournamentItemInfoStart
@@ -115,7 +108,7 @@ const groups = ref([
             </div>
           </div>
           <div
-            class="flex w-64 flex-col gap-2 rounded-md bg-gray-50 p-2 px-3 dark:bg-gray-700"
+            class="flex w-64 flex-col gap-2 rounded-md bg-gray-50 p-2 px-3 dark:bg-gray-800"
             v-if="data"
           >
             <div class="flex justify-between">
@@ -137,10 +130,15 @@ const groups = ref([
             />
             <TournamentTeamStatus :data="data" class="grow" />
           </div>
-          <div
-            class="flex w-auto items-center gap-1 rounded-md bg-gray-50 p-3 pr-3 dark:bg-gray-700"
-          >
-            a
+          <div class="rounded-md bg-gray-50 p-3 pr-3 text-sm dark:bg-gray-800">
+            <div class="flex items-center space-x-1">
+              <UIcon name="i-heroicons-user-group" />
+              <p>{{ tournament?.groups }} Gruppen</p>
+            </div>
+            <div class="flex items-center space-x-1">
+              <UIcon name="i-heroicons-identification" />
+              <p>{{ tournament?.group_teams }} Teams pro Gruppe</p>
+            </div>
           </div>
         </div>
         <div class="flex h-full w-full flex-col gap-3 p-6">
