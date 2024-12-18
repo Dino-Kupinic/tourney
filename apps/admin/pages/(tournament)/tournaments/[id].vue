@@ -43,10 +43,8 @@ const links = [
 const { data: groups } = await useFetch(
   `/api/tournaments/${tournament.value.id}/groups`,
 )
-console.log(groups.value)
 
 const isOpenLive = defineModel<boolean>()
-
 const isTournamentLive: ComputedRef<boolean> = computed(() => {
   return tournament.value?.is_live!
 })
@@ -58,6 +56,7 @@ const liveLabel = computed(() => {
   return is_live.value ? "Offline gehen..." : "Live gehen..."
 })
 
+const { fetchLiveTournaments } = useLiveTournaments()
 const onSetLive = async () => {
   try {
     await $fetch(`/api/tournaments/${tournament.value?.id}/live`, {
@@ -68,6 +67,7 @@ const onSetLive = async () => {
     })
     isOpenLive.value = false
     await refresh()
+    await fetchLiveTournaments()
     displaySuccessNotification(
       "Erfolgreich",
       `Das Turnier ist jetzt ${tournament.value?.is_live ? "live" : "offline"}.`,
