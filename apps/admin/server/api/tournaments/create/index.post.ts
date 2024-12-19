@@ -19,6 +19,8 @@ type Body = {
   thumbnail_path: string
   location: string
   last_edited_by_id: string
+  groups: number
+  group_teams: number
 }
 
 export default defineEventHandler(async (event) => {
@@ -35,6 +37,8 @@ export default defineEventHandler(async (event) => {
     thumbnail_path,
     location,
     last_edited_by_id,
+    groups,
+    group_teams,
   } = await readBody<Body>(event)
 
   if (
@@ -47,7 +51,9 @@ export default defineEventHandler(async (event) => {
     !prizes ||
     !thumbnail_path ||
     !location ||
-    !last_edited_by_id
+    !last_edited_by_id ||
+    !groups ||
+    !group_teams
   ) {
     throw createError({
       statusCode: 400,
@@ -68,14 +74,39 @@ export default defineEventHandler(async (event) => {
     thumbnail_path,
     location,
     last_edited_by_id,
+    groups,
+    group_teams,
   }
 
-  const { error } = await supabase.from("tournament").insert(tournament)
+  const { data, error: tournamentError } = await supabase
+    .from("tournament")
+    .insert(tournament)
+    .select()
 
-  if (error) {
+  if (tournamentError) {
     throw createError({
       statusCode: 500,
-      statusMessage: error.message,
+      statusMessage: tournamentError.message,
+    })
+  }
+
+  let groupNames: string[]
+  tournament.sport === "Fußball"
+    ? (groupNames = ["Gruppe A", "Gruppe B", "Gruppe C", "Gruppe D"])
+    : (groupNames = ["Gruppe A", "Gruppe B"])
+  const groupInserts = groupNames.map((name) => ({
+    tournament_id: data?.[0].id,
+    name,
+  }))
+
+  const { error: groupError } = await supabase
+    .from("group")
+    .insert(groupInserts)
+
+  if (groupError) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: groupError.message,
     })
   }
 

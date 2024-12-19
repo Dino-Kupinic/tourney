@@ -1,7 +1,7 @@
 import { serverSupabaseClient } from "#supabase/server"
 import type { Database, Enums, Tables } from "~/types/database.types"
 import type { FormPlayer } from "~/types/form"
-import type { PlayerDTO, TeamDTO } from "~/types/dto"
+import type { PlayerDTO } from "~/types/dto"
 import type { RegistrationWithClass } from "~/types/registration"
 
 type Body = {
@@ -24,13 +24,61 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  type TeamInsert = Omit<TeamDTO, "group">
-  const team: TeamInsert = {
+  const { data: groups, error: groupError } = await supabase
+    .from("group")
+    .select("*")
+    .eq("tournament_id", tournament.id)
+
+  if (groupError) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: groupError.message,
+    })
+  }
+
+  if (!groups || groups.length === 0) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "No groups found for the tournament",
+    })
+  }
+
+  const groupTeamCounts = await Promise.all(
+    groups.map(async (group) => {
+      const { count, error } = await supabase
+        .from("team")
+        .select("*", { count: "exact" })
+        .eq("group_id", group.id)
+
+      if (error) {
+        throw createError({
+          statusCode: 500,
+          statusMessage: error.message,
+        })
+      }
+
+      return { groupId: group.id, count: count ?? 0 }
+    }),
+  )
+
+  const targetGroup = groupTeamCounts.find(
+    (group) => group.count < tournament.group_teams,
+  )
+
+  if (!targetGroup) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "No available group for this team in the tournament",
+    })
+  }
+
+  const team = {
     name: registration.class.name,
     logo_id: logo.id,
     logo_variant_id: logo_variant?.id ?? null,
     tournament_id: tournament.id,
     registration_id: registration.id,
+    group_id: targetGroup.groupId,
   }
 
   const { data, error } = await supabase.from("team").insert(team).select()
