@@ -82,6 +82,8 @@ const creationSchema = z.object({
   }),
   thumbnail_path: z.string(),
   location: z.string(),
+  groups: z.number(),
+  group_teams: z.number(),
 })
 
 const creationState = reactive({
@@ -91,7 +93,7 @@ const creationState = reactive({
   from: undefined,
   to: undefined,
   year: 0,
-  sport: undefined,
+  sport: "Fußball",
   prizes: {
     first: "",
     second: "",
@@ -100,6 +102,8 @@ const creationState = reactive({
   },
   thumbnail_path: undefined,
   location: "Sportplatz",
+  groups: 0,
+  group_teams: 0,
 })
 
 watch(
@@ -109,9 +113,25 @@ watch(
   },
 )
 
+const FOOTBALL_GROUPS: number = 4
+const FOOTBALL_TEAMS: number = 5
+const VOLLEYBALL_BASKETBALL_GROUPS: number = 2
+const VOLLEYBALL_BASKETBALL_TEAMS: number = 5
+
 const onSubmitCreate = async () => {
   try {
     creationSchema.parse(creationState)
+    switch (creationState.sport as Enums<"sport_type">) {
+      case "Fußball":
+        creationState.groups = FOOTBALL_GROUPS
+        creationState.group_teams = FOOTBALL_TEAMS
+        break
+      case "Volleyball":
+      case "Basketball":
+        creationState.groups = VOLLEYBALL_BASKETBALL_GROUPS
+        creationState.group_teams = VOLLEYBALL_BASKETBALL_TEAMS
+        break
+    }
     const { id } = useUser()
     await $fetch("/api/tournaments/create", {
       method: "POST",

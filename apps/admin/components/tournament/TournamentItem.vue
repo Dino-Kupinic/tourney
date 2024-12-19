@@ -119,41 +119,12 @@ const onDelete = async () => {
           <div
             class="flex grow items-center gap-1 rounded-md bg-gray-50 p-1 px-3 dark:bg-gray-800"
           >
-            <div class="flex flex-col text-base sm:text-sm">
-              <div class="flex items-center space-x-1">
-                <UIcon name="i-heroicons-calendar-days" />
-                <p>
-                  {{ useDateFormat(tournament.start_date, "DD.MM.YYYY") }}
-                </p>
-              </div>
-              <div class="flex items-center space-x-1">
-                <UIcon name="i-heroicons-map-pin" />
-                <p class="max-w-28 truncate">
-                  {{ tournament.location }}
-                </p>
-              </div>
-            </div>
+            <TournamentItemInfoStart :tournament :truncate="true" />
           </div>
           <div
             class="flex items-center gap-1 rounded-md bg-gray-50 p-1 pr-3 dark:bg-gray-800"
           >
-            <UIcon name="i-heroicons-arrow-long-down" size="20" />
-            <div class="flex flex-col text-base sm:text-sm">
-              <div class="flex items-center space-x-1">
-                <UIcon name="i-heroicons-clock" />
-                <p>
-                  {{
-                    useDateFormat(parseStringToDate(tournament.from), "HH:mm")
-                  }}
-                </p>
-              </div>
-              <div class="flex items-center space-x-1">
-                <UIcon name="i-heroicons-clock" />
-                <p>
-                  {{ useDateFormat(parseStringToDate(tournament.to), "HH:mm") }}
-                </p>
-              </div>
-            </div>
+            <TournamentItemInfoTime :tournament />
           </div>
         </div>
         <div

@@ -8,8 +8,9 @@ const avatar = createAvatar(glass, {
   seed: name.value,
 })
 const svg = avatar.toDataUri()
-const { data } = await useFetch("/api/tournaments/live/count")
-const liveTournaments = ref<number>(data.value ?? 0)
+// TODO: make navbar rerender on live tournament change
+const { liveTournaments, fetchLiveTournaments } = useLiveTournaments()
+await fetchLiveTournaments()
 
 const navigationLinks: VerticalNavigationLink[][] = [
   [
