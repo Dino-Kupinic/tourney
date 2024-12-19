@@ -4,10 +4,18 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   modules: ["@vueuse/nuxt", "@nuxtjs/supabase"],
   devtools: { enabled: true },
+  devServer: {
+    port: 3000,
+  },
   components: [
     {
       path: "~/components",
       pathPrefix: false,
     },
   ],
+  runtimeConfig: {
+    public: {
+      clientUrl: "",
+    },
+  },
 })

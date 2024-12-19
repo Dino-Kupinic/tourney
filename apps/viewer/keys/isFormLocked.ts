@@ -1,1 +1,1 @@
-export const key = Symbol() as InjectionKey<ComputedRef<boolean>>
+export const formLocked = Symbol() as InjectionKey<ComputedRef<boolean>>

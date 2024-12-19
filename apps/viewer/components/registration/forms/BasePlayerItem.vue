@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Tables } from "~/types/database.types"
-import { key } from "~/keys/isFormLocked"
+import { formLocked } from "~/keys/isFormLocked"
+import { classMixing } from "~/keys/allowClassMixing"
 
 const { index } = defineProps<{
   index: number
@@ -12,7 +13,8 @@ const firstName = defineModel<string>("firstName")
 const lastName = defineModel<string>("lastName")
 const schoolClass = defineModel<Tables<"class">>("schoolClass")
 
-const isLocked = inject(key)
+const isLocked = inject(formLocked)
+const allowClassMixing = inject(classMixing)
 
 const fNameInput = `players.${index}.firstName`
 const lNameInput = `players.${index}.lastName`
@@ -38,7 +40,7 @@ const lNameInput = `players.${index}.lastName`
           />
         </UFormGroup>
       </div>
-      <UFormGroup label="Klasse" name="email" size="lg">
+      <UFormGroup label="Klasse" name="email" size="lg" v-if="allowClassMixing">
         <USelectMenu
           v-model="schoolClass"
           :options="schoolClasses ?? []"

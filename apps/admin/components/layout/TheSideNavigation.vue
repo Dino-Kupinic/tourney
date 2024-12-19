@@ -8,7 +8,9 @@ const avatar = createAvatar(glass, {
   seed: name.value,
 })
 const svg = avatar.toDataUri()
-const liveTournaments = ref<number>(3)
+// TODO: make navbar rerender on live tournament change
+const { liveTournaments, fetchLiveTournaments } = useLiveTournaments()
+await fetchLiveTournaments()
 
 const navigationLinks: VerticalNavigationLink[][] = [
   [
@@ -59,6 +61,11 @@ const navigationLinks: VerticalNavigationLink[][] = [
       icon: "i-heroicons-queue-list",
       to: "/logs",
     },
+    {
+      label: "Verwaltung",
+      icon: "i-heroicons-squares-2x2",
+      to: "/management",
+    },
   ],
 ]
 
@@ -85,7 +92,9 @@ const profileLinks: VerticalNavigationLink[] = [
       :ui="{
         wrapper: 'mr-2 grow',
         badge: {
+          // @ts-ignore
           color: 'red',
+          // @ts-ignore
           variant: 'subtle',
         },
       }"
@@ -95,7 +104,9 @@ const profileLinks: VerticalNavigationLink[] = [
       :ui="{
         wrapper: 'mr-2',
         badge: {
+          // @ts-ignore
           color: 'primary',
+          // @ts-ignore
           variant: 'subtle',
         },
       }"

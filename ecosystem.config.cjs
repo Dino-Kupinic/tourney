@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "tourney-viewer",
-      port: "3000",
+      port: "3001",
       cwd: "./apps/viewer",
       script: "./.output/server/index.mjs",
       exec_mode: "cluster",
@@ -13,7 +13,7 @@ module.exports = {
     },
     {
       name: "tourney-admin",
-      port: "3001",
+      port: "3000",
       cwd: "./apps/admin",
       script: "./.output/server/index.mjs",
       exec_mode: "cluster",

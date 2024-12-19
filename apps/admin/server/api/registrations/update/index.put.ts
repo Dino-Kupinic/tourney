@@ -19,4 +19,6 @@ export default defineEventHandler(async (event) => {
       statusCode: 500,
     })
   }
+
+  setResponseStatus(event, 204, "success")
 })

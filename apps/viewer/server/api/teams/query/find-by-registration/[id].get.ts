@@ -12,18 +12,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("team")
     .select("*")
     .eq("registration_id", id)
     .single()
-
-  if (error) {
-    throw createError({
-      message: error.message,
-      statusCode: 500,
-    })
-  }
 
   return data
 })
