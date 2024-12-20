@@ -17,6 +17,7 @@ const layout = computed(() => {
   <div>
     <NuxtRouteAnnouncer />
     <NuxtLoadingIndicator />
+    <NuxtPwaManifest />
     <NuxtLayout :name="layout">
       <NuxtPage />
     </NuxtLayout>

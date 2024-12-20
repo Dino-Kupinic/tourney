@@ -1,6 +1,6 @@
 {
   "name": "tourney",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "This project is a web application for managing tournaments.",
   "workspaces": [
     "packages/*",
@@ -24,6 +24,7 @@
     "dev:docs": "vitepress dev docs",
     "dev:admin:host": "pnpm --filter=tourney-admin run dev --host",
     "dev:viewer:host": "pnpm --filter=tourney-viewer run dev --host",
+    "generate-pwa-assets": "pnpm --filter=tourney-viewer run generate-pwa-assets",
     "start:supabase": "cd ./apps/api/supabase && npx supabase start --ignore-health-check",
     "stop:supabase": "cd ./apps/api/supabase && npx supabase stop",
     "types:supabase": "cd ./apps/api/supabase && npx supabase gen types --lang=typescript --local > ../../admin/types/database.types.ts && npx supabase gen types --lang=typescript --local > ../../viewer/types/database.types.ts",
