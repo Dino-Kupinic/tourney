@@ -23,14 +23,11 @@ export default defineNuxtConfig({
       clientUrl: "",
     },
   },
-  // mdc: {
-  //   components: {
-  //     prose: false, // Disable predefined prose components
-  //     map: {
-  //       p: "ProseH1",
-  //     },
-  //   },
-  // },
+  content: {
+    markdown: {
+      anchorLinks: false,
+    },
+  },
   monacoEditor: {
     locale: "de",
   },

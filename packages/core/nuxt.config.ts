@@ -25,12 +25,6 @@ export default defineNuxtConfig({
       { name: "JetBrains Mono", provider: "google" },
     ],
   },
-  components: [
-    {
-      path: "~/components",
-      pathPrefix: false,
-    },
-  ],
   colorMode: {
     preference: "light",
   },
