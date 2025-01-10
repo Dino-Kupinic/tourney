@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import type { ParsedJsonTournament } from "~/types/prizes"
+import {
+  FOOTBALL_MAX_TEAMS,
+  VOLLEYBALL_BASKETBALL_MAX_TEAMS,
+} from "~/misc/constants"
 
 const title = ref<string>("Turniere")
 useHead({
@@ -22,10 +26,10 @@ const { data } = await useFetch(`/api/tournaments/${tournament.value.id}/teams`)
 const maxTeams = computed(() => {
   switch (tournament.value?.sport) {
     case "Fußball":
-      return 20
+      return FOOTBALL_MAX_TEAMS
     case "Basketball":
     case "Volleyball":
-      return 10
+      return VOLLEYBALL_BASKETBALL_MAX_TEAMS
   }
 })
 
@@ -85,6 +89,30 @@ const refreshTournament = () => {
   refresh()
   displaySuccessNotification("Aktualisiert", "Die Daten wurde aktualisiert.")
 }
+
+const timeline = [
+  {
+    label: "Gruppenphase",
+  },
+  {
+    label: "Kreuzspiele",
+  },
+  {
+    label: "Halbfinale",
+  },
+  {
+    label: "Finale",
+  },
+]
+
+const flowGroups = computed(() => {
+  return groups.value?.map((group) => {
+    return {
+      name: group.name,
+      teams: group.teams.map((team) => team.name),
+    }
+  })
+})
 </script>
 
 <template>
@@ -189,6 +217,18 @@ const refreshTournament = () => {
           </div>
         </div>
         <div class="flex h-full w-full flex-col gap-3 p-6">
+          <strong>Ablauf</strong>
+          <UBreadcrumb :links="timeline" divider="i-heroicons-arrow-long-right">
+            <template #default="{ link, isActive }">
+              <UBadge
+                :color="isActive ? 'primary' : 'gray'"
+                class="truncate rounded-full"
+                :variant="isActive ? 'subtle' : 'solid'"
+              >
+                {{ link.label }}
+              </UBadge>
+            </template>
+          </UBreadcrumb>
           <strong>Gruppen</strong>
           <div
             class="overflow-hidden rounded-md border border-gray-300 dark:border-gray-700"
@@ -249,7 +289,7 @@ const refreshTournament = () => {
       </div>
       <div class="w-1/2">
         <ClientOnly>
-          <TournamentFlow />
+          <TournamentFlow :groups="flowGroups" />
           <template #fallback>
             <div
               class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
