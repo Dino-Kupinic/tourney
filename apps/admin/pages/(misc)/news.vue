@@ -34,7 +34,6 @@ if (!supabase.storage.getBucket("misc")) {
 // }
 
 const { data } = await supabase.storage.from("misc").download("news.md")
-console.log(await data?.text())
 content.value = (await data?.text()) ?? ""
 async function refresh() {
   const { data, error } = await supabase.storage
