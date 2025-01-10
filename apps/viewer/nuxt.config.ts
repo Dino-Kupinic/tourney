@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "@nuxtjs/supabase",
     "@vite-pwa/nuxt",
+    "@nuxt/content",
   ],
   supabase: {
     redirect: false,
@@ -29,6 +30,11 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
+  content: {
+    markdown: {
+      anchorLinks: false,
+    },
+  },
   pwa: {
     manifest: {
       name: "tourney",
