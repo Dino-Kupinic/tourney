@@ -4,6 +4,7 @@ import {
   FOOTBALL_MAX_TEAMS,
   VOLLEYBALL_BASKETBALL_MAX_TEAMS,
 } from "~/misc/constants"
+import ModalConfirm from "~/components/modal/ModalConfirm.vue"
 
 const title = ref<string>("Turniere")
 useHead({
@@ -44,7 +45,7 @@ const links = [
   },
 ]
 
-const { data: groups } = await useFetch(
+const { data: groups, refresh: refreshGroups } = await useFetch(
   `/api/tournaments/${tournament.value.id}/groups`,
 )
 
@@ -90,6 +91,23 @@ const refreshTournament = () => {
   displaySuccessNotification("Aktualisiert", "Die Daten wurde aktualisiert.")
 }
 
+const mixGroups = async () => {
+  try {
+    await $fetch(`/api/tournaments/${tournament.value?.id}/mix`)
+    await refreshGroups()
+    displaySuccessNotification(
+      "Erfolgreich",
+      "Die Gruppen wurden neu gemischt.",
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler",
+      "Die Gruppen konnten nicht gemischt werden.",
+    )
+  }
+}
+
 const timeline = [
   {
     label: "Gruppenphase",
@@ -117,7 +135,67 @@ const flowGroups = computed(() => {
   })
 })
 
-console.log(groups.value)
+const teams = computed(() => {
+  return groups.value
+    ?.flatMap((group) => group.teams)
+    .sort((a, b) => {
+      return a.name.localeCompare(b.name)
+    })
+})
+
+const search = ref<string>("")
+const filteredTeams = computed(() => {
+  return teams.value?.filter((team) => {
+    return team.name.toLowerCase().includes(search.value.toLowerCase())
+  })
+})
+
+const isOpenConfirm = ref<boolean>(false)
+const editPlayerNote = async (id: string, note: string) => {
+  try {
+    await $fetch("/api/players/edit", {
+      method: "PUT",
+      body: { id, note },
+    })
+    await refreshGroups()
+    isOpenConfirm.value = false
+    displaySuccessNotification(
+      "Notiz bearbeitet",
+      "Die Notiz wurde bearbeitet.",
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler",
+      "Die Notiz konnte nicht bearbeitet werden.",
+    )
+  }
+}
+
+const isOpenDelete = ref<boolean>(false)
+const playerToDeleteId = ref<string>("")
+const onDeleteClick = (id: string) => {
+  playerToDeleteId.value = id
+  isOpenDelete.value = true
+}
+
+const deletePlayer = async () => {
+  try {
+    await $fetch(`/api/players/delete/${playerToDeleteId.value}`, {
+      method: "DELETE",
+    })
+    await refreshGroups()
+    playerToDeleteId.value = ""
+    isOpenDelete.value = false
+    displaySuccessNotification("Gelöscht", "Der Spieler wurde gelöscht.")
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler",
+      "Der Spieler konnte nicht gelöscht werden.",
+    )
+  }
+}
 </script>
 
 <template>
@@ -145,12 +223,17 @@ console.log(groups.value)
           size="xs"
           square
         />
+        <ModalConfirm v-model="isOpenConfirm" @confirm="mixGroups">
+          <p>Möchtest du die Gruppen neu mischen?</p>
+        </ModalConfirm>
         <UButton
           v-if="!tournament?.is_live"
           label="Gruppen neu mischen..."
           icon="i-heroicons-table-cells"
           variant="soft"
+          color="yellow"
           size="xs"
+          @click="isOpenConfirm = true"
         />
         <UButton
           :label="liveLabel"
@@ -161,6 +244,9 @@ console.log(groups.value)
           @click="isOpenLive = true"
         />
         <ModalLive v-model="isOpenLive" @live="onSetLive" />
+        <ModalDelete v-model="isOpenDelete" @delete="deletePlayer()">
+          <p>Möchtest du diesen Schüler wirklich vom Team entfernen?</p>
+        </ModalDelete>
       </div>
     </ToolbarContainer>
   </BasePageHeader>
@@ -232,7 +318,7 @@ console.log(groups.value)
           </UBreadcrumb>
           <strong>Gruppen</strong>
           <div
-            class="overflow-hidden rounded-md border border-gray-300 dark:border-gray-700"
+            class="shrink-0 overflow-hidden rounded-md border border-gray-300 dark:border-gray-700"
           >
             <table class="w-full table-auto border-separate border-spacing-0">
               <thead>
@@ -285,12 +371,72 @@ console.log(groups.value)
               </tbody>
             </table>
           </div>
-          <strong>Teams</strong>
+          <div class="flex w-full justify-between">
+            <strong>Teams</strong>
+            <SearchInput v-model="search" placeholder="Suche nach Teams..." />
+          </div>
+          <div class="flex flex-col gap-3 pb-24">
+            <div
+              v-for="team in filteredTeams"
+              class="flex flex-col gap-1 rounded-md border border-gray-300 p-3 dark:border-gray-700"
+            >
+              <strong>{{ team.name }}</strong>
+              <template v-if="team.player.length > 0">
+                <div
+                  v-for="player in team.player"
+                  class="flex gap-1 rounded-md bg-gray-100 p-3 pr-3 dark:bg-gray-800"
+                >
+                  <UFormGroup label="Vorname">
+                    <UInput v-model="player.first_name" disabled />
+                  </UFormGroup>
+                  <UFormGroup label="Nachname">
+                    <UInput v-model="player.last_name" disabled />
+                  </UFormGroup>
+                  <UFormGroup label="Klasse">
+                    <UInput v-model="player.class" class="w-20" disabled />
+                  </UFormGroup>
+                  <UFormGroup label="Notiz">
+                    <UInput v-model="player.note" />
+                  </UFormGroup>
+                  <div class="flex h-full gap-1">
+                    <div class="self-end">
+                      <UButton
+                        icon="i-heroicons-pencil"
+                        color="gray"
+                        size="sm"
+                        square
+                        @click="editPlayerNote(player.id, player.note)"
+                      />
+                    </div>
+                    <div class="self-end" v-if="!isTournamentLive">
+                      <UButton
+                        icon="i-heroicons-x-mark"
+                        color="red"
+                        variant="soft"
+                        size="sm"
+                        square
+                        @click="onDeleteClick(player.id)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <template v-else>
+                <UAlert
+                  icon="i-heroicons-exclamation-triangle"
+                  color="red"
+                  variant="soft"
+                  title="Keine Spieler"
+                  description="Dieses Team hat keine Spieler!"
+                />
+              </template>
+            </div>
+          </div>
         </div>
       </div>
       <div class="w-1/2">
         <ClientOnly>
-          <TournamentFlow :groups="flowGroups" />
+          <TournamentFlow :groups="flowGroups" :key="flowGroups" />
           <template #fallback>
             <div
               class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"

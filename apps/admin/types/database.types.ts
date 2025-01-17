@@ -184,7 +184,7 @@ export type Database = {
           first_name: string
           id: string
           last_name: string
-          note: string | null
+          note: string
           team_id: string
         }
         Insert: {
@@ -193,7 +193,7 @@ export type Database = {
           first_name: string
           id?: string
           last_name: string
-          note?: string | null
+          note?: string
           team_id: string
         }
         Update: {
@@ -202,7 +202,7 @@ export type Database = {
           first_name?: string
           id?: string
           last_name?: string
-          note?: string | null
+          note?: string
           team_id?: string
         }
         Relationships: [

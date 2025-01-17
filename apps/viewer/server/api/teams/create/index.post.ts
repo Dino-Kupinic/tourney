@@ -95,6 +95,7 @@ export default defineEventHandler(async (event) => {
     first_name: formPlayer.firstName,
     last_name: formPlayer.lastName,
     class: formPlayer.schoolClass.name,
+    note: "",
     team_id: data[0].id,
   }))
 
