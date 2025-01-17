@@ -160,16 +160,22 @@ const submit = async () => {
     registration: registration.value,
   }
 
-  await $fetch("/api/teams/create", {
-    method: "POST",
-    body: payload,
-  })
-
-  await refresh()
-
-  setTimeout(() => {
-    window.scrollBy(0, 512)
-  }, 500)
+  try {
+    await $fetch("/api/teams/create", {
+      method: "POST",
+      body: payload,
+    })
+    await refresh()
+    setTimeout(() => {
+      window.scrollBy(0, 512)
+    }, 500)
+  } catch (error) {
+    const err = error as Error
+    throw createError({
+      statusMessage: err.message,
+      fatal: true,
+    })
+  }
 }
 </script>
 

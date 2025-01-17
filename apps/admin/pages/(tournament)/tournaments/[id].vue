@@ -101,6 +101,9 @@ const timeline = [
     label: "Halbfinale",
   },
   {
+    label: "Kleines Finale",
+  },
+  {
     label: "Finale",
   },
 ]
@@ -113,6 +116,8 @@ const flowGroups = computed(() => {
     }
   })
 })
+
+console.log(groups.value)
 </script>
 
 <template>
@@ -219,12 +224,8 @@ const flowGroups = computed(() => {
         <div class="flex h-full w-full flex-col gap-3 p-6">
           <strong>Ablauf</strong>
           <UBreadcrumb :links="timeline" divider="i-heroicons-arrow-long-right">
-            <template #default="{ link, isActive }">
-              <UBadge
-                :color="isActive ? 'primary' : 'gray'"
-                class="truncate rounded-full"
-                :variant="isActive ? 'subtle' : 'solid'"
-              >
+            <template #default="{ link }">
+              <UBadge color="gray" class="truncate rounded-full">
                 {{ link.label }}
               </UBadge>
             </template>

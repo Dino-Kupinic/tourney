@@ -128,7 +128,6 @@ export type Database = {
       match: {
         Row: {
           end_time: string | null
-          group_id: string | null
           id: string
           round: Database["public"]["Enums"]["tournament_phase"]
           start_time: string
@@ -138,7 +137,6 @@ export type Database = {
         }
         Insert: {
           end_time?: string | null
-          group_id?: string | null
           id?: string
           round: Database["public"]["Enums"]["tournament_phase"]
           start_time: string
@@ -148,7 +146,6 @@ export type Database = {
         }
         Update: {
           end_time?: string | null
-          group_id?: string | null
           id?: string
           round?: Database["public"]["Enums"]["tournament_phase"]
           start_time?: string
@@ -157,13 +154,6 @@ export type Database = {
           tournament_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "match_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "group"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "match_team1_id_fkey"
             columns: ["team1_id"]

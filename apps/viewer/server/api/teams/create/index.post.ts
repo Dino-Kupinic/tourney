@@ -68,7 +68,8 @@ export default defineEventHandler(async (event) => {
   if (!targetGroup) {
     throw createError({
       statusCode: 400,
-      statusMessage: "No available group for this team in the tournament",
+      statusMessage:
+        "No available group for this team in the tournament, the tournament is full.",
     })
   }
 
