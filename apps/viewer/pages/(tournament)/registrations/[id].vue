@@ -5,6 +5,7 @@ import type { FormPlayer } from "~/types/form"
 import { formLocked } from "~/keys/isFormLocked"
 import { classMixing } from "~/keys/allowClassMixing"
 import type { RegistrationWithClass } from "~/types/registration"
+import displayFailureNotification from "~/utils/displayFailureNotification"
 
 useHead({
   title: "Anmeldung",
@@ -171,9 +172,9 @@ const submit = async () => {
     }, 500)
   } catch (error) {
     const err = error as Error
+    displayFailureNotification("Fehler beim Anmelden", err.message)
     throw createError({
       statusMessage: err.message,
-      fatal: true,
     })
   }
 }

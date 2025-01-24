@@ -4,7 +4,8 @@ import {
   FOOTBALL_MAX_TEAMS,
   VOLLEYBALL_BASKETBALL_MAX_TEAMS,
 } from "~/misc/constants"
-import ModalConfirm from "~/components/modal/ModalConfirm.vue"
+import { z } from "zod"
+import type { Enums } from "~/types/database.types"
 
 const title = ref<string>("Turniere")
 useHead({
@@ -95,6 +96,7 @@ const mixGroups = async () => {
   try {
     await $fetch(`/api/tournaments/${tournament.value?.id}/mix`)
     await refreshGroups()
+    isOpenConfirm.value = false
     displaySuccessNotification(
       "Erfolgreich",
       "Die Gruppen wurden neu gemischt.",
@@ -109,21 +111,11 @@ const mixGroups = async () => {
 }
 
 const timeline = [
-  {
-    label: "Gruppenphase",
-  },
-  {
-    label: "Kreuzspiele",
-  },
-  {
-    label: "Halbfinale",
-  },
-  {
-    label: "Kleines Finale",
-  },
-  {
-    label: "Finale",
-  },
+  { label: "Gruppenphase" },
+  { label: "Kreuzspiele" },
+  { label: "Halbfinale" },
+  { label: "Kleines Finale" },
+  { label: "Finale" },
 ]
 
 const flowGroups = computed(() => {
@@ -196,6 +188,48 @@ const deletePlayer = async () => {
     )
   }
 }
+
+const editSchema = z.object({
+  name: z.string(),
+  rules: z.string(),
+  start_date: z.string().date(),
+  from: z.string().time(),
+  to: z.string().time(),
+  year: z.number(),
+  sport: z.custom<Enums<"sport_type">>(),
+  prizes: z.object({
+    first: z.string(),
+    second: z.string(),
+    third: z.string(),
+    bonus: z.string(),
+  }),
+  thumbnail_path: z.string(),
+  location: z.string(),
+  groups: z.number(),
+  group_teams: z.number(),
+})
+
+const editState = reactive({
+  name: undefined,
+  rules: "",
+  start_date: undefined,
+  from: undefined,
+  to: undefined,
+  year: 0,
+  sport: "Fußball",
+  prizes: {
+    first: "",
+    second: "",
+    third: "",
+    bonus: "",
+  },
+  thumbnail_path: undefined,
+  location: "Sportplatz",
+  groups: 0,
+  group_teams: 0,
+})
+
+const isOpenEdit = ref<boolean>(false)
 </script>
 
 <template>
@@ -223,6 +257,13 @@ const deletePlayer = async () => {
           size="xs"
           square
         />
+        <ModalEdit
+          v-model="isOpenEdit"
+          @create="onSubmitEdit"
+          modal-width="sm:max-w-4xl"
+        >
+          <TournamentForm :schema="editSchema" :state="editState" />
+        </ModalEdit>
         <ModalConfirm v-model="isOpenConfirm" @confirm="mixGroups">
           <p>Möchtest du die Gruppen neu mischen?</p>
         </ModalConfirm>
@@ -297,6 +338,10 @@ const deletePlayer = async () => {
             <TournamentTeamStatus :data="data" class="grow" />
           </div>
           <div class="rounded-md bg-gray-50 p-3 pr-3 text-sm dark:bg-gray-800">
+            <div class="flex items-center space-x-1">
+              <UIcon name="i-heroicons-ticket" />
+              <p>{{ tournament?.sport }}</p>
+            </div>
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-user-group" />
               <p>{{ tournament?.groups }} Gruppen</p>
@@ -376,61 +421,72 @@ const deletePlayer = async () => {
             <SearchInput v-model="search" placeholder="Suche nach Teams..." />
           </div>
           <div class="flex flex-col gap-3 pb-24">
-            <div
-              v-for="team in filteredTeams"
-              class="flex flex-col gap-1 rounded-md border border-gray-300 p-3 dark:border-gray-700"
-            >
-              <strong>{{ team.name }}</strong>
-              <template v-if="team.player.length > 0">
-                <div
-                  v-for="player in team.player"
-                  class="flex gap-1 rounded-md bg-gray-100 p-3 pr-3 dark:bg-gray-800"
-                >
-                  <UFormGroup label="Vorname">
-                    <UInput v-model="player.first_name" disabled />
-                  </UFormGroup>
-                  <UFormGroup label="Nachname">
-                    <UInput v-model="player.last_name" disabled />
-                  </UFormGroup>
-                  <UFormGroup label="Klasse">
-                    <UInput v-model="player.class" class="w-20" disabled />
-                  </UFormGroup>
-                  <UFormGroup label="Notiz">
-                    <UInput v-model="player.note" />
-                  </UFormGroup>
-                  <div class="flex h-full gap-1">
-                    <div class="self-end">
-                      <UButton
-                        icon="i-heroicons-pencil"
-                        color="gray"
-                        size="sm"
-                        square
-                        @click="editPlayerNote(player.id, player.note)"
-                      />
-                    </div>
-                    <div class="self-end" v-if="!isTournamentLive">
-                      <UButton
-                        icon="i-heroicons-x-mark"
-                        color="red"
-                        variant="soft"
-                        size="sm"
-                        square
-                        @click="onDeleteClick(player.id)"
-                      />
+            <template v-if="filteredTeams?.length">
+              <div
+                v-for="team in filteredTeams"
+                class="flex flex-col gap-1 rounded-md border border-gray-300 p-3 dark:border-gray-700"
+              >
+                <strong>{{ team.name }}</strong>
+                <template v-if="team.player.length > 0">
+                  <div
+                    v-for="player in team.player"
+                    class="flex gap-1 rounded-md bg-gray-100 p-3 pr-3 dark:bg-gray-800"
+                  >
+                    <UFormGroup label="Vorname">
+                      <UInput v-model="player.first_name" disabled />
+                    </UFormGroup>
+                    <UFormGroup label="Nachname">
+                      <UInput v-model="player.last_name" disabled />
+                    </UFormGroup>
+                    <UFormGroup label="Klasse">
+                      <UInput v-model="player.class" class="w-20" disabled />
+                    </UFormGroup>
+                    <UFormGroup label="Notiz">
+                      <UInput v-model="player.note" />
+                    </UFormGroup>
+                    <div class="flex h-full gap-1">
+                      <div class="self-end">
+                        <UButton
+                          icon="i-heroicons-pencil"
+                          color="gray"
+                          size="sm"
+                          square
+                          @click="editPlayerNote(player.id, player.note)"
+                        />
+                      </div>
+                      <div class="self-end" v-if="!isTournamentLive">
+                        <UButton
+                          icon="i-heroicons-x-mark"
+                          color="red"
+                          variant="soft"
+                          size="sm"
+                          square
+                          @click="onDeleteClick(player.id)"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </template>
-              <template v-else>
-                <UAlert
-                  icon="i-heroicons-exclamation-triangle"
-                  color="red"
-                  variant="soft"
-                  title="Keine Spieler"
-                  description="Dieses Team hat keine Spieler!"
-                />
-              </template>
-            </div>
+                </template>
+                <template v-else>
+                  <UAlert
+                    icon="i-heroicons-exclamation-triangle"
+                    color="red"
+                    variant="soft"
+                    title="Keine Spieler"
+                    description="Dieses Team hat keine Spieler!"
+                  />
+                </template>
+              </div>
+            </template>
+            <template v-else>
+              <UAlert
+                icon="i-heroicons-information-circle"
+                color="primary"
+                variant="soft"
+                title="Keine Teams"
+                description="Dieses Turnier hat noch keine Teams. Wurden Anmeldungen schon erstellt und verschickt?"
+              />
+            </template>
           </div>
         </div>
       </div>
