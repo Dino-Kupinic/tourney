@@ -443,7 +443,7 @@ const onSubmitEdit = async () => {
           <div>
             <UAlert
               v-if="maxTeams !== data?.teams"
-              icon="i-heroicons-information-circle"
+              icon="i-heroicons-exclamation-triangle"
               color="red"
               variant="soft"
               title="Gruppen unvollständig"
