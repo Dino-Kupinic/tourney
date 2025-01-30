@@ -32,7 +32,14 @@ const maxTeams = computed(() => {
     case "Basketball":
     case "Volleyball":
       return VOLLEYBALL_BASKETBALL_MAX_TEAMS
+    default:
+      return 0
   }
+})
+
+const groupAlert = computed(() => {
+  if (!groups.value || !data.value) return
+  return `Es fehlen noch ${maxTeams.value - data.value.teams} Teams.`
 })
 
 const links = [
@@ -210,26 +217,42 @@ const editSchema = z.object({
 })
 
 const editState = reactive({
-  name: undefined,
-  rules: "",
-  start_date: undefined,
-  from: undefined,
-  to: undefined,
-  year: 0,
-  sport: "Fußball",
+  name: tournament.value.name,
+  rules: tournament.value.rules,
+  start_date: tournament.value.start_date,
+  from: tournament.value.from,
+  to: tournament.value.to,
+  year: tournament.value.year,
+  sport: tournament.value.sport,
   prizes: {
-    first: "",
-    second: "",
-    third: "",
-    bonus: "",
+    first: tournament.value.prizes?.first ?? "",
+    second: tournament.value.prizes?.second ?? "",
+    third: tournament.value.prizes?.third ?? "",
+    bonus: tournament.value.prizes?.bonus ?? "",
   },
-  thumbnail_path: undefined,
-  location: "Sportplatz",
-  groups: 0,
-  group_teams: 0,
+  thumbnail_path: tournament.value.thumbnail_path,
+  location: tournament.value.location,
+  groups: tournament.value.groups,
+  group_teams: tournament.value.group_teams,
 })
 
 const isOpenEdit = ref<boolean>(false)
+const onSubmitEdit = async () => {
+  try {
+    isOpenEdit.value = false
+    await refresh()
+    displaySuccessNotification(
+      "Turnier bearbeitet",
+      "Das Turnier wurde erfolgreich bearbeitet.",
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler beim Bearbeiten",
+      "Das Turnier konnte nicht bearbeitet werden.",
+    )
+  }
+}
 </script>
 
 <template>
@@ -256,10 +279,11 @@ const isOpenEdit = ref<boolean>(false)
           color="gray"
           size="xs"
           square
+          @click="isOpenEdit = true"
         />
         <ModalEdit
           v-model="isOpenEdit"
-          @create="onSubmitEdit"
+          @edit="onSubmitEdit"
           modal-width="sm:max-w-4xl"
         >
           <TournamentForm :schema="editSchema" :state="editState" />
@@ -415,6 +439,16 @@ const isOpenEdit = ref<boolean>(false)
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div>
+            <UAlert
+              v-if="maxTeams !== data?.teams"
+              icon="i-heroicons-information-circle"
+              color="red"
+              variant="soft"
+              title="Gruppen unvollständig"
+              :description="groupAlert"
+            />
           </div>
           <div class="flex w-full justify-between">
             <strong>Teams</strong>
