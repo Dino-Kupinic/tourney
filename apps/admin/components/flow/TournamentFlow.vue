@@ -4,11 +4,7 @@ import { VueFlow } from "@vue-flow/core"
 import { Background } from "@vue-flow/background"
 import { MiniMap } from "@vue-flow/minimap"
 import { Controls } from "@vue-flow/controls"
-
-interface Group {
-  name: string
-  teams: string[]
-}
+import type { Group } from "~/types/group"
 
 const { groups } = defineProps<{
   groups: Group[]

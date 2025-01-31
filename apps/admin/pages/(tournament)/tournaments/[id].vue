@@ -6,6 +6,7 @@ import {
 } from "~/misc/constants"
 import { z } from "zod"
 import type { Enums } from "~/types/database.types"
+import type { Group } from "~/types/group"
 
 const title = ref<string>("Turniere")
 useHead({
@@ -125,13 +126,13 @@ const timeline = [
   { label: "Finale" },
 ]
 
-const flowGroups = computed(() => {
-  return groups.value?.map((group) => {
-    return {
+const flowGroups = computed<Group[]>(() => {
+  return (
+    groups.value?.map((group) => ({
       name: group.name,
       teams: group.teams.map((team) => team.name),
-    }
-  })
+    })) ?? []
+  )
 })
 
 const teams = computed(() => {
@@ -526,7 +527,10 @@ const onSubmitEdit = async () => {
       </div>
       <div class="w-1/2">
         <ClientOnly>
-          <TournamentFlow :groups="flowGroups" :key="flowGroups" />
+          <TournamentFlow
+            :groups="flowGroups"
+            :key="JSON.stringify(flowGroups)"
+          />
           <template #fallback>
             <div
               class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
