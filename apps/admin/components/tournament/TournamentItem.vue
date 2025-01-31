@@ -27,13 +27,6 @@ const isOpenInfo = ref<boolean>(false)
 const items = [
   [
     {
-      label: "Editieren",
-      icon: "i-heroicons-pencil-square-20-solid",
-      click: () => {
-        console.log("Edit")
-      },
-    },
-    {
       label: "Info",
       icon: "i-heroicons-information-circle",
       click: () => (isOpenInfo.value = true),

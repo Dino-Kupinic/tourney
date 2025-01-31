@@ -240,6 +240,13 @@ const editState = reactive({
 const isOpenEdit = ref<boolean>(false)
 const onSubmitEdit = async () => {
   try {
+    await $fetch("/api/tournaments/edit", {
+      method: "PUT",
+      body: {
+        id: tournament.value?.id,
+        tournament: editState,
+      },
+    })
     isOpenEdit.value = false
     await refresh()
     displaySuccessNotification(
@@ -261,10 +268,7 @@ const onSubmitEdit = async () => {
     <ToolbarContainer class="flex w-full items-center justify-between">
       <div class="flex items-center gap-2">
         <UBreadcrumb :links="links" />
-        <TournamentLiveDisplay
-          v-if="tournament"
-          :is-live="tournament.is_live"
-        />
+        <TournamentLiveDisplay v-if="tournament" :is-live="isTournamentLive" />
       </div>
       <div class="flex items-center space-x-2">
         <UButton
@@ -275,6 +279,7 @@ const onSubmitEdit = async () => {
           @click="refreshTournament"
         />
         <UButton
+          v-if="!isTournamentLive"
           icon="i-heroicons-pencil-square"
           label="Bearbeiten"
           color="gray"
