@@ -23,7 +23,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@dicebear/collection": "^9.2.1",
+    "@dicebear/collection": "^9.2.2",
     "@dicebear/core": "^9.2.1",
     "@iconify-json/heroicons": "^1.2.2",
     "@nuxtjs/supabase": "1.4.0",
