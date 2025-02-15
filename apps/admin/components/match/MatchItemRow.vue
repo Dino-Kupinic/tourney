@@ -5,11 +5,17 @@ defineProps<{
   match: Match
   next: boolean
 }>()
+
+const isOpenInfo = ref<boolean>(false)
 </script>
 
 <template>
+  <ModalInfo v-model="isOpenInfo">
+    <pre class="overflow-auto">{{ match }}</pre>
+  </ModalInfo>
   <div
-    class="flex w-full flex-col items-center justify-between rounded-md border border-gray-200 px-6 py-3 shadow-sm dark:border-gray-700"
+    class="flex w-full flex-col items-center justify-between rounded-md border border-gray-200 px-6 py-3 shadow-sm hover:cursor-pointer hover:bg-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
+    @click="isOpenInfo = true"
   >
     <div class="flex w-full items-center justify-between">
       <div class="flex flex-col items-center space-y-1">
