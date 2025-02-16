@@ -1,6 +1,7 @@
 import type { Database } from "~/types/database.types"
 
 export type Match = Database["public"]["Tables"]["match"]["Row"] & {
+  status: "completed" | "upcoming"
   team1:
     | (Database["public"]["Tables"]["team"]["Row"] & {
         group: Database["public"]["Tables"]["group"]["Row"] | null

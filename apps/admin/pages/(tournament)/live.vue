@@ -137,6 +137,7 @@ const { data: standings } = await useFetch<Standing[]>(
               v-for="(match, index) in matches"
               :match
               :next="index < 2"
+              :key="match.id"
             />
           </div>
         </div>
@@ -144,9 +145,10 @@ const { data: standings } = await useFetch<Standing[]>(
           <strong>Live</strong>
           <div
             class="flex h-full flex-col gap-1 overflow-auto border-t border-gray-200 pt-3 dark:border-gray-700"
+            v-if="matches"
           >
-            <MatchItemLive />
-            <MatchItemLive />
+            <MatchItemLive :match="matches[0]" />
+            <MatchItemLive :match="matches[1]" />
           </div>
         </div>
       </div>

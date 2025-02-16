@@ -305,6 +305,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "result_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches_status"
+            referencedColumns: ["match_id"]
+          },
+          {
             foreignKeyName: "result_winner_id_fkey"
             columns: ["winner_id"]
             isOneToOne: false
@@ -448,6 +455,57 @@ export type Database = {
       }
     }
     Views: {
+      matches_status: {
+        Row: {
+          end_time: string | null
+          match_id: string | null
+          round: Database["public"]["Enums"]["tournament_phase"] | null
+          start_time: string | null
+          status: string | null
+          team1_id: string | null
+          team1_name: string | null
+          team2_id: string | null
+          team2_name: string | null
+          tournament_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_team1_id_fkey"
+            columns: ["team1_id"]
+            isOneToOne: false
+            referencedRelation: "team"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_team1_id_fkey"
+            columns: ["team1_id"]
+            isOneToOne: false
+            referencedRelation: "team_standings"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "match_team2_id_fkey"
+            columns: ["team2_id"]
+            isOneToOne: false
+            referencedRelation: "team"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_team2_id_fkey"
+            columns: ["team2_id"]
+            isOneToOne: false
+            referencedRelation: "team_standings"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "match_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournament"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_standings: {
         Row: {
           draws: number | null
