@@ -129,6 +129,7 @@ export type Database = {
         Row: {
           end_time: string | null
           id: string
+          is_live: boolean
           round: Database["public"]["Enums"]["tournament_phase"]
           start_time: string
           team1_id: string
@@ -138,6 +139,7 @@ export type Database = {
         Insert: {
           end_time?: string | null
           id?: string
+          is_live?: boolean
           round: Database["public"]["Enums"]["tournament_phase"]
           start_time: string
           team1_id: string
@@ -147,6 +149,7 @@ export type Database = {
         Update: {
           end_time?: string | null
           id?: string
+          is_live?: boolean
           round?: Database["public"]["Enums"]["tournament_phase"]
           start_time?: string
           team1_id?: string

@@ -12,7 +12,6 @@ useHead({
 const { tournaments, fetchTournaments } = useLiveTournaments()
 await fetchTournaments()
 const selected = ref(tournaments.value[0])
-console.log(selected.value)
 
 const { data: tournament, refresh: tournamentRefresh } =
   await useFetch<ParsedJsonTournament | null>(
@@ -37,7 +36,7 @@ const flowGroups = computed<Group[]>(() => {
 })
 
 const { data: matches, refresh: matchRefresh } = await useFetch<Match[]>(
-  `/api/matches/${tournament.value.id}`,
+  `/api/views/matches/${tournament.value.id}`,
 )
 
 const refresh = async () => {
@@ -54,6 +53,20 @@ const isOpenInfo = ref<boolean>(false)
 const { data: standings } = await useFetch<Standing[]>(
   `/api/views/standings/${tournament.value.id}`,
 )
+
+const liveMatches = useState<Match[]>("liveMatches", () => [])
+const { data: liveMatchesData, refresh: refreshLiveMatches } = await useFetch<
+  Match[]
+>(`/api/views/matches/live/${tournament.value.id}`)
+liveMatches.value = liveMatchesData.value ?? []
+
+// TODO: adding works but refresh doesn't
+const refreshMatches = async () => {
+  await matchRefresh()
+  await refreshLiveMatches()
+}
+
+// TODO: Don't display seconds in time
 </script>
 
 <template>
@@ -83,12 +96,12 @@ const { data: standings } = await useFetch<Standing[]>(
       <ModalInfo v-model="isOpenInfo">
         <p>Punktetabelle Abkürzungen</p>
         <ul class="list-disc">
+          <li class="ml-6">Pkt. = Punkte</li>
           <li class="ml-6">S = Siege</li>
-          <li class="ml-6">N = Niederlagen</li>
           <li class="ml-6">U = Unentschieden</li>
-          <li class="ml-6">
-            Tore = Tore geschossen / Tore bekommen / Differenz
-          </li>
+          <li class="ml-6">N = Niederlagen</li>
+          <li class="ml-6">T = Tore geschossen : Tore bekommen</li>
+          <li class="ml-6">D = Tore Differenz</li>
         </ul>
       </ModalInfo>
     </ToolbarContainer>
@@ -137,19 +150,34 @@ const { data: standings } = await useFetch<Standing[]>(
               v-for="(match, index) in matches"
               :match
               :next="index < 2"
-              :key="match.id"
+              :key="match.match_id!"
+              @live="refreshMatches"
             />
           </div>
         </div>
-        <div class="flex grow-0 flex-col gap-1">
+        <div
+          class="flex flex-col gap-1"
+          :class="[liveMatches.length ? 'grow-0' : 'grow']"
+        >
           <strong>Live</strong>
-          <div
-            class="flex h-full flex-col gap-1 overflow-auto border-t border-gray-200 pt-3 dark:border-gray-700"
-            v-if="matches"
-          >
-            <MatchItemLive :match="matches[0]" />
-            <MatchItemLive :match="matches[1]" />
-          </div>
+          <template v-if="liveMatches.length">
+            <div
+              class="flex h-full flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-3 dark:border-gray-700"
+            >
+              <MatchItemLive v-for="match in liveMatches" :match />
+            </div>
+          </template>
+          <template v-else>
+            <div>
+              <UAlert
+                icon="i-heroicons-rocket-launch"
+                color="primary"
+                variant="soft"
+                title="Keine Live Matches"
+                description="Klicke auf 'Starten' links bei einem Match um ein Spiel zu beginnen."
+              />
+            </div>
+          </template>
         </div>
       </div>
     </div>

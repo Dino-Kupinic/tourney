@@ -5,6 +5,13 @@ const { match } = defineProps<{
   match: Match
 }>()
 
+const logoTeam1 = computed(() => {
+  return match.team1?.logo_variant?.image_path ?? match.team1?.logo?.image_path
+})
+const logoTeam2 = computed(() => {
+  return match.team2?.logo_variant?.image_path ?? match.team2?.logo?.image_path
+})
+
 const timeElapsed = ref<number>(0)
 const isRunning = ref<boolean>(false)
 
@@ -42,6 +49,7 @@ const winner = computed(() => {
 })
 
 const isOpenConfirm = ref<boolean>(false)
+const liveMatches = useState<Match[]>("liveMatches")
 const completeMatch = () => {
   isOpenConfirm.value = false
 }
@@ -72,7 +80,14 @@ const completeMatch = () => {
     </div>
     <div class="flex w-full items-center justify-between">
       <div class="flex flex-col items-center space-y-1">
-        <UIcon name="i-game-icons-heartburn" size="36" />
+        <NuxtImg
+          width="36"
+          height="36"
+          :src="getImageUrl(logoTeam1!)"
+          :class="{
+            'dark:invert dark:filter': match.team1?.logo_variant === null,
+          }"
+        />
         <p class="text-xs">{{ match.team1?.name }}</p>
         <div class="space-x-0.5">
           <UButton
@@ -99,7 +114,14 @@ const completeMatch = () => {
         <p class="text-4xl font-bold">{{ score2 }}</p>
       </div>
       <div class="flex flex-col items-center space-y-1">
-        <UIcon name="i-game-icons-dragon-head" size="36" />
+        <NuxtImg
+          width="36"
+          height="36"
+          :src="getImageUrl(logoTeam2!)"
+          :class="{
+            'dark:invert dark:filter': match.team2?.logo_variant === null,
+          }"
+        />
         <p class="text-xs">{{ match.team2?.name }}</p>
         <div class="space-x-0.5">
           <UButton
