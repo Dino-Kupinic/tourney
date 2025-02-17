@@ -3,6 +3,7 @@ import type { Group } from "~/types/group"
 import type { ParsedJsonTournament } from "~/types/prizes"
 import type { Match } from "~/types/match"
 import type { Standing } from "~/types/standing"
+import type { Tables } from "~/types/database.types"
 
 const title = ref<string>("Live")
 useHead({
@@ -11,7 +12,7 @@ useHead({
 
 const { tournaments, fetchTournaments } = useLiveTournaments()
 await fetchTournaments()
-const selected = ref(tournaments.value[0])
+const selected = ref<Tables<"tournament">>(tournaments.value[0])
 
 const { data: tournament, refresh: tournamentRefresh } =
   await useFetch<ParsedJsonTournament | null>(
@@ -73,6 +74,19 @@ const refreshMatches = async () => {
   <BasePageHeader :title="title">
     <ToolbarContainer>
       <UButton
+        size="xs"
+        variant="soft"
+        color="indigo"
+        label="Automatikmodus..."
+        icon="i-heroicons-arrow-path-rounded-square"
+      />
+      <UButton
+        size="xs"
+        variant="soft"
+        color="primary"
+        label="Gruppenphase starten..."
+      />
+      <UButton
         icon="i-heroicons-arrow-path"
         color="gray"
         size="xs"
@@ -108,78 +122,62 @@ const refreshMatches = async () => {
   </BasePageHeader>
   <BasePageContent>
     <div class="h-full w-full">
-      <div class="h-1/3">
-        <!--        <ClientOnly>-->
-        <!--          <TournamentFlow-->
-        <!--            :groups="flowGroups"-->
-        <!--            :key="JSON.stringify(flowGroups)"-->
-        <!--          />-->
-        <!--          <template #fallback>-->
-        <!--            <div-->
-        <!--              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"-->
-        <!--            >-->
-        <!--              <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />-->
-        <!--            </div>-->
-        <!--          </template>-->
-        <!--        </ClientOnly>-->
-      </div>
-      <div
-        class="flex h-2/3 justify-between gap-6 border-t border-gray-200 p-6 dark:border-gray-700"
-      >
-        <div class="flex grow flex-col gap-1">
-          <strong>Punkte</strong>
-          <template v-if="standings">
-            <StandingsTable :standings="standings" />
-          </template>
-          <template v-else>
-            <UAlert
-              icon="i-heroicons-exclamation-triangle"
-              color="yellow"
-              variant="soft"
-              title="Keine Daten"
-              description="Wurden Matches erstellt?"
-            />
-          </template>
-        </div>
-        <div class="flex grow flex-col gap-1">
-          <strong>Spielplan</strong>
-          <div
-            class="flex flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-3 dark:border-gray-700"
-          >
-            <MatchItemRow
-              v-for="(match, index) in matches"
-              :match
-              :next="index < 2"
-              :key="match.match_id!"
-              @live="refreshMatches"
-            />
-          </div>
+      <template v-if="matches?.length">
+        <div class="h-1/3">
+          <!--        <ClientOnly>-->
+          <!--          <TournamentFlow-->
+          <!--            :groups="flowGroups"-->
+          <!--            :key="JSON.stringify(flowGroups)"-->
+          <!--          />-->
+          <!--          <template #fallback>-->
+          <!--            <div-->
+          <!--              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"-->
+          <!--            >-->
+          <!--              <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />-->
+          <!--            </div>-->
+          <!--          </template>-->
+          <!--        </ClientOnly>-->
         </div>
         <div
-          class="flex flex-col gap-1"
-          :class="[liveMatches.length ? 'grow-0' : 'grow']"
+          class="flex h-2/3 justify-between gap-6 border-t border-gray-200 p-6 dark:border-gray-700"
         >
-          <strong>Live</strong>
-          <template v-if="liveMatches.length">
+          <div class="flex grow flex-col gap-1">
+            <strong>Punkte</strong>
+            <StandingsTable v-if="standings" :standings="standings" />
+          </div>
+          <div class="flex grow flex-col gap-1">
+            <strong>Spielplan</strong>
+            <div
+              class="flex flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-3 dark:border-gray-700"
+            >
+              <MatchItemRow
+                v-for="(match, index) in matches"
+                :match
+                :next="index < 2"
+                :key="match.match_id!"
+                @live="refreshMatches"
+              />
+            </div>
+          </div>
+          <div
+            class="flex flex-col gap-1"
+            :class="[liveMatches.length ? 'grow-0' : 'grow']"
+          >
+            <strong>Live</strong>
             <div
               class="flex h-full flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-3 dark:border-gray-700"
             >
               <MatchItemLive v-for="match in liveMatches" :match />
             </div>
-          </template>
-          <template v-else>
-            <div>
-              <UAlert
-                icon="i-heroicons-rocket-launch"
-                color="primary"
-                variant="soft"
-                title="Keine Live Matches"
-                description="Klicke auf 'Starten' links bei einem Match um ein Spiel zu beginnen."
-              />
-            </div>
-          </template>
+          </div>
         </div>
-      </div>
+      </template>
+      <template v-else>
+        <EmptyState
+          title="Keine Matches"
+          description="Es sind keine Matches vorhanden. Starte die Gruppenphase um loszulegen."
+        />
+      </template>
     </div>
   </BasePageContent>
 </template>

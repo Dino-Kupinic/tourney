@@ -65,7 +65,7 @@ const addToLive = async () => {
           label="Starten..."
           color="primary"
           size="3xs"
-          variant="soft"
+          variant="link"
           @click="addToLive"
         />
       </div>
