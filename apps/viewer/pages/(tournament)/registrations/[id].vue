@@ -1,11 +1,10 @@
 <script setup lang="ts">
+import { formLocked } from "~/keys/isFormLocked"
+import { classMixing } from "~/keys/allowClassMixing"
 import type { ParsedJsonTournament } from "~/types/prizes"
 import type { Tables } from "~/types/database.types"
 import type { FormPlayer } from "~/types/form"
-import { formLocked } from "~/keys/isFormLocked"
-import { classMixing } from "~/keys/allowClassMixing"
 import type { RegistrationWithClass } from "~/types/registration"
-import displayFailureNotification from "~/utils/displayFailureNotification"
 
 useHead({
   title: "Anmeldung",
