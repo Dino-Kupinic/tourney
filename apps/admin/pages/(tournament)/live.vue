@@ -3,6 +3,7 @@ import type { Group } from "~/types/group"
 import type { ParsedJsonTournament } from "~/types/prizes"
 import type { Match } from "~/types/match"
 import type { Standing } from "~/types/standing"
+import { z } from "zod"
 
 const title = ref<string>("Live")
 useHead({
@@ -61,34 +62,53 @@ const { data: liveMatches, refresh: refreshLiveMatches } = await useFetch<
   Match[]
 >(`/api/views/matches/live/${tournament.value.id}`)
 
-// TODO: adding works but refresh doesn't
 const refreshMatches = async () => {
   await matchRefresh()
   await refreshLiveMatches()
 }
 
+const schema = z.object({
+  interval: z.number().int().positive(),
+  start_time: z.string(),
+})
+
+const state = reactive({
+  interval: 12,
+  start_time: tournament.value?.from,
+})
+
 const supabase = useSupabaseClient()
 const isOpenCreate = ref<boolean>(false)
 const generateGroupMatches = async () => {
-  const { error } = await supabase.rpc("generate_group_stage_matches", {
-    p_interval_minutes: 12,
-    p_start_time: "08:00",
-    p_tournament_id: tournament.value?.id!,
-  })
-  if (error) {
-    displayFailureNotification("Fehler", error.message)
-    console.error(error)
-  } else {
+  try {
+    schema.parse(state)
+    const { error } = await supabase.rpc("generate_group_stage_matches", {
+      p_interval_minutes: state.interval,
+      p_start_time: state.start_time,
+      p_tournament_id: tournament.value?.id!,
+    })
+    if (error) {
+      displayFailureNotification(
+        "Fehler",
+        error.message || "Ein Fehler ist aufgetreten.",
+      )
+      console.error(error)
+      return
+    }
     await refreshMatches()
     displaySuccessNotification(
       "Gruppenphase gestartet",
-      "Die Gruppenphase wurde gestartet.",
+      "Die Gruppenphase wurde erfolgreich gestartet.",
     )
+    isOpenCreate.value = false
+  } catch (err) {
+    displayFailureNotification(
+      "Fehler",
+      "Ein unerwarteter Fehler ist aufgetreten.",
+    )
+    console.error(err)
   }
-  isOpenCreate.value = false
 }
-
-// TODO: Don't display seconds in time
 </script>
 
 <template>
@@ -114,8 +134,27 @@ const generateGroupMatches = async () => {
         title="Gruppenphase starten"
         v-model="isOpenCreate"
         @create="generateGroupMatches"
+        modal-width="sm:max-w-sm"
       >
-        <!-- TODO: form -->
+        <UForm :schema="schema" :state="state" class="space-y-4 pt-2">
+          <UFormGroup
+            label="Matchlänge"
+            name="interval"
+            description="Matchlänge in Minuten, nach dieser Zeit folgt das nächste Match."
+            required
+          >
+            <UInput v-model="state.interval" />
+          </UFormGroup>
+
+          <UFormGroup
+            label="Startzeit"
+            name="start_time"
+            description="Startzeit der Gruppenphase. Standardmäßig die Turnierzeit."
+            required
+          >
+            <UInput v-model="state.start_time" type="time" :step="60" />
+          </UFormGroup>
+        </UForm>
       </ModalCreate>
       <UButton
         icon="i-heroicons-arrow-path"
