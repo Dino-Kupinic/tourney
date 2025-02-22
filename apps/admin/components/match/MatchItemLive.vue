@@ -13,18 +13,14 @@ const logoTeam2 = computed(
 const timeElapsed = ref<number>(0)
 const isRunning = ref<boolean>(false)
 
-// Get the current timestamp in milliseconds
 const now = useTimestamp({ immediate: true })
 
 const calculateElapsedTime = () => {
   if (!match.start_time) return
-
   const [hours, minutes, seconds] = match.start_time.split(":").map(Number)
   const startDateTime = new Date()
-  startDateTime.setHours(hours, minutes, seconds || 0, 0) // Ensure seconds and milliseconds are set
+  startDateTime.setHours(hours, minutes, seconds || 0, 0)
   const startTimeMs = startDateTime.getTime()
-
-  // Compute elapsed time in milliseconds
   timeElapsed.value = now.value - startTimeMs
 }
 
@@ -32,9 +28,9 @@ calculateElapsedTime()
 
 const { resume } = useIntervalFn(
   () => {
-    timeElapsed.value += 10 // Update every 10ms for smoother precision
+    timeElapsed.value += 1
   },
-  10, // Interval of 10ms
+  1,
   { immediate: true },
 )
 
