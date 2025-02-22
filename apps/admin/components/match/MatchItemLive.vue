@@ -15,6 +15,18 @@ const logoTeam2 = computed(() => {
 const timeElapsed = ref<number>(0)
 const isRunning = ref<boolean>(false)
 
+const now = useTimestamp({ offset: 0 })
+
+const calculateElapsedTime = () => {
+  if (!match.start_time) return
+  const [hours, minutes, seconds] = match.start_time.split(":").map(Number)
+  const startDateTime = new Date()
+  startDateTime.setHours(hours, minutes, seconds, 0)
+  timeElapsed.value = Math.floor((now.value - startDateTime.getTime()) / 1000)
+}
+
+calculateElapsedTime()
+
 const { resume } = useIntervalFn(
   () => {
     timeElapsed.value++
@@ -27,6 +39,7 @@ const startStopwatch = () => {
   isRunning.value = true
   resume()
 }
+
 startStopwatch()
 
 const formattedTime = computed(() => {
@@ -52,6 +65,10 @@ const isOpenConfirm = ref<boolean>(false)
 const completeMatch = () => {
   isOpenConfirm.value = false
 }
+
+const startTime = computed(() => {
+  return `gestartet ${match.start_time?.split(":").slice(0, 2).join(":")}`
+})
 </script>
 
 <template>
@@ -68,87 +85,112 @@ const completeMatch = () => {
     </p>
     <p v-if="winner === null">Somit ein Unentschieden.</p>
   </ModalMatch>
-  <div
-    class="flex w-96 flex-col items-center justify-between gap-1 rounded-md border border-gray-200 px-6 py-3 shadow-sm dark:border-gray-700"
-  >
-    <div>
-      <p class="font-mono text-xs">{{ match.round }} - {{ formattedTime }}</p>
-      <p class="text-center text-xs italic text-gray-500">
-        gestartet um {{ match.start_time }}
-      </p>
-    </div>
-    <div class="flex w-full items-center justify-between">
-      <div class="flex flex-col items-center space-y-1">
-        <NuxtImg
-          width="36"
-          height="36"
-          :src="getImageUrl(logoTeam1!)"
-          :class="{
-            'dark:invert dark:filter': match.team1?.logo_variant === null,
-          }"
+  <div class="rounded-md border border-gray-200 shadow-sm dark:border-gray-700">
+    <div
+      class="flex justify-between gap-0.5 rounded-t-md border-b border-gray-200 bg-gray-100 p-0.5 dark:border-gray-700 dark:bg-gray-800"
+    >
+      <div class="flex gap-0.5">
+        <UBadge
+          :label="match.round ?? 'Unbekannte Runde'"
+          color="fuchsia"
+          size="xs"
+          variant="subtle"
+          block
         />
-        <p class="text-xs">{{ match.team1?.name }}</p>
-        <div class="space-x-0.5">
-          <UButton
-            :ui="{ rounded: 'rounded-full' }"
-            size="2xs"
-            color="gray"
-            square
-            icon="i-heroicons-minus"
-            @click="score1--"
+        <UBadge
+          :label="startTime"
+          color="indigo"
+          size="xs"
+          variant="subtle"
+          block
+        />
+      </div>
+      <UBadge
+        :label="formattedTime"
+        icon="i-heroicons-clock"
+        color="primary"
+        size="xs"
+        variant="subtle"
+        :trailing="false"
+        block
+      />
+    </div>
+    <div
+      class="flex w-96 flex-col items-center justify-between gap-1 px-6 py-3"
+    >
+      <div class="flex w-full items-center justify-between">
+        <div class="flex flex-col items-center space-y-1">
+          <NuxtImg
+            width="36"
+            height="36"
+            :src="getImageUrl(logoTeam1!)"
+            :class="{
+              'dark:invert dark:filter': match.team1?.logo_variant === null,
+            }"
           />
-          <UButton
-            :ui="{ rounded: 'rounded-full' }"
-            size="2xs"
-            color="gray"
-            square
-            icon="i-heroicons-plus"
-            @click="score1++"
+          <p class="text-xs">{{ match.team1?.name }}</p>
+          <div class="space-x-0.5">
+            <UButton
+              :ui="{ rounded: 'rounded-full' }"
+              size="2xs"
+              color="gray"
+              square
+              icon="i-heroicons-minus"
+              @click="score1--"
+            />
+            <UButton
+              :ui="{ rounded: 'rounded-full' }"
+              size="2xs"
+              color="gray"
+              square
+              icon="i-heroicons-plus"
+              @click="score1++"
+            />
+          </div>
+        </div>
+        <div class="flex items-center gap-5">
+          <p class="text-4xl font-bold">{{ score1 }}</p>
+          <p>vs</p>
+          <p class="text-4xl font-bold">{{ score2 }}</p>
+        </div>
+        <div class="flex flex-col items-center space-y-1">
+          <NuxtImg
+            width="36"
+            height="36"
+            :src="getImageUrl(logoTeam2!)"
+            :class="{
+              'dark:invert dark:filter': match.team2?.logo_variant === null,
+            }"
           />
+          <p class="text-xs">{{ match.team2?.name }}</p>
+          <div class="space-x-0.5">
+            <UButton
+              :ui="{ rounded: 'rounded-full' }"
+              size="2xs"
+              color="gray"
+              square
+              icon="i-heroicons-minus"
+              @click="score2--"
+            />
+            <UButton
+              :ui="{ rounded: 'rounded-full' }"
+              size="2xs"
+              color="gray"
+              square
+              icon="i-heroicons-plus"
+              @click="score2++"
+            />
+          </div>
         </div>
       </div>
-      <div class="flex items-center gap-5">
-        <p class="text-4xl font-bold">{{ score1 }}</p>
-        <p>vs</p>
-        <p class="text-4xl font-bold">{{ score2 }}</p>
-      </div>
-      <div class="flex flex-col items-center space-y-1">
-        <NuxtImg
-          width="36"
-          height="36"
-          :src="getImageUrl(logoTeam2!)"
-          :class="{
-            'dark:invert dark:filter': match.team2?.logo_variant === null,
-          }"
-        />
-        <p class="text-xs">{{ match.team2?.name }}</p>
-        <div class="space-x-0.5">
-          <UButton
-            :ui="{ rounded: 'rounded-full' }"
-            size="2xs"
-            color="gray"
-            square
-            icon="i-heroicons-minus"
-            @click="score2--"
-          />
-          <UButton
-            :ui="{ rounded: 'rounded-full' }"
-            size="2xs"
-            color="gray"
-            square
-            icon="i-heroicons-plus"
-            @click="score2++"
-          />
-        </div>
-      </div>
+      <UButton
+        icon="i-heroicons-hand-raised"
+        variant="soft"
+        color="fuchsia"
+        label="Spiel beenden..."
+        size="2xs"
+        @click="isOpenConfirm = true"
+      />
     </div>
-    <UButton
-      icon="i-heroicons-hand-raised"
-      variant="soft"
-      color="fuchsia"
-      label="Spiel beenden..."
-      size="2xs"
-      @click="isOpenConfirm = true"
-    />
   </div>
 </template>

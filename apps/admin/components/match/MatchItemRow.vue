@@ -42,6 +42,10 @@ const addToLive = async () => {
     })
   }
 }
+
+const startTime = computed(() => {
+  return match.start_time?.split(":").slice(0, 2).join(":")
+})
 </script>
 
 <template>
@@ -108,7 +112,7 @@ const addToLive = async () => {
         <div class="flex h-full flex-col items-center justify-between">
           <p class="text-xs text-gray-500">{{ match.round }}</p>
           <p>vs</p>
-          <p class="text-xs text-gray-500">{{ match.start_time }}</p>
+          <p class="text-xs text-gray-500">ca. {{ startTime }}</p>
         </div>
         <div class="flex flex-col items-center space-y-1">
           <NuxtImg
