@@ -1,37 +1,40 @@
 <script setup lang="ts">
 import type { Match } from "~/types/match"
 
-const { match } = defineProps<{
-  match: Match
-}>()
+const { match } = defineProps<{ match: Match }>()
 
-const logoTeam1 = computed(() => {
-  return match.team1?.logo_variant?.image_path ?? match.team1?.logo?.image_path
-})
-const logoTeam2 = computed(() => {
-  return match.team2?.logo_variant?.image_path ?? match.team2?.logo?.image_path
-})
+const logoTeam1 = computed(
+  () => match.team1?.logo_variant?.image_path ?? match.team1?.logo?.image_path,
+)
+const logoTeam2 = computed(
+  () => match.team2?.logo_variant?.image_path ?? match.team2?.logo?.image_path,
+)
 
 const timeElapsed = ref<number>(0)
 const isRunning = ref<boolean>(false)
 
-const now = useTimestamp({ offset: 0 })
+// Get the current timestamp in milliseconds
+const now = useTimestamp({ immediate: true })
 
 const calculateElapsedTime = () => {
   if (!match.start_time) return
+
   const [hours, minutes, seconds] = match.start_time.split(":").map(Number)
   const startDateTime = new Date()
-  startDateTime.setHours(hours, minutes, seconds, 0)
-  timeElapsed.value = Math.floor((now.value - startDateTime.getTime()) / 1000)
+  startDateTime.setHours(hours, minutes, seconds || 0, 0) // Ensure seconds and milliseconds are set
+  const startTimeMs = startDateTime.getTime()
+
+  // Compute elapsed time in milliseconds
+  timeElapsed.value = now.value - startTimeMs
 }
 
 calculateElapsedTime()
 
 const { resume } = useIntervalFn(
   () => {
-    timeElapsed.value++
+    timeElapsed.value += 10 // Update every 10ms for smoother precision
   },
-  1000,
+  10, // Interval of 10ms
   { immediate: true },
 )
 
@@ -43,22 +46,21 @@ const startStopwatch = () => {
 startStopwatch()
 
 const formattedTime = computed(() => {
-  const minutes = Math.floor(timeElapsed.value / 60)
-  const seconds = timeElapsed.value % 60
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+  const totalSeconds = Math.floor(timeElapsed.value / 1000)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  const milliseconds = timeElapsed.value % 1000
+
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(milliseconds).padStart(3, "0")}`
 })
 
 const score1 = ref<number>(0)
 const score2 = ref<number>(0)
 
 const winner = computed(() => {
-  if (score1.value > score2.value) {
-    return match.team1
-  } else if (score1.value < score2.value) {
-    return match.team2
-  } else {
-    return null
-  }
+  if (score1.value > score2.value) return match.team1
+  if (score1.value < score2.value) return match.team2
+  return null
 })
 
 const isOpenConfirm = ref<boolean>(false)
@@ -66,9 +68,7 @@ const completeMatch = () => {
   isOpenConfirm.value = false
 }
 
-const startTime = computed(() => {
-  return `gestartet ${match.start_time?.split(":").slice(0, 2).join(":")}`
-})
+const startTime = computed(() => `gestartet ${match.start_time}`)
 </script>
 
 <template>
@@ -112,6 +112,7 @@ const startTime = computed(() => {
         size="xs"
         variant="subtle"
         :trailing="false"
+        class="w-[90px]"
         block
       />
     </div>

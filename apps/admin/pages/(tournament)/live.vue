@@ -43,16 +43,6 @@ const { data: matches, refresh: matchRefresh } = await useFetch<Match[]>(
   `/api/views/matches/${tournament.value.id}`,
 )
 
-const refresh = async () => {
-  await tournamentRefresh()
-  await groupRefresh()
-  await matchRefresh()
-  displaySuccessNotification(
-    "Daten aktualisiert",
-    "Die Daten wurden aktualisiert.",
-  )
-}
-
 const isOpenInfo = ref<boolean>(false)
 const { data: standings } = await useFetch<Standing[]>(
   `/api/views/standings/${tournament.value.id}`,
@@ -61,6 +51,17 @@ const { data: standings } = await useFetch<Standing[]>(
 const { data: liveMatches, refresh: refreshLiveMatches } = await useFetch<
   Match[]
 >(`/api/views/matches/live/${tournament.value.id}`)
+
+const refresh = async () => {
+  await tournamentRefresh()
+  await groupRefresh()
+  await matchRefresh()
+  await refreshLiveMatches()
+  displaySuccessNotification(
+    "Daten aktualisiert",
+    "Die Daten wurden aktualisiert.",
+  )
+}
 
 const refreshMatches = async () => {
   await matchRefresh()

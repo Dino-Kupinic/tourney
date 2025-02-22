@@ -15,16 +15,13 @@ const logoTeam2 = computed(() => {
   return match.team2?.logo_variant?.image_path ?? match.team2?.logo?.image_path
 })
 
-const currentTime = new Date().toLocaleTimeString("de-DE", {
-  hour: "2-digit",
-  minute: "2-digit",
-})
-// TODO: Edit button
-const changeStartTime = () => {
-  match.start_time = currentTime
-}
 const addToLive = async () => {
   try {
+    const currentTime = new Date().toLocaleTimeString("de-DE", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
     await $fetch(`/api/matches/live`, {
       method: "PUT",
       body: {
