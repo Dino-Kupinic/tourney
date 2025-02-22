@@ -49,7 +49,6 @@ const winner = computed(() => {
 })
 
 const isOpenConfirm = ref<boolean>(false)
-const liveMatches = useState<Match[]>("liveMatches")
 const completeMatch = () => {
   isOpenConfirm.value = false
 }

@@ -3,7 +3,6 @@ import type { Group } from "~/types/group"
 import type { ParsedJsonTournament } from "~/types/prizes"
 import type { Match } from "~/types/match"
 import type { Standing } from "~/types/standing"
-import type { Tables } from "~/types/database.types"
 
 const title = ref<string>("Live")
 useHead({
@@ -11,12 +10,15 @@ useHead({
 })
 
 const { tournaments, fetchTournaments } = useLiveTournaments()
+const selected = useState<string>("selectedTournament", () => "")
 await fetchTournaments()
-const selected = ref<Tables<"tournament">>(tournaments.value[0])
+if (!selected.value && tournaments.value.length > 0) {
+  selected.value = tournaments.value[0].id
+}
 
 const { data: tournament, refresh: tournamentRefresh } =
   await useFetch<ParsedJsonTournament | null>(
-    `/api/tournaments/${selected.value.id}`,
+    () => `/api/tournaments/${selected.value}`,
   )
 if (!tournament.value) {
   throw createError({
@@ -55,16 +57,35 @@ const { data: standings } = await useFetch<Standing[]>(
   `/api/views/standings/${tournament.value.id}`,
 )
 
-const liveMatches = useState<Match[]>("liveMatches", () => [])
-const { data: liveMatchesData, refresh: refreshLiveMatches } = await useFetch<
+const { data: liveMatches, refresh: refreshLiveMatches } = await useFetch<
   Match[]
 >(`/api/views/matches/live/${tournament.value.id}`)
-liveMatches.value = liveMatchesData.value ?? []
 
 // TODO: adding works but refresh doesn't
 const refreshMatches = async () => {
   await matchRefresh()
   await refreshLiveMatches()
+}
+
+const supabase = useSupabaseClient()
+const isOpenCreate = ref<boolean>(false)
+const generateGroupMatches = async () => {
+  const { error } = await supabase.rpc("generate_group_stage_matches", {
+    p_interval_minutes: 12,
+    p_start_time: "08:00",
+    p_tournament_id: tournament.value?.id!,
+  })
+  if (error) {
+    displayFailureNotification("Fehler", error.message)
+    console.error(error)
+  } else {
+    await refreshMatches()
+    displaySuccessNotification(
+      "Gruppenphase gestartet",
+      "Die Gruppenphase wurde gestartet.",
+    )
+  }
+  isOpenCreate.value = false
 }
 
 // TODO: Don't display seconds in time
@@ -79,13 +100,23 @@ const refreshMatches = async () => {
         color="indigo"
         label="Automatikmodus..."
         icon="i-heroicons-arrow-path-rounded-square"
+        v-if="matches?.length"
       />
       <UButton
         size="xs"
         variant="soft"
         color="primary"
         label="Gruppenphase starten..."
+        @click="isOpenCreate = true"
+        v-if="matches?.length === 0"
       />
+      <ModalCreate
+        title="Gruppenphase starten"
+        v-model="isOpenCreate"
+        @create="generateGroupMatches"
+      >
+        <!-- TODO: form -->
+      </ModalCreate>
       <UButton
         icon="i-heroicons-arrow-path"
         color="gray"
@@ -161,7 +192,7 @@ const refreshMatches = async () => {
           </div>
           <div
             class="flex flex-col gap-1"
-            :class="[liveMatches.length ? 'grow-0' : 'grow']"
+            :class="[liveMatches?.length ? 'grow-0' : 'grow']"
           >
             <strong>Live</strong>
             <div

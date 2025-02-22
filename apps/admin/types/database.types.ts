@@ -534,28 +534,14 @@ export type Database = {
       }
     }
     Functions: {
-      generate_group_stage_matches:
-        | {
-            Args: {
-              p_tournament_id: string
-            }
-            Returns: undefined
-          }
-        | {
-            Args: {
-              p_tournament_id: string
-              p_start_time: string
-            }
-            Returns: undefined
-          }
-        | {
-            Args: {
-              p_tournament_id: string
-              p_start_time_ac: string
-              p_start_time_bd: string
-            }
-            Returns: undefined
-          }
+      generate_group_stage_matches: {
+        Args: {
+          p_tournament_id: string
+          p_start_time: string
+          p_interval_minutes: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       registration_status:
