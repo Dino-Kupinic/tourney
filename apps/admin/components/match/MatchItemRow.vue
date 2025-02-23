@@ -30,7 +30,6 @@ const addToLive = async () => {
       },
     })
     emit("live")
-    displaySuccessNotification("Spiel gestartet", "Das Spiel wurde gestartet")
   } catch (error) {
     const err = error as Error
     displayFailureNotification("Fehler", err.message)

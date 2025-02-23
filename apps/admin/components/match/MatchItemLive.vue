@@ -50,8 +50,8 @@ const formattedTime = computed(() => {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(milliseconds).padStart(3, "0")}`
 })
 
-const score1 = ref<number>(0)
-const score2 = ref<number>(0)
+const score1 = useState<number>(`score1-${match.match_id}`, () => 0)
+const score2 = useState<number>(`score2-${match.match_id}`, () => 0)
 
 const winner = computed(() => {
   if (score1.value > score2.value) return match.team1
@@ -59,9 +59,37 @@ const winner = computed(() => {
   return null
 })
 
+const emit = defineEmits(["finish"])
 const isOpenConfirm = ref<boolean>(false)
-const completeMatch = () => {
-  isOpenConfirm.value = false
+const supabase = useSupabaseClient()
+const completeMatch = async () => {
+  try {
+    const { error } = await supabase.rpc("record_match_result", {
+      p_match_id: match.match_id!,
+      p_team1_score: score1.value,
+      p_team2_score: score2.value,
+    })
+    if (error) {
+      displayFailureNotification(
+        "Fehler",
+        error.message || "Ein Fehler ist aufgetreten.",
+      )
+      console.error(error)
+      return
+    }
+    emit("finish")
+    displaySuccessNotification(
+      "Match beendet",
+      "Das Match wurde erfolgreich beendet.",
+    )
+    isOpenConfirm.value = false
+  } catch (error) {
+    const err = error as Error
+    displayFailureNotification("Fehler", err.message)
+    throw createError({
+      statusMessage: err.message,
+    })
+  }
 }
 
 const startTime = computed(() => `gestartet ${match.start_time}`)
@@ -112,9 +140,7 @@ const startTime = computed(() => `gestartet ${match.start_time}`)
         block
       />
     </div>
-    <div
-      class="flex w-96 flex-col items-center justify-between gap-1 px-6 py-3"
-    >
+    <div class="flex flex-col items-center justify-between gap-1 px-6 py-3">
       <div class="flex w-full items-center justify-between">
         <div class="flex flex-col items-center space-y-1">
           <NuxtImg
@@ -133,7 +159,7 @@ const startTime = computed(() => `gestartet ${match.start_time}`)
               color="gray"
               square
               icon="i-heroicons-minus"
-              @click="score1--"
+              @click="score1 > 0 ? score1-- : 0"
             />
             <UButton
               :ui="{ rounded: 'rounded-full' }"
@@ -167,7 +193,7 @@ const startTime = computed(() => `gestartet ${match.start_time}`)
               color="gray"
               square
               icon="i-heroicons-minus"
-              @click="score2--"
+              @click="score2 > 0 ? score2-- : 0"
             />
             <UButton
               :ui="{ rounded: 'rounded-full' }"

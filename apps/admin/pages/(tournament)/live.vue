@@ -44,9 +44,9 @@ const { data: matches, refresh: matchRefresh } = await useFetch<Match[]>(
 )
 
 const isOpenInfo = ref<boolean>(false)
-const { data: standings } = await useFetch<Standing[]>(
-  `/api/views/standings/${tournament.value.id}`,
-)
+const { data: standings, refresh: standingsRefresh } = await useFetch<
+  Standing[]
+>(`/api/views/standings/${tournament.value.id}`)
 
 const { data: liveMatches, refresh: refreshLiveMatches } = await useFetch<
   Match[]
@@ -66,6 +66,7 @@ const refresh = async () => {
 const refreshMatches = async () => {
   await matchRefresh()
   await refreshLiveMatches()
+  await standingsRefresh()
 }
 
 const schema = z.object({
@@ -102,12 +103,12 @@ const generateGroupMatches = async () => {
       "Die Gruppenphase wurde erfolgreich gestartet.",
     )
     isOpenCreate.value = false
-  } catch (err) {
-    displayFailureNotification(
-      "Fehler",
-      "Ein unerwarteter Fehler ist aufgetreten.",
-    )
-    console.error(err)
+  } catch (error) {
+    const err = error as Error
+    displayFailureNotification("Fehler", err.message)
+    throw createError({
+      statusMessage: err.message,
+    })
   }
 }
 </script>
@@ -193,62 +194,64 @@ const generateGroupMatches = async () => {
   </BasePageHeader>
   <BasePageContent>
     <div class="h-full w-full">
-      <template v-if="matches?.length">
-        <div class="h-1/3">
-          <!--        <ClientOnly>-->
-          <!--          <TournamentFlow-->
-          <!--            :groups="flowGroups"-->
-          <!--            :key="JSON.stringify(flowGroups)"-->
-          <!--          />-->
-          <!--          <template #fallback>-->
-          <!--            <div-->
-          <!--              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"-->
-          <!--            >-->
-          <!--              <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />-->
-          <!--            </div>-->
-          <!--          </template>-->
-          <!--        </ClientOnly>-->
+      <!--      <template v-if="matches?.length || liveMatches?.length">-->
+      <div class="h-1/3">
+        <!--        <ClientOnly>-->
+        <!--          <TournamentFlow-->
+        <!--            :groups="flowGroups"-->
+        <!--            :key="JSON.stringify(flowGroups)"-->
+        <!--          />-->
+        <!--          <template #fallback>-->
+        <!--            <div-->
+        <!--              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"-->
+        <!--            >-->
+        <!--              <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />-->
+        <!--            </div>-->
+        <!--          </template>-->
+        <!--        </ClientOnly>-->
+      </div>
+      <div
+        class="flex h-2/3 justify-between gap-6 border-t border-gray-200 p-6 dark:border-gray-700"
+      >
+        <div class="flex w-1/3 flex-col gap-1">
+          <strong>Punkte</strong>
+          <StandingsTable v-if="standings" :standings="standings" />
         </div>
-        <div
-          class="flex h-2/3 justify-between gap-6 border-t border-gray-200 p-6 dark:border-gray-700"
-        >
-          <div class="flex grow flex-col gap-1">
-            <strong>Punkte</strong>
-            <StandingsTable v-if="standings" :standings="standings" />
-          </div>
-          <div class="flex grow flex-col gap-1">
-            <strong>Spielplan</strong>
-            <div
-              class="flex flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-3 dark:border-gray-700"
-            >
-              <MatchItemRow
-                v-for="(match, index) in matches"
-                :match
-                :next="index < 2"
-                :key="match.match_id!"
-                @live="refreshMatches"
-              />
-            </div>
-          </div>
+        <div class="flex w-1/3 flex-col gap-1">
+          <strong>Spielplan</strong>
           <div
-            class="flex flex-col gap-1"
-            :class="[liveMatches?.length ? 'grow-0' : 'grow']"
+            class="flex flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-3 dark:border-gray-700"
           >
-            <strong>Live</strong>
-            <div
-              class="flex h-full flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-3 dark:border-gray-700"
-            >
-              <MatchItemLive v-for="match in liveMatches" :match />
-            </div>
+            <MatchItemRow
+              v-for="(match, index) in matches"
+              :match
+              :next="index < 2"
+              :key="match.match_id!"
+              @live="refreshMatches"
+            />
           </div>
         </div>
-      </template>
-      <template v-else>
-        <EmptyState
-          title="Keine Matches"
-          description="Es sind keine Matches vorhanden. Starte die Gruppenphase um loszulegen."
-        />
-      </template>
+        <div class="flex w-1/3 flex-col gap-1">
+          <strong>Live</strong>
+          <div
+            class="flex h-full flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-3 dark:border-gray-700"
+          >
+            <MatchItemLive
+              v-for="match in liveMatches"
+              :key="match.match_id!"
+              :match
+              @finish="refreshMatches"
+            />
+          </div>
+        </div>
+      </div>
+      <!--      </template>-->
+      <!--      <template v-else>-->
+      <!--        <EmptyState-->
+      <!--          title="Keine Matches"-->
+      <!--          description="Es sind keine Matches vorhanden. Starte die Gruppenphase um loszulegen."-->
+      <!--        />-->
+      <!--      </template>-->
     </div>
   </BasePageContent>
 </template>

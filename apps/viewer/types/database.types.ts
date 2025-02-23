@@ -542,6 +542,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      record_match_result: {
+        Args: {
+          p_match_id: string
+          p_team1_score: number
+          p_team2_score: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       registration_status:
