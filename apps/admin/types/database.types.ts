@@ -456,6 +456,46 @@ export type Database = {
         }
         Relationships: []
       }
+      tournament_result: {
+        Row: {
+          position: number
+          team_id: string
+          tournament_id: string
+        }
+        Insert: {
+          position: number
+          team_id: string
+          tournament_id: string
+        }
+        Update: {
+          position?: number
+          team_id?: string
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_results_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "team"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_results_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "team_standings"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "tournament_results_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournament"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       matches_status: {
@@ -574,6 +614,12 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_tournament_results: {
+        Args: {
+          p_tournament_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       registration_status:
@@ -584,8 +630,8 @@ export type Database = {
       sport_type: "Fußball" | "Volleyball" | "Basketball"
       tournament_phase:
         | "Gruppenphase"
-        | "Kreuzspiele"
-        | "Halbfinale"
+        | "Viertelfinale"
+        | "Semifinale"
         | "Finale"
         | "Kleines Finale"
     }
