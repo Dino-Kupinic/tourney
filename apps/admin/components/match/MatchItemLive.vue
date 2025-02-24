@@ -129,16 +129,18 @@ const startTime = computed(() => `gestartet ${match.start_time}`)
           block
         />
       </div>
-      <UBadge
-        :label="formattedTime"
-        icon="i-heroicons-clock"
-        color="primary"
-        size="xs"
-        variant="subtle"
-        :trailing="false"
-        class="w-[90px]"
-        block
-      />
+      <ClientOnly>
+        <UBadge
+          :label="formattedTime"
+          icon="i-heroicons-clock"
+          color="primary"
+          size="xs"
+          variant="subtle"
+          :trailing="false"
+          class="w-[90px]"
+          block
+        />
+      </ClientOnly>
     </div>
     <div class="flex flex-col items-center justify-between gap-1 px-6 py-3">
       <div class="flex w-full items-center justify-between">

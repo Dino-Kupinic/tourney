@@ -534,7 +534,31 @@ export type Database = {
       }
     }
     Functions: {
+      generate_final: {
+        Args: {
+          p_tournament_id: string
+          p_start_time: string
+          p_interval_minutes: number
+        }
+        Returns: undefined
+      }
       generate_group_stage_matches: {
+        Args: {
+          p_tournament_id: string
+          p_start_time: string
+          p_interval_minutes: number
+        }
+        Returns: undefined
+      }
+      generate_quarterfinals: {
+        Args: {
+          p_tournament_id: string
+          p_start_time: string
+          p_interval_minutes: number
+        }
+        Returns: undefined
+      }
+      generate_semifinals: {
         Args: {
           p_tournament_id: string
           p_start_time: string
