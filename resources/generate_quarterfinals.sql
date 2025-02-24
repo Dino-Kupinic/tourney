@@ -16,7 +16,7 @@ BEGIN
   CREATE TEMP TABLE top_teams AS
   WITH ranked_teams AS (SELECT t.id                                                                                              AS team_id,
                                t.name                                                                                            AS team_name,
-                               t.tournament_id,
+                               g.tournament_id,
                                g.name                                                                                            AS group_name,
                                ts.points,
                                ts.goal_difference,
@@ -33,7 +33,8 @@ BEGIN
          group_name,
          points,
          goal_difference,
-         goals_scored
+         goals_scored,
+         rank
   FROM ranked_teams
   WHERE rank <= 2;
 
@@ -81,12 +82,13 @@ BEGIN
     EXIT WHEN NOT FOUND;
 
     INSERT INTO public.match (tournament_id, team1_id, team2_id, start_time, round)
-    VALUES (p_tournament_id, team1, team2, start_time, 'Quarter-final');
+    VALUES (p_tournament_id, team1, team2, start_time, 'Viertelfinale');
 
     start_time := start_time + interval_minutes;
   END LOOP;
 
   -- Clean up temporary table
+  CLOSE quarterfinal_teams;
   DROP TABLE top_teams;
 END;
 $$ LANGUAGE plpgsql;
@@ -96,36 +98,44 @@ CREATE OR REPLACE FUNCTION trigger_generate_quarterfinals()
   RETURNS TRIGGER AS
 $$
 DECLARE
-  tournament_id             UUID;
+  v_tournament_id           UUID;
+  v_round                   TEXT;
   group_stage_count         INT;
   group_stage_results_count INT;
 BEGIN
-  -- Get the tournament_id of the match being updated
-  tournament_id := NEW.match_id;
+  -- Retrieve tournament_id and round from the match table
+  SELECT m.tournament_id, m.round
+  INTO v_tournament_id, v_round
+  FROM public.match m
+  WHERE m.id = NEW.match_id;
+
+  -- Ensure we have a valid tournament ID and that this match is from the group stage
+  IF v_tournament_id IS NULL OR v_round <> 'Gruppenphase' THEN
+    RETURN NEW;
+  END IF;
 
   -- Count the total number of group stage matches
   SELECT COUNT(*)
   INTO group_stage_count
   FROM public.match
-  WHERE tournament_id = tournament_id
+  WHERE tournament_id = v_tournament_id
     AND round = 'Gruppenphase';
-  -- Assuming 'Gruppenphase' is the round name for group stage
 
   -- Count the number of group stage matches with results
   SELECT COUNT(*)
   INTO group_stage_results_count
   FROM public.match m
          LEFT JOIN public.result r ON m.id = r.match_id
-  WHERE m.tournament_id = tournament_id
+  WHERE m.tournament_id = v_tournament_id
     AND m.round = 'Gruppenphase'
     AND r.id IS NOT NULL;
 
   -- If all group stage results are available, generate quarter-finals
   IF group_stage_count = group_stage_results_count THEN
     PERFORM generate_quarterfinals(
-      tournament_id,
+      v_tournament_id,
       NOW()::TIME, -- Use the current time as the start time
-      12 -- Interval in minutes between matches
+      15 -- Interval in minutes between matches
             );
   END IF;
 

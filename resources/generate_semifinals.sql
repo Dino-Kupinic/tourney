@@ -6,66 +6,67 @@ CREATE OR REPLACE FUNCTION generate_semifinals(
   RETURNS VOID AS
 $$
 DECLARE
-  team1            UUID;
-  team2            UUID;
+  team_ids         UUID[];
   start_time       TIME     := p_start_time;
   interval_minutes INTERVAL := (p_interval_minutes || ' minutes')::INTERVAL;
-  semifinal_teams  REFCURSOR;
 BEGIN
   -- Fetch the winners of the quarter-finals
-  CREATE TEMP TABLE quarterfinal_winners AS
-  SELECT m.id  AS match_id,
-         CASE
-           WHEN r.winner_id IS NOT NULL THEN r.winner_id
-           WHEN r.team1_score > r.team2_score THEN m.team1_id
-           WHEN r.team2_score > r.team1_score THEN m.team2_id
-           ELSE NULL -- Handle draws (if applicable)
-           END AS winner_id
-  FROM public.match m
-         LEFT JOIN public.result r ON m.id = r.match_id
-  WHERE m.tournament_id = p_tournament_id
-    AND m.round = 'Viertelfinale';
+  SELECT ARRAY_AGG(winner_id ORDER BY match_id)
+  INTO team_ids
+  FROM (SELECT m.id  AS match_id,
+               CASE
+                 WHEN r.winner_id IS NOT NULL THEN r.winner_id
+                 WHEN r.team1_score > r.team2_score THEN m.team1_id
+                 WHEN r.team2_score > r.team1_score THEN m.team2_id
+                 ELSE NULL -- Handle draws (if applicable)
+                 END AS winner_id
+        FROM public.match m
+               LEFT JOIN public.result r ON m.id = r.match_id
+        WHERE m.tournament_id = p_tournament_id
+          AND m.round = 'Viertelfinale') AS quarterfinal_winners
+  WHERE winner_id IS NOT NULL;
+  -- Ensure NULL values are removed
 
-  -- Pair the quarter-final winners for semi-finals
-  OPEN semifinal_teams FOR
-    SELECT q1.winner_id AS team1,
-           q2.winner_id AS team2
-    FROM quarterfinal_winners q1
-           JOIN quarterfinal_winners q2 ON q1.match_id < q2.match_id
-    LIMIT 2;
+  -- Ensure we have exactly 4 winners
+  IF array_length(team_ids, 1) != 4 THEN
+    RAISE NOTICE 'Invalid number of quarter-final winners: %', array_length(team_ids, 1);
+    RETURN;
+  END IF;
 
-  -- Insert semi-final matches
-  LOOP
-    FETCH semifinal_teams INTO team1, team2;
-    EXIT WHEN NOT FOUND;
+  -- Insert two semi-final matches with correct pairing
+  INSERT INTO public.match (tournament_id, team1_id, team2_id, start_time, round)
+  VALUES (p_tournament_id, team_ids[1], team_ids[3], start_time, 'Semifinale'),
+         (p_tournament_id, team_ids[2], team_ids[4], start_time + interval_minutes, 'Semifinale');
 
-    INSERT INTO public.match (tournament_id, team1_id, team2_id, start_time, round)
-    VALUES (p_tournament_id, team1, team2, start_time, 'Semifinale');
-
-    start_time := start_time + interval_minutes;
-  END LOOP;
-
-  -- Clean up temporary table
-  DROP TABLE quarterfinal_winners;
 END;
 $$ LANGUAGE plpgsql;
 
+-- Trigger to generate semi-finals after quarter-final results
 CREATE OR REPLACE FUNCTION trigger_generate_semifinals()
   RETURNS TRIGGER AS
 $$
 DECLARE
-  tournament_id              UUID;
+  v_tournament_id            UUID;
+  v_round                    TEXT;
   quarterfinal_count         INT;
   quarterfinal_results_count INT;
 BEGIN
-  -- Get the tournament_id of the match being updated
-  tournament_id := NEW.match_id;
+  -- Retrieve tournament_id and round from the match table
+  SELECT m.tournament_id, m.round
+  INTO v_tournament_id, v_round
+  FROM public.match m
+  WHERE m.id = NEW.match_id;
+
+  -- Ensure we have a valid tournament ID and that this match is from the quarter-finals
+  IF v_tournament_id IS NULL OR v_round <> 'Viertelfinale' THEN
+    RETURN NEW;
+  END IF;
 
   -- Count the total number of quarter-final matches
   SELECT COUNT(*)
   INTO quarterfinal_count
   FROM public.match
-  WHERE tournament_id = tournament_id
+  WHERE tournament_id = v_tournament_id
     AND round = 'Viertelfinale';
 
   -- Count the number of quarter-final matches with results
@@ -73,16 +74,16 @@ BEGIN
   INTO quarterfinal_results_count
   FROM public.match m
          LEFT JOIN public.result r ON m.id = r.match_id
-  WHERE m.tournament_id = tournament_id
+  WHERE m.tournament_id = v_tournament_id
     AND m.round = 'Viertelfinale'
     AND r.id IS NOT NULL;
 
   -- If all quarter-final results are available, generate semi-finals
   IF quarterfinal_count = quarterfinal_results_count THEN
     PERFORM generate_semifinals(
-      tournament_id,
+      v_tournament_id,
       NOW()::TIME, -- Use the current time as the start time
-      30 -- Interval in minutes between matches
+      15 -- Interval in minutes between matches
             );
   END IF;
 
@@ -91,8 +92,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create the trigger
-CREATE TRIGGER trigger_quarterfinal_results
+CREATE OR REPLACE TRIGGER trigger_quarterfinal_results
   AFTER INSERT OR UPDATE
   ON public.result
   FOR EACH ROW
 EXECUTE FUNCTION trigger_generate_semifinals();
+

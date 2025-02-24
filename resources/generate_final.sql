@@ -41,6 +41,7 @@ BEGIN
   END IF;
 
   -- Clean up temporary table
+  CLOSE final_teams;
   DROP TABLE semifinal_winners;
 END;
 $$ LANGUAGE plpgsql;
@@ -49,18 +50,28 @@ CREATE OR REPLACE FUNCTION trigger_generate_final()
   RETURNS TRIGGER AS
 $$
 DECLARE
-  tournament_id           UUID;
+  v_tournament_id         UUID;
+  v_round                 TEXT;
   semifinal_count         INT;
   semifinal_results_count INT;
+  existing_final_count    INT;
 BEGIN
-  -- Get the tournament_id of the match being updated
-  tournament_id := NEW.match_id;
+  -- Retrieve tournament_id and round from the match table
+  SELECT m.tournament_id, m.round
+  INTO v_tournament_id, v_round
+  FROM public.match m
+  WHERE m.id = NEW.match_id;
+
+  -- Ensure we have a valid tournament ID and that this match is from the semi-finals
+  IF v_tournament_id IS NULL OR v_round <> 'Semifinale' THEN
+    RETURN NEW;
+  END IF;
 
   -- Count the total number of semi-final matches
   SELECT COUNT(*)
   INTO semifinal_count
   FROM public.match
-  WHERE tournament_id = tournament_id
+  WHERE tournament_id = v_tournament_id
     AND round = 'Semifinale';
 
   -- Count the number of semi-final matches with results
@@ -68,16 +79,23 @@ BEGIN
   INTO semifinal_results_count
   FROM public.match m
          LEFT JOIN public.result r ON m.id = r.match_id
-  WHERE m.tournament_id = tournament_id
+  WHERE m.tournament_id = v_tournament_id
     AND m.round = 'Semifinale'
     AND r.id IS NOT NULL;
 
-  -- If all semi-final results are available, generate the final
-  IF semifinal_count = semifinal_results_count THEN
+  -- Check if a final match has already been generated
+  SELECT COUNT(*)
+  INTO existing_final_count
+  FROM public.match
+  WHERE tournament_id = v_tournament_id
+    AND round = 'Finale';
+
+  -- If all semi-final results are available and no final exists, generate the final
+  IF semifinal_count = semifinal_results_count AND existing_final_count = 0 THEN
     PERFORM generate_final(
-      tournament_id,
+      v_tournament_id,
       NOW()::TIME, -- Use the current time as the start time
-      30 -- Interval in minutes (not used for final)
+      15 -- Interval in minutes (not used for final)
             );
   END IF;
 
@@ -86,7 +104,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create the trigger
-CREATE TRIGGER trigger_semifinal_results
+CREATE OR REPLACE TRIGGER trigger_semifinal_results
   AFTER INSERT OR UPDATE
   ON public.result
   FOR EACH ROW
