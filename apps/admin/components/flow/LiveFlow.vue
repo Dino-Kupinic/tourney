@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from "vue"
-import { VueFlow, Position } from "@vue-flow/core"
+import type { Node } from "@vue-flow/core"
+import { VueFlow } from "@vue-flow/core"
 import { Background } from "@vue-flow/background"
 import { Controls } from "@vue-flow/controls"
 import { MiniMap } from "@vue-flow/minimap"
@@ -47,8 +47,6 @@ const edges = ref([
 
 <template>
   <VueFlow
-    :nodes="nodes"
-    :edges="edges"
     class="bg-gray-100 dark:bg-gray-800"
     :default-viewport="{ zoom: 1.5 }"
     :min-zoom="0.2"

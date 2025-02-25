@@ -57,6 +57,7 @@ const refresh = async () => {
   await groupRefresh()
   await matchRefresh()
   await refreshLiveMatches()
+  await refreshResults()
   displaySuccessNotification(
     "Daten aktualisiert",
     "Die Daten wurden aktualisiert.",
@@ -67,6 +68,7 @@ const refreshMatches = async () => {
   await matchRefresh()
   await refreshLiveMatches()
   await standingsRefresh()
+  await refreshResults()
 }
 
 const schema = z.object({
@@ -111,6 +113,10 @@ const generateGroupMatches = async () => {
     })
   }
 }
+
+const { data: results, refresh: refreshResults } = await useFetch(
+  `/api/tournament_results/${tournament.value.id}`,
+)
 </script>
 
 <template>
@@ -130,7 +136,7 @@ const generateGroupMatches = async () => {
         color="primary"
         label="Gruppenphase starten..."
         @click="isOpenCreate = true"
-        v-if="matches?.length === 0"
+        v-if="matches?.length === 0 && !results"
       />
       <ModalCreate
         title="Gruppenphase starten"
@@ -194,8 +200,7 @@ const generateGroupMatches = async () => {
   </BasePageHeader>
   <BasePageContent>
     <div class="h-full w-full">
-      <!--      <template v-if="matches?.length || liveMatches?.length">-->
-      <div class="h-2/3">
+      <div class="h-1/3">
         <ClientOnly>
           <LiveFlow />
           <template #fallback>
@@ -212,6 +217,7 @@ const generateGroupMatches = async () => {
       >
         <div class="flex w-1/3 flex-col gap-1">
           <strong>Punkte</strong>
+          <pre v-if="results">{{ results }}</pre>
           <StandingsTable v-if="standings" :standings="standings" />
         </div>
         <div class="flex w-1/3 flex-col gap-1">
@@ -242,13 +248,6 @@ const generateGroupMatches = async () => {
           </div>
         </div>
       </div>
-      <!--      </template>-->
-      <!--      <template v-else>-->
-      <!--        <EmptyState-->
-      <!--          title="Keine Matches"-->
-      <!--          description="Es sind keine Matches vorhanden. Starte die Gruppenphase um loszulegen."-->
-      <!--        />-->
-      <!--      </template>-->
     </div>
   </BasePageContent>
 </template>
