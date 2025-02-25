@@ -4,6 +4,7 @@ import type { ParsedJsonTournament } from "~/types/prizes"
 import type { Match } from "~/types/match"
 import type { Standing } from "~/types/standing"
 import { z } from "zod"
+import TournamentPlaces from "~/components/tournament/TournamentPlaces.vue"
 
 const title = ref<string>("Live")
 useHead({
@@ -117,6 +118,28 @@ const generateGroupMatches = async () => {
 const { data: results, refresh: refreshResults } = await useFetch(
   `/api/tournament_results/${tournament.value.id}`,
 )
+
+// TODO: improve this bandaid fix
+
+const first = computed(() => {
+  // @ts-ignore
+  return results.value?.[0].team.name
+})
+
+const second = computed(() => {
+  // @ts-ignore
+  return results.value?.[1].team.name
+})
+
+const third = computed(() => {
+  // @ts-ignore
+  return results.value?.[2].team.name
+})
+
+const fourth = computed(() => {
+  // @ts-ignore
+  return results.value?.[3].team.name
+})
 </script>
 
 <template>
@@ -216,8 +239,14 @@ const { data: results, refresh: refreshResults } = await useFetch(
         class="flex h-2/3 justify-between gap-6 border-t border-gray-200 p-6 dark:border-gray-700"
       >
         <div class="flex w-1/3 flex-col gap-1">
-          <strong>Punkte</strong>
-          <pre v-if="results">{{ results }}</pre>
+          <strong>Platzierungen</strong>
+          <TournamentPlaces
+            v-if="results"
+            :first="first"
+            :second="second"
+            :third="third"
+            :fourth="fourth"
+          />
           <StandingsTable v-if="standings" :standings="standings" />
         </div>
         <div class="flex w-1/3 flex-col gap-1">

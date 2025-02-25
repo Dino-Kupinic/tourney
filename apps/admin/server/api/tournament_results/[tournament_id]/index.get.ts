@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
     .from("tournament_result")
     .select("*, team:team_id(*)")
     .eq("tournament_id", id)
+    .order("position")
 
   return data
 })
