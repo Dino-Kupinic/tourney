@@ -195,20 +195,17 @@ const generateGroupMatches = async () => {
   <BasePageContent>
     <div class="h-full w-full">
       <!--      <template v-if="matches?.length || liveMatches?.length">-->
-      <div class="h-1/3">
-        <!--        <ClientOnly>-->
-        <!--          <TournamentFlow-->
-        <!--            :groups="flowGroups"-->
-        <!--            :key="JSON.stringify(flowGroups)"-->
-        <!--          />-->
-        <!--          <template #fallback>-->
-        <!--            <div-->
-        <!--              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"-->
-        <!--            >-->
-        <!--              <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />-->
-        <!--            </div>-->
-        <!--          </template>-->
-        <!--        </ClientOnly>-->
+      <div class="h-2/3">
+        <ClientOnly>
+          <LiveFlow />
+          <template #fallback>
+            <div
+              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
+            >
+              <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
+            </div>
+          </template>
+        </ClientOnly>
       </div>
       <div
         class="flex h-2/3 justify-between gap-6 border-t border-gray-200 p-6 dark:border-gray-700"
