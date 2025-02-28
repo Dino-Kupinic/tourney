@@ -112,6 +112,7 @@ const { data: results, refresh: refreshResults } = await useFetch(
 
 const getTeamName = (index: number) =>
   computed(() => {
+    if (!results.value) return
     // @ts-ignore
     return results.value?.[index]?.team?.name
   })
