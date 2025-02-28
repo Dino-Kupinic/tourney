@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import type { Group } from "~/types/group"
 import type { ParsedJsonTournament } from "~/types/prizes"
 import type { Match } from "~/types/match"
 import type { Standing } from "~/types/standing"
 import { z } from "zod"
-import TournamentPlaces from "~/components/tournament/TournamentPlaces.vue"
 
 const title = ref<string>("Live")
 useHead({
@@ -31,14 +29,6 @@ if (!tournament.value) {
 const { data: groups, refresh: groupRefresh } = await useFetch(
   `/api/tournaments/${tournament.value.id}/groups`,
 )
-const flowGroups = computed<Group[]>(() => {
-  return (
-    groups.value?.map((group) => ({
-      name: group.name,
-      teams: group.teams.map((team) => team.name),
-    })) ?? []
-  )
-})
 
 const { data: matches, refresh: matchRefresh } = await useFetch<Match[]>(
   `/api/views/matches/${tournament.value.id}`,
@@ -115,31 +105,21 @@ const generateGroupMatches = async () => {
   }
 }
 
+const isOpenWinners = ref<boolean>(false)
 const { data: results, refresh: refreshResults } = await useFetch(
   `/api/tournament_results/${tournament.value.id}`,
 )
 
-// TODO: improve this bandaid fix
+const getTeamName = (index: number) =>
+  computed(() => {
+    // @ts-ignore
+    return results.value?.[index]?.team?.name
+  })
 
-const first = computed(() => {
-  // @ts-ignore
-  return results.value?.[0].team.name
-})
-
-const second = computed(() => {
-  // @ts-ignore
-  return results.value?.[1].team.name
-})
-
-const third = computed(() => {
-  // @ts-ignore
-  return results.value?.[2].team.name
-})
-
-const fourth = computed(() => {
-  // @ts-ignore
-  return results.value?.[3].team.name
-})
+const first = getTeamName(0)
+const second = getTeamName(1)
+const third = getTeamName(2)
+const fourth = getTeamName(3)
 </script>
 
 <template>
@@ -148,18 +128,28 @@ const fourth = computed(() => {
       <UButton
         size="xs"
         variant="soft"
-        color="indigo"
-        label="Automatikmodus..."
-        icon="i-heroicons-arrow-path-rounded-square"
-        v-if="matches?.length"
+        color="amber"
+        label="Gewinner anzeigen"
+        icon="i-heroicons-trophy"
+        v-if="results?.length"
+        @click="isOpenWinners = true"
       />
+      <ModalInfo v-model="isOpenWinners">
+        <TournamentPlaces
+          v-if="results?.length"
+          :first="first"
+          :second="second"
+          :third="third"
+          :fourth="fourth"
+        />
+      </ModalInfo>
       <UButton
         size="xs"
         variant="soft"
         color="primary"
         label="Gruppenphase starten..."
         @click="isOpenCreate = true"
-        v-if="matches?.length === 0 && !results"
+        v-if="!matches?.length && !liveMatches?.length && !results?.length"
       />
       <ModalCreate
         title="Gruppenphase starten"
@@ -240,13 +230,6 @@ const fourth = computed(() => {
       >
         <div class="flex w-1/3 flex-col gap-1">
           <strong>Platzierungen</strong>
-          <TournamentPlaces
-            v-if="results"
-            :first="first"
-            :second="second"
-            :third="third"
-            :fourth="fourth"
-          />
           <StandingsTable v-if="standings" :standings="standings" />
         </div>
         <div class="flex w-1/3 flex-col gap-1">

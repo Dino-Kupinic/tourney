@@ -118,11 +118,10 @@ const mixGroups = async () => {
   }
 }
 
-// TODO: update this
 const timeline = [
   { label: "Gruppenphase" },
-  { label: "Kreuzspiele" },
-  { label: "Halbfinale" },
+  { label: "Viertelfinale" },
+  { label: "Semifinale" },
   { label: "Kleines Finale" },
   { label: "Finale" },
 ]
