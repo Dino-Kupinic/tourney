@@ -61,8 +61,8 @@ const creationSchema = z.object({
   name: z.string(),
   rules: z.string(),
   start_date: z.string().date(),
-  from: z.string().time(),
-  to: z.string().time(),
+  from: z.string(),
+  to: z.string(),
   year: z.number(),
   sport: z.custom<Enums<"sport_type">>(),
   prizes: z.object({
