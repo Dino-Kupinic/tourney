@@ -62,11 +62,11 @@ const thumbnails = computed(() => {
 
           <div class="flex space-x-3">
             <UFormGroup label="Von" name="from" required class="grow">
-              <UInput v-model="state.from" type="time" :step="2" />
+              <UInput v-model="state.from" type="time" :step="60" />
             </UFormGroup>
 
             <UFormGroup label="Bis" name="to" required class="grow">
-              <UInput v-model="state.to" type="time" :step="2" />
+              <UInput v-model="state.to" type="time" :step="60" />
             </UFormGroup>
           </div>
         </div>
