@@ -55,9 +55,9 @@ const isOpenInfo = ref<boolean>(false)
 const isOpenLinks = ref<boolean>(false)
 
 const years = Array.from(
-  { length: 10 },
+  { length: 11 },
   (_, i) =>
-    `${new Date().getFullYear() + i}/${(new Date().getFullYear() + i + 1).toString().slice(2)}`,
+    `${new Date().getFullYear() + i - 1}/${(new Date().getFullYear() + i).toString().slice(2)}`,
 )
 const classYear = ref<string>(years[0])
 const encodedYear = computed(() => encodeURIComponent(classYear.value))

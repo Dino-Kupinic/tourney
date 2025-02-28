@@ -10,7 +10,7 @@ defineProps<{
   <div class="mt-64 flex w-full items-center justify-center">
     <div class="max-w-96 space-y-3">
       <UIcon
-        name="i-heroicons-ticket"
+        name="i-heroicons-face-frown"
         size="24"
         class="text-gray-500 dark:text-gray-400"
       />

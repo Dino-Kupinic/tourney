@@ -15,6 +15,9 @@ content.value = (await data?.text()) ?? ""
         class="h-full w-full overflow-auto rounded-md bg-gray-100 p-3 sm:p-6 dark:bg-gray-900"
         :value="content"
       />
+      <div v-else>
+        <p class="p-3">Kein Inhalt</p>
+      </div>
     </ClientOnly>
   </div>
 </template>
