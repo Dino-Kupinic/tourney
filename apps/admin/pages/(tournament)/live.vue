@@ -121,6 +121,35 @@ const first = getTeamName(0)
 const second = getTeamName(1)
 const third = getTeamName(2)
 const fourth = getTeamName(3)
+
+const tabsMatches = [
+  {
+    slot: "matches",
+    key: "matches",
+    label: "Matches",
+    icon: "i-heroicons-bars-4",
+  },
+  {
+    slot: "history",
+    key: "history",
+    label: "Historie",
+    icon: "i-heroicons-archive-box",
+  },
+]
+
+const tabTable = [
+  {
+    label: "Platzierungen",
+    icon: "i-heroicons-table-cells",
+  },
+]
+
+const tabLive = [
+  {
+    label: "Live",
+    icon: "i-heroicons-signal",
+  },
+]
 </script>
 
 <template>
@@ -227,30 +256,57 @@ const fourth = getTeamName(3)
         </ClientOnly>
       </div>
       <div
-        class="flex h-2/3 justify-between gap-6 border-t border-gray-200 p-6 dark:border-gray-700"
+        class="flex h-2/3 justify-between gap-6 border-t border-gray-200 p-6 pt-3 dark:border-gray-700"
       >
-        <div class="flex w-1/3 flex-col gap-1">
-          <strong>Platzierungen</strong>
+        <div class="flex w-1/3 flex-col gap-0.5">
+          <UTabs
+            :items="tabTable"
+            :ui="{ list: { tab: { height: 'h-7' }, height: 'h-9' } }"
+          />
           <StandingsTable v-if="standings" :standings="standings" />
         </div>
-        <div class="flex w-1/3 flex-col gap-1">
-          <strong>Spielplan</strong>
-          <div
-            class="flex flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-3 dark:border-gray-700"
+        <div class="flex w-1/3 flex-col gap-0.5">
+          <UTabs
+            :items="tabsMatches"
+            :ui="{ list: { tab: { height: 'h-7' }, height: 'h-9' } }"
           >
-            <MatchItemRow
-              v-for="(match, index) in matches"
-              :match
-              :next="index < 2"
-              :key="match.match_id!"
-              @live="refreshMatches"
-            />
-          </div>
+            <template #icon="{ item, selected }">
+              <UIcon
+                :name="item.icon"
+                class="me-2 h-4 w-4 flex-shrink-0"
+                :class="[selected && 'text-primary-500 dark:text-primary-400']"
+              />
+            </template>
+
+            <template #matches="{ item }">
+              <div
+                class="flex flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-2 dark:border-gray-700"
+              >
+                <MatchItemRow
+                  v-for="(match, index) in matches"
+                  :match
+                  :next="index < 2"
+                  :key="match.match_id!"
+                  @live="refreshMatches"
+                />
+              </div>
+            </template>
+            <template #history="{ item }">
+              <div
+                class="flex flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-2 dark:border-gray-700"
+              >
+                <p>a</p>
+              </div>
+            </template>
+          </UTabs>
         </div>
-        <div class="flex w-1/3 flex-col gap-1">
-          <strong>Live</strong>
+        <div class="flex w-1/3 flex-col gap-0.5">
+          <UTabs
+            :items="tabLive"
+            :ui="{ list: { tab: { height: 'h-7' }, height: 'h-9' } }"
+          />
           <div
-            class="flex h-full flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-3 dark:border-gray-700"
+            class="flex h-full flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-2 dark:border-gray-700"
           >
             <MatchItemLive
               v-for="match in liveMatches"
