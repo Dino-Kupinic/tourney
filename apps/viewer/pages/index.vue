@@ -29,7 +29,7 @@ useHead({
           ⚽️
         </div>
         <div
-          class="flex h-20 w-20 items-center justify-center rounded-full bg-white bg-yellow-100 text-3xl"
+          class="flex h-20 w-20 items-center justify-center rounded-full bg-yellow-100 text-3xl"
         >
           🏀
         </div>
