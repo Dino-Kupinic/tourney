@@ -272,7 +272,11 @@ const { data: history, refresh: refreshHistory } = await useFetch(
           <UTabs
             :items="tabsMatches"
             :ui="{
-              list: { tab: { height: 'h-7' }, height: 'h-9' },
+              list: {
+                base: 'relative mb-0.5',
+                tab: { height: 'h-7' },
+                height: 'h-9',
+              },
             }"
           >
             <template #icon="{ item, selected }">

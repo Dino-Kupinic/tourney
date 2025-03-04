@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Match } from "~/types/match"
+import { z } from "zod"
 
 const { id, match, score1, score2, winner } = defineProps<{
   id: string
@@ -15,9 +16,26 @@ const logoTeam1 = computed(
 const logoTeam2 = computed(
   () => match.team2?.logo_variant?.image_path ?? match.team2?.logo?.image_path,
 )
+
+const isOpenEdit = ref<boolean>(false)
+const editSchema = z.object({
+  score1: z.number(),
+  score2: z.number(),
+  start_time: z.string(),
+  end_time: z.string(),
+})
+
+const editState = reactive({
+  id: "",
+  expire_date: "",
+  name: "",
+  allow_class_mixing: false,
+  class: "",
+})
 </script>
 
 <template>
+  <ModalEdit v-model="isOpenEdit" modal-width="sm:max-w-md"> a </ModalEdit>
   <div class="rounded-md border border-gray-200 shadow-sm dark:border-gray-700">
     <div
       class="flex justify-between gap-0.5 rounded-t-md border-b border-gray-200 bg-gray-100 p-0.5 dark:border-gray-700 dark:bg-gray-800"
@@ -54,7 +72,7 @@ const logoTeam2 = computed(
           color="gray"
           size="3xs"
           square
-          @click=""
+          @click="isOpenEdit = true"
         />
       </div>
     </div>
@@ -69,7 +87,11 @@ const logoTeam2 = computed(
               'dark:invert dark:filter': match.team1?.logo_variant === null,
             }"
           />
-          <p class="text-xs">{{ match.team1?.name }}</p>
+          <p
+            :class="['text-xs', winner === match.team1?.id && 'text-amber-500']"
+          >
+            {{ match.team1?.name }}
+          </p>
           <p class="text-xs text-gray-500">{{ match.team1?.group?.name }}</p>
         </div>
         <div class="flex items-center gap-5">
@@ -86,7 +108,11 @@ const logoTeam2 = computed(
               'dark:invert dark:filter': match.team2?.logo_variant === null,
             }"
           />
-          <p class="text-xs">{{ match.team2?.name }}</p>
+          <p
+            :class="['text-xs', winner === match.team2?.id && 'text-amber-500']"
+          >
+            {{ match.team2?.name }}
+          </p>
           <p class="text-xs text-gray-500">{{ match.team2?.group?.name }}</p>
         </div>
       </div>
