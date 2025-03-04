@@ -64,6 +64,20 @@ const isOpenConfirm = ref<boolean>(false)
 const supabase = useSupabaseClient()
 const completeMatch = async () => {
   try {
+    const { error: endTimeError } = await supabase
+      .from("match")
+      .update({
+        end_time: new Date().toLocaleTimeString("de-DE", { hour12: false }),
+      })
+      .eq("id", match.match_id!)
+    if (endTimeError) {
+      displayFailureNotification(
+        "Fehler",
+        endTimeError.message || "Ein Fehler ist aufgetreten.",
+      )
+      console.error(endTimeError)
+      return
+    }
     const { error } = await supabase.rpc("record_match_result", {
       p_match_id: match.match_id!,
       p_team1_score: score1.value,
@@ -91,8 +105,6 @@ const completeMatch = async () => {
     })
   }
 }
-
-const startTime = computed(() => `gestartet ${match.start_time}`)
 </script>
 
 <template>
@@ -122,10 +134,11 @@ const startTime = computed(() => `gestartet ${match.start_time}`)
           block
         />
         <UBadge
-          :label="startTime"
+          :label="match.start_time!"
           color="indigo"
           size="xs"
           variant="subtle"
+          icon="i-heroicons-clock"
           block
         />
       </div>
