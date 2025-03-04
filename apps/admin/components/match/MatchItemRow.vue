@@ -46,7 +46,7 @@ const startTime = computed(() => {
 
 <template>
   <ModalInfo v-model="isOpenInfo">
-    <pre class="overflow-auto">{{ match }}</pre>
+    <pre class="h-96 overflow-auto rounded-md border p-3">{{ match }}</pre>
   </ModalInfo>
   <div class="rounded-md border border-gray-200 shadow-sm dark:border-gray-700">
     <div
@@ -76,13 +76,6 @@ const startTime = computed(() => {
         size="xs"
         variant="subtle"
         block
-      />
-      <UButton
-        icon="i-heroicons-pencil"
-        color="gray"
-        size="3xs"
-        square
-        @click=""
       />
     </div>
     <div
