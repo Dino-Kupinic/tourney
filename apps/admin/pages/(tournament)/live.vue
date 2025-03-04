@@ -314,6 +314,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
                   :score1="result.team1_score"
                   :score2="result.team2_score"
                   :winner="result.winner_id"
+                  @refresh="refreshMatches"
                 />
               </div>
             </template>
