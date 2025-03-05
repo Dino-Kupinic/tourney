@@ -33,7 +33,7 @@ const bonus = computed(() => {
           class="absolute left-0 top-0 h-full w-full overflow-clip object-cover object-top"
         />
         <h2
-          class="z-10 text-3xl font-bold tracking-tight dark:drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
+          class="z-10 text-3xl font-bold tracking-tight text-white drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
         >
           {{ tournament.name }}
         </h2>
@@ -107,7 +107,7 @@ const bonus = computed(() => {
         block
         label="Anschauen"
         :to="`/tournaments/${tournament.id}`"
-        size="lg"
+        size="xl"
         variant="soft"
       />
     </template>

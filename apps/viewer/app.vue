@@ -14,13 +14,11 @@ const layout = computed(() => {
 </script>
 
 <template>
-  <div>
-    <NuxtRouteAnnouncer />
-    <NuxtLoadingIndicator />
-    <NuxtPwaManifest />
-    <NuxtLayout :name="layout">
-      <NuxtPage />
-    </NuxtLayout>
-    <UNotifications />
-  </div>
+  <NuxtRouteAnnouncer />
+  <NuxtLoadingIndicator />
+  <NuxtPwaManifest />
+  <NuxtLayout :name="layout">
+    <NuxtPage />
+  </NuxtLayout>
+  <UNotifications />
 </template>
