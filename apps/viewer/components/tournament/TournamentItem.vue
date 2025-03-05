@@ -107,7 +107,7 @@ const bonus = computed(() => {
         block
         label="Anschauen"
         :to="`/tournaments/${tournament.id}`"
-        size="lg"
+        size="xl"
         variant="soft"
       />
     </template>

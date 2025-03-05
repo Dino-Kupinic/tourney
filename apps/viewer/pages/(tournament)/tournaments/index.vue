@@ -32,7 +32,7 @@ const groupedTournaments = computed(() => {
   <PageHeader title="Turniere" description="Alle Turniere im Überblick" />
 
   <div v-for="group in groupedTournaments" :key="group.year">
-    <UDivider type="dashed">
+    <UDivider>
       <strong>{{ group.year }}</strong>
     </UDivider>
     <div class="grid grid-cols-1 flex-col gap-4 py-4 sm:grid-cols-3">

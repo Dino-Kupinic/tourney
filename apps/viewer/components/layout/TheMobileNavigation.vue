@@ -4,7 +4,7 @@ const links = getNavLinks(true)
 
 <template>
   <nav
-    class="fixed bottom-0 z-20 flex h-16 w-full justify-around border-t border-gray-200 bg-gray-50 py-1 dark:border-gray-800 dark:bg-gray-900"
+    class="fixed bottom-0 z-20 flex h-16 w-full justify-around border-t border-gray-200 bg-gray-50 bg-opacity-70 py-1 backdrop-blur-lg dark:border-gray-800 dark:bg-gray-900 dark:bg-opacity-70"
   >
     <div v-for="link in links" :key="link.label">
       <NuxtLink :to="link.to" active-class="text-primary-500">

@@ -33,7 +33,9 @@ const bonus = computed(() => {
     label="Zurück"
   />
   <PageTitle>{{ tournament?.name }}</PageTitle>
-  <div class="mt-3 max-w-96 rounded-md border bg-white p-3 dark:bg-gray-900">
+  <div
+    class="mt-3 max-w-96 rounded-md border bg-white p-3 dark:border-gray-800 dark:bg-gray-900"
+  >
     <PageHeading>Infos</PageHeading>
     <div class="flex items-center gap-4 sm:gap-3">
       <div
