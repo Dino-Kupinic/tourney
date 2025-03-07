@@ -5,19 +5,19 @@ useHead({
 </script>
 
 <template>
-  <PageHeader
-    title="Einstellungen"
-    description="Hier kannst du deine Präferenzen einstellen"
-  />
-  <UCard>
-    <template #header> Aussehen </template>
-    <BaseSettingsItem>
-      <div class="flex items-center justify-between">
-        <strong>Modus</strong>
-        <ThemeButton />
-      </div>
-    </BaseSettingsItem>
-  </UCard>
+  <PageWrapper>
+    <PageHeader
+      title="Einstellungen"
+      description="Hier kannst du deine Präferenzen einstellen"
+    />
+    <UCard>
+      <template #header> Aussehen </template>
+      <BaseSettingsItem>
+        <div class="flex items-center justify-between">
+          <strong>Modus</strong>
+          <ThemeButton />
+        </div>
+      </BaseSettingsItem>
+    </UCard>
+  </PageWrapper>
 </template>
-
-<style scoped></style>
