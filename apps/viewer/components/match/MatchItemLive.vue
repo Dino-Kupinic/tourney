@@ -102,6 +102,7 @@ const formattedTime = computed(() => {
             }"
           />
           <p class="text-xs">{{ match.team1?.name }}</p>
+          <p class="text-xs text-gray-500">{{ match.team1?.group?.name }}</p>
         </div>
         <div class="flex items-center gap-5">
           <p class="text-lg">vs</p>
@@ -116,6 +117,7 @@ const formattedTime = computed(() => {
             }"
           />
           <p class="text-xs">{{ match.team2?.name }}</p>
+          <p class="text-xs text-gray-500">{{ match.team2?.group?.name }}</p>
         </div>
       </div>
     </div>

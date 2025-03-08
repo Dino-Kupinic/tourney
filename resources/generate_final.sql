@@ -57,14 +57,14 @@ BEGIN
   FETCH final_teams INTO team1, team2;
   IF FOUND THEN
     INSERT INTO public.match (tournament_id, team1_id, team2_id, start_time, round)
-    VALUES (p_tournament_id, team1, team2, start_time, 'Finale');
+    VALUES (p_tournament_id, team1, team2, start_time + interval_minutes, 'Finale');
   END IF;
 
   -- Insert 3rd place match
   FETCH third_place_teams INTO team3, team4;
   IF FOUND THEN
     INSERT INTO public.match (tournament_id, team1_id, team2_id, start_time, round)
-    VALUES (p_tournament_id, team3, team4, start_time + interval_minutes, 'Kleines Finale');
+    VALUES (p_tournament_id, team3, team4, start_time, 'Kleines Finale');
   END IF;
 
   -- Clean up temporary table and cursors
