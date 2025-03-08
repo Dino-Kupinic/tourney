@@ -29,18 +29,20 @@ const groupedTournaments = computed(() => {
 </script>
 
 <template>
-  <PageHeader title="Turniere" description="Alle Turniere im Überblick" />
+  <PageWrapper>
+    <PageHeader title="Turniere" description="Alle Turniere im Überblick" />
 
-  <div v-for="group in groupedTournaments" :key="group.year">
-    <UDivider>
-      <strong>{{ group.year }}</strong>
-    </UDivider>
-    <div class="grid grid-cols-1 flex-col gap-4 py-4 sm:grid-cols-3">
-      <TournamentItem
-        v-for="tournament in group.tournaments"
-        :tournament="tournament"
-        :key="tournament.id"
-      />
+    <div v-for="group in groupedTournaments" :key="group.year">
+      <UDivider>
+        <strong>{{ group.year }}</strong>
+      </UDivider>
+      <div class="grid grid-cols-1 flex-col gap-4 py-4 sm:grid-cols-3">
+        <TournamentItem
+          v-for="tournament in group.tournaments"
+          :tournament="tournament"
+          :key="tournament.id"
+        />
+      </div>
     </div>
-  </div>
+  </PageWrapper>
 </template>

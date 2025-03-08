@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { NuxtError } from "#app"
 
-const props = defineProps({
+defineProps({
   error: Object as () => NuxtError,
 })
 </script>
@@ -21,9 +21,11 @@ const props = defineProps({
       <div>
         <strong>Fehlermeldung</strong>
         <div
-          class="h-36 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
+          class="h-40 w-80 rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
         >
-          <pre class="text text-wrap text-sm">{{ error?.message }}</pre>
+          <pre class="w-full overflow-auto text-wrap text-sm">
+            {{ error?.message }}
+          </pre>
         </div>
       </div>
       <UButton block to="/tournaments" size="lg" label="Zurück zu Turniere" />

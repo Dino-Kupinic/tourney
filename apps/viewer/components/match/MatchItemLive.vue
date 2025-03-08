@@ -53,78 +53,9 @@ const formattedTime = computed(() => {
 
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(milliseconds).padStart(3, "0")}`
 })
-
-const score1 = useState<number>(`score1-${match.match_id}`, () => 0)
-const score2 = useState<number>(`score2-${match.match_id}`, () => 0)
-
-const winner = computed(() => {
-  if (score1.value > score2.value) return match.team1
-  if (score1.value < score2.value) return match.team2
-  return null
-})
-
-const emit = defineEmits(["finish"])
-const isOpenConfirm = ref<boolean>(false)
-const supabase = useSupabaseClient()
-const completeMatch = async () => {
-  try {
-    const { error: endTimeError } = await supabase
-      .from("match")
-      .update({
-        end_time: new Date().toLocaleTimeString("de-DE", { hour12: false }),
-      })
-      .eq("id", match.match_id!)
-    if (endTimeError) {
-      displayFailureNotification(
-        "Fehler",
-        endTimeError.message || "Ein Fehler ist aufgetreten.",
-      )
-      console.error(endTimeError)
-      return
-    }
-    const { error } = await supabase.rpc("record_match_result", {
-      p_match_id: match.match_id!,
-      p_team1_score: score1.value,
-      p_team2_score: score2.value,
-    })
-    if (error) {
-      displayFailureNotification(
-        "Fehler",
-        error.message || "Ein Fehler ist aufgetreten.",
-      )
-      console.error(error)
-      return
-    }
-    emit("finish")
-    displaySuccessNotification(
-      "Match beendet",
-      "Das Match wurde erfolgreich beendet.",
-    )
-    isOpenConfirm.value = false
-  } catch (error) {
-    const err = error as Error
-    displayFailureNotification("Fehler", err.message)
-    throw createError({
-      statusMessage: err.message,
-    })
-  }
-}
 </script>
 
 <template>
-  <ModalMatch v-model="isOpenConfirm" @confirm="completeMatch">
-    <p>
-      {{ match.team1?.name }} hat <strong>{{ score1 }}</strong> Punkt(e) <br />
-      {{ match.team2?.name }} hat <strong>{{ score2 }}</strong> Punkt(e)
-    </p>
-    <br />
-    <p>
-      Anhand von diesen Angaben, wird
-      <strong class="text-primary-500">{{ winner?.name ?? "keiner" }}</strong>
-      der Gewinner.
-    </p>
-    <p v-if="winner === null">Somit ein Unentschieden.</p>
-  </ModalMatch>
   <div class="rounded-md border border-gray-200 shadow-sm dark:border-gray-700">
     <div
       class="flex justify-between gap-0.5 rounded-t-md border-b border-gray-200 bg-gray-100 p-0.5 dark:border-gray-700 dark:bg-gray-800"
@@ -172,29 +103,9 @@ const completeMatch = async () => {
           />
           <p class="text-xs">{{ match.team1?.name }}</p>
           <p class="text-xs text-gray-500">{{ match.team1?.group?.name }}</p>
-          <div class="space-x-0.5">
-            <UButton
-              :ui="{ rounded: 'rounded-full' }"
-              size="2xs"
-              color="gray"
-              square
-              icon="i-heroicons-minus"
-              @click="score1 > 0 ? score1-- : 0"
-            />
-            <UButton
-              :ui="{ rounded: 'rounded-full' }"
-              size="2xs"
-              color="gray"
-              square
-              icon="i-heroicons-plus"
-              @click="score1++"
-            />
-          </div>
         </div>
         <div class="flex items-center gap-5">
-          <p class="text-4xl font-bold">{{ score1 }}</p>
-          <p>vs</p>
-          <p class="text-4xl font-bold">{{ score2 }}</p>
+          <p class="text-lg">vs</p>
         </div>
         <div class="flex flex-col items-center space-y-1">
           <NuxtImg
@@ -207,34 +118,8 @@ const completeMatch = async () => {
           />
           <p class="text-xs">{{ match.team2?.name }}</p>
           <p class="text-xs text-gray-500">{{ match.team2?.group?.name }}</p>
-          <div class="space-x-0.5">
-            <UButton
-              :ui="{ rounded: 'rounded-full' }"
-              size="2xs"
-              color="gray"
-              square
-              icon="i-heroicons-minus"
-              @click="score2 > 0 ? score2-- : 0"
-            />
-            <UButton
-              :ui="{ rounded: 'rounded-full' }"
-              size="2xs"
-              color="gray"
-              square
-              icon="i-heroicons-plus"
-              @click="score2++"
-            />
-          </div>
         </div>
       </div>
-      <UButton
-        icon="i-heroicons-hand-raised"
-        variant="soft"
-        color="fuchsia"
-        label="Spiel beenden..."
-        size="2xs"
-        @click="isOpenConfirm = true"
-      />
     </div>
   </div>
 </template>

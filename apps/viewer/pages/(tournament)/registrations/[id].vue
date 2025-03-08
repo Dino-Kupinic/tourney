@@ -180,7 +180,7 @@ const submit = async () => {
 </script>
 
 <template>
-  <div>
+  <PageWrapper>
     <PageHeader
       title="Anmeldeformular"
       description="Trage dich hier ein für ein Turnier"
@@ -438,5 +438,5 @@ const submit = async () => {
         </div>
       </template>
     </UCard>
-  </div>
+  </PageWrapper>
 </template>
