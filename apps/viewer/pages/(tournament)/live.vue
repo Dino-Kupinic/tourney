@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ParsedJsonTournament } from "~/types/prizes"
 import type { Match } from "~/types/match"
+import type { Standing } from "~/types/standing"
 
 const { tournaments, fetchTournaments } = useLiveTournaments()
 const selected = useState<string>("selectedTournament", () => "")
@@ -8,20 +9,6 @@ await fetchTournaments()
 if (!selected.value && tournaments.value.length > 0) {
   selected.value = tournaments.value[0].id
 }
-
-// const refreshing = ref(false)
-// const target = useTemplateRef("target")
-// const { isSwiping, direction } = useSwipe(target)
-//
-// watch(direction, (newDirection) => {
-//   if (newDirection === "down" && !refreshing.value) {
-//     refreshing.value = true
-//     setTimeout(async () => {
-//       await refreshTournaments()
-//       refreshing.value = false
-//     }, 1000)
-//   }
-// })
 
 const { data: tournament, refresh: tournamentRefresh } =
   await useFetch<ParsedJsonTournament | null>(
@@ -38,6 +25,24 @@ const { data: matches, refresh: matchRefresh } = await useFetch<Match[]>(
   `/api/views/matches/${tournament.value.id}`,
 )
 
+const { data: groups } = await useFetch(`/api/groups/${tournament.value.id}`)
+if (!groups.value) {
+  throw createError({
+    statusCode: 404,
+    message: "Gruppen nicht gefunden",
+  })
+}
+const selectedGroup = useState<string>("selectedGroup", () => "")
+if (!selectedGroup.value && groups.value.length > 0) {
+  selectedGroup.value = groups.value[0].id
+}
+const { data: standings, refresh: standingsRefresh } = await useFetch<
+  Standing[]
+>(() => `/api/views/standings/group/${selectedGroup.value}`)
+watch(selectedGroup, async () => {
+  await standingsRefresh()
+})
+
 const { data: liveMatches, refresh: refreshLiveMatches } = await useFetch<
   Match[]
 >(`/api/views/matches/live/${tournament.value.id}`)
@@ -46,26 +51,34 @@ const refresh = async () => {
   await tournamentRefresh()
   await matchRefresh()
   await refreshLiveMatches()
+  await refreshHistory()
 }
 
 const supabase = useSupabaseClient()
-
-const channels = supabase
-  .channel("custom-update-channel")
+supabase
+  .channel("channel-match")
   .on(
     "postgres_changes",
-    { event: "*", schema: "public", table: "matches_status" },
-    (payload) => {
-      console.log("Change received!", payload)
+    { event: "*", schema: "public", table: "match" },
+    async () => {
+      await refresh()
+    },
+  )
+  .on(
+    "postgres_changes",
+    { event: "*", schema: "public", table: "result" },
+    async () => {
+      await refresh()
     },
   )
   .subscribe()
+
+const { data: history, refresh: refreshHistory } = await useFetch(
+  `/api/results/${tournament.value.id}`,
+)
 </script>
 
 <template>
-  <!--  <div v-if="refreshing" class="flex h-24 w-full items-center justify-center">-->
-  <!--    <UIcon name="i-svg-spinners-6-dots-rotate" class="h-8 w-8" />-->
-  <!--  </div>-->
   <div ref="target" class="h-full w-full">
     <div
       class="w-full border-b bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900"
@@ -102,16 +115,31 @@ const channels = supabase
             </p>
           </div>
         </div>
-        <MatchItemLive
-          v-for="match in liveMatches"
-          :key="match.match_id!"
-          :match
-        />
+        <div
+          class="flex flex-col gap-1.5 rounded-md bg-gray-50 p-3 dark:bg-gray-900"
+        >
+          <template v-if="liveMatches?.length">
+            <MatchItemLive
+              v-for="match in liveMatches"
+              :key="match.match_id!"
+              :match
+            />
+          </template>
+          <template v-else>
+            <UAlert
+              icon="i-heroicons-information-circle"
+              color="primary"
+              variant="soft"
+              title="Zurzeit keine Live Spiele"
+              description="Das nächste Spiel beginnt in Kürze."
+            />
+          </template>
+        </div>
       </div>
       <div class="flex flex-col gap-1.5">
         <UDivider>Anstehende Spiele</UDivider>
         <div
-          class="flex h-[30rem] flex-col gap-1.5 overflow-auto rounded-md bg-gray-50 p-3 pb-8 dark:bg-gray-900"
+          class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md bg-gray-50 p-3 pb-8 dark:bg-gray-900"
         >
           <MatchItemRow
             v-for="(match, index) in matches"
@@ -119,6 +147,34 @@ const channels = supabase
             :next="index < 2"
             :key="match.match_id!"
           />
+        </div>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <UDivider>Historie</UDivider>
+        <div
+          class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md bg-gray-50 p-3 pb-8 dark:bg-gray-900"
+        >
+          <!-- @vue-ignore -->
+          <ResultItem
+            v-for="result in history"
+            :match="result.match as Match"
+            :id="result.id"
+            :score1="result.team1_score"
+            :score2="result.team2_score"
+            :winner="result.winner_id"
+          />
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <UDivider>Platzierungen</UDivider>
+          <USelect
+            v-if="groups"
+            :options="groups"
+            v-model="selectedGroup"
+            size="lg"
+            value-attribute="id"
+            option-attribute="name"
+          />
+          <StandingsTable v-if="standings" :standings="standings" />
         </div>
       </div>
     </div>

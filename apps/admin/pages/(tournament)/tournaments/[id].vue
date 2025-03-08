@@ -487,7 +487,7 @@ const onSubmitEdit = async () => {
                     <div class="flex h-full gap-1">
                       <div class="self-end">
                         <UButton
-                          icon="i-heroicons-pencil"
+                          icon="i-heroicons-check"
                           color="gray"
                           size="sm"
                           square

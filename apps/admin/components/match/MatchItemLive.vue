@@ -26,9 +26,13 @@ const calculateElapsedTime = () => {
 
 calculateElapsedTime()
 
+let lastTimestamp = Date.now()
 const { resume } = useIntervalFn(
   () => {
-    timeElapsed.value += 1
+    const currentTimestamp = Date.now()
+    const delta = currentTimestamp - lastTimestamp
+    timeElapsed.value += delta
+    lastTimestamp = currentTimestamp
   },
   1,
   { immediate: true },
