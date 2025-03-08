@@ -3,9 +3,9 @@
 <template>
   <div class="flex h-dvh w-full flex-col">
     <TheMobileHeader />
-    <div class="mt-16 grow p-4 pb-16">
+    <main class="mt-16 grow pb-16">
       <slot />
-    </div>
+    </main>
     <TheNavigation />
   </div>
 </template>
