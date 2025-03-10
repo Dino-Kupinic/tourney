@@ -186,7 +186,8 @@ const onUpdate = async (status: Enums<"registration_status">) => {
       "Die Anmeldungen wurden erfolgreich aktualisiert.",
     )
   } catch (err) {
-    console.error(err)
+    const error = err as Error
+    console.error(error)
     displayFailureNotification(
       "Fehler beim Aktualisieren",
       "Die Anmeldungen konnten nicht aktualisiert werden.",
