@@ -11,28 +11,6 @@ const theme = computed(() => {
 })
 
 const supabase = useSupabaseClient()
-if (!supabase.storage.getBucket("misc")) {
-  const { error } = await supabase.storage.createBucket("misc", {
-    public: true,
-  })
-  if (error) {
-    throw createError({
-      statusCode: 500,
-      message: error.message,
-    })
-  }
-}
-
-// const { error } = await supabase.storage
-//   .from("misc")
-//   .upload("news.md", "# Test")
-// if (error) {
-//   throw createError({
-//     statusCode: 500,
-//     message: error.message,
-//   })
-// }
-
 const { data } = await supabase.storage.from("misc").download("news.md")
 content.value = (await data?.text()) ?? ""
 async function refresh() {
