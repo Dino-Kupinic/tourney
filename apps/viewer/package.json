@@ -15,7 +15,7 @@
     "@vite-pwa/nuxt": "0.10.6",
     "handlebars": "^4.7.8",
     "nuxt": "^3.14.1592",
-    "puppeteer": "^24.3.0",
+    "puppeteer": "^24.4.0",
     "vue": "3.5.13",
     "vue-router": "4.5.0",
     "zod": "^3.24.1"
@@ -26,6 +26,8 @@
     "@supabase/supabase-js": "^2.45.4",
     "@types/k6": "^0.54.2",
     "@vite-pwa/assets-generator": "^0.2.6",
+    "@iconify-json/heroicons": "^1.2.2",
+    "@iconify-json/material-symbols": "^1.2.15",
     "@vueuse/core": "^12.0.0",
     "@vueuse/nuxt": "^12.0.0",
     "vue-tsc": "2.2.4"
