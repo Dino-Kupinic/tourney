@@ -149,23 +149,9 @@ If it works, great! You can now log in in the admin dashboard with the created u
 ![img.png](.github/image_bucket_variants.png)
 *.svg logo variants grouped in the variants folder*
 
-#### RLS Policies
+#### Realtime
 
-1. Create the RLS policies:
-
-- Read Access `SELECT`
-  - on all tables for the `public` role
-- Write Access `INSERT`
-  - `class`, `registration`, `tournament` for the `authenticated` role
-  - `player`, `team` for the `public` role
-- Update Access `UPDATE`
-  - `registration` for the `public` role
-- Delete Access `DELETE`
-  - `registration` for the `authenticated` role
-
-> [!CAUTION]
-> These policies are subject to change.
-> Please refer to the latest documentation.
+Enable realtime for the table `match` and `result`.
 
 ## 🚀 Deployment
 
