@@ -115,6 +115,7 @@ const generatePDF = async () => {
       schoolClass: registration.value?.class?.name,
       year: new Date().getFullYear(),
       sport: tournament.value?.sport,
+      deadline: registration.value?.expire_date,
     }
 
     const response = await $fetch<Blob>("/api/pdf/generate", {
@@ -131,15 +132,20 @@ const generatePDF = async () => {
   }
 }
 
-// TODO: change later
+const COUNT_DEV = 2
+const FOOTBALL_PROD = 10
+const BASKETBALL_PROD = 5
+const VOLLEYBALL_PROD = 6
+
 const playerCount = computed(() => {
+  const isDev = import.meta.dev
   switch (tournament.value?.sport) {
     case "Fußball":
-      return 2 // 10
+      return isDev ? COUNT_DEV : FOOTBALL_PROD
     case "Basketball":
-      return 3 // 5
+      return isDev ? COUNT_DEV : BASKETBALL_PROD
     case "Volleyball":
-      return 4 // 6
+      return isDev ? COUNT_DEV : VOLLEYBALL_PROD
   }
   throw createError({
     statusCode: 404,
@@ -151,7 +157,6 @@ const formRef = useTemplateRef("formRef")
 const submit = async () => {
   // @ts-ignore build error
   formRef.value?.$.exposed?.submitForm()
-
   const payload = {
     formPlayers: formPlayers.value,
     logo: selectedLogo.value,

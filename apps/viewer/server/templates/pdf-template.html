@@ -37,7 +37,7 @@
 
 <p>Die Klasse <strong>{{ schoolClass }}</strong> meldet sich hiermit verbindlich zum {{ sport }}-Turnier der HTL Steyr
   an. Die
-  Teilnahmegebühr beträgt <strong>25€</strong>.
+  Teilnahmegebühr beträgt <strong>{{ money }}€</strong>.
 </p>
 
 <h2>Spielerliste</h2>
@@ -45,24 +45,24 @@
 <table>
   <tbody>
   <tr>
-    <td>1. {{getPlayer players 0}}</td>
-    <td>6. {{getPlayer players 5}}</td>
+    <td>1. {{ getPlayer players 0 }}</td>
+    <td>6. {{ getPlayer players 5 }}</td>
   </tr>
   <tr>
-    <td>2. {{getPlayer players 1}}</td>
-    <td>7. {{getPlayer players 6}}</td>
+    <td>2. {{ getPlayer players 1 }}</td>
+    <td>7. {{ getPlayer players 6 }}</td>
   </tr>
   <tr>
-    <td>3. {{getPlayer players 2}}</td>
-    <td>8. {{getPlayer players 7}}</td>
+    <td>3. {{ getPlayer players 2 }}</td>
+    <td>8. {{ getPlayer players 7 }}</td>
   </tr>
   <tr>
-    <td>4. {{getPlayer players 3}}</td>
-    <td>9. {{getPlayer players 8}}</td>
+    <td>4. {{ getPlayer players 3 }}</td>
+    <td>9. {{ getPlayer players 8 }}</td>
   </tr>
   <tr>
-    <td>5. {{getPlayer players 4}}</td>
-    <td>10. {{getPlayer players 9}}</td>
+    <td>5. {{ getPlayer players 4 }}</td>
+    <td>10. {{ getPlayer players 9 }}</td>
   </tr>
   </tbody>
 </table>
@@ -112,16 +112,9 @@
 </table>
 
 <p>Die an diesem Tag unterrichtenden Lehrer stimmen der Teilnahme zu.</p>
-<p>
-  Auswahlkriterien der Mannschaften bei mehr als 20 Teams:
-</p>
-<ul>
-  <li>Organisationsklasse und Vorjahressieger haben einen Fixplatz! Danach gleichmäßige Aufteilung auf alle Abteilungen
-    der HTL mit Losentscheid! Falls in einer Abteilung Startplätze übrig bleiben, werden sie den anderen Abteilungen
-    zugelost.
-  </li>
-  <li>Eine ev. Damenmannschaft hat einen fixen Starplatz.</li>
-</ul>
+
+<strong>Die Anmeldung ist bis spätestens {{ deadline }} abzugeben.</strong>
+<p>Genauere Informationen befinden sich in der <strong>tourney</strong> app unter "Turniere" und "Medien"!</p>
 
 ARGE BSP {{ year }}
 
