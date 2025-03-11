@@ -265,6 +265,27 @@ const onSubmitEdit = async () => {
     )
   }
 }
+
+const { data: matches } = await useFetch(
+  `/api/tournaments/${tournament.value.id}/matches`,
+)
+
+const hasMatches = computed(() => matches.value && matches.value.length > 0)
+
+const allTeamsRegistered = computed(() => {
+  return (
+    groups.value?.every((group) =>
+      group.teams.every(
+        (team) => team.registration?.status === "Abgeschlossen",
+      ),
+    ) ?? false
+  )
+})
+
+const canGoLive = computed(() => {
+  if (isTournamentLive.value) return true
+  return allTeamsRegistered.value && data.value?.teams === maxTeams.value
+})
 </script>
 
 <template>
@@ -301,23 +322,54 @@ const onSubmitEdit = async () => {
         <ModalConfirm v-model="isOpenConfirm" @confirm="mixGroups">
           <p>Möchtest du die Gruppen neu mischen?</p>
         </ModalConfirm>
-        <UButton
-          v-if="!tournament?.is_live"
-          label="Gruppen neu mischen..."
-          icon="i-heroicons-table-cells"
-          variant="soft"
-          color="yellow"
-          size="xs"
-          @click="isOpenConfirm = true"
-        />
-        <UButton
-          :label="liveLabel"
-          icon="i-heroicons-signal"
-          color="red"
-          variant="soft"
-          size="xs"
-          @click="isOpenLive = true"
-        />
+        <template v-if="hasMatches && !isTournamentLive">
+          <UTooltip text="Spiele existieren, keine Gruppenmischung möglich.">
+            <UButton
+              v-if="!tournament?.is_live"
+              label="Gruppen neu mischen..."
+              icon="i-heroicons-table-cells"
+              variant="soft"
+              color="yellow"
+              size="xs"
+              :disabled="hasMatches as boolean"
+              @click="isOpenConfirm = true"
+            />
+          </UTooltip>
+        </template>
+        <template v-else>
+          <UButton
+            v-if="!tournament?.is_live"
+            label="Gruppen neu mischen..."
+            icon="i-heroicons-table-cells"
+            variant="soft"
+            color="yellow"
+            size="xs"
+            @click="isOpenConfirm = true"
+          />
+        </template>
+        <template v-if="!canGoLive">
+          <UTooltip text="Alle Teams müssen akzeptiert sein">
+            <UButton
+              :label="liveLabel"
+              icon="i-heroicons-signal"
+              color="red"
+              variant="soft"
+              size="xs"
+              :disabled="!canGoLive"
+              @click="isOpenLive = true"
+            />
+          </UTooltip>
+        </template>
+        <template v-else>
+          <UButton
+            :label="liveLabel"
+            icon="i-heroicons-signal"
+            color="red"
+            variant="soft"
+            size="xs"
+            @click="isOpenLive = true"
+          />
+        </template>
         <ModalLive v-model="isOpenLive" @live="onSetLive" />
         <ModalDelete v-model="isOpenDelete" @delete="deletePlayer()">
           <p>Möchtest du diesen Schüler wirklich vom Team entfernen?</p>
