@@ -75,6 +75,7 @@ const creationSchema = z.object({
   location: z.string(),
   groups: z.number(),
   group_teams: z.number(),
+  knockout_interval: z.number(),
 })
 
 const creationState = reactive({
@@ -95,6 +96,7 @@ const creationState = reactive({
   location: "Sportplatz",
   groups: 0,
   group_teams: 0,
+  knockout_interval: 15,
 })
 
 watch(

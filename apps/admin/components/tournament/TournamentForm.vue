@@ -48,26 +48,41 @@ const thumbnails = computed(() => {
           />
         </UFormGroup>
 
-        <div
-          class="flex flex-col gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
-        >
-          <UFormGroup
-            label="Startdatum"
-            name="start_date"
-            description="An diesem Datum findet das Turnier statt."
-            required
+        <div class="flex gap-3">
+          <div
+            class="flex flex-col gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
           >
-            <UInput v-model="state.start_date" type="date" />
-          </UFormGroup>
-
-          <div class="flex space-x-3">
-            <UFormGroup label="Von" name="from" required class="grow">
-              <UInput v-model="state.from" type="time" :step="60" />
+            <UFormGroup
+              label="Startdatum"
+              name="start_date"
+              description="An diesem Datum findet es statt."
+              required
+            >
+              <UInput v-model="state.start_date" type="date" />
             </UFormGroup>
 
-            <UFormGroup label="Bis" name="to" required class="grow">
-              <UInput v-model="state.to" type="time" :step="60" />
+            <div class="flex space-x-3">
+              <UFormGroup label="Von" name="from" required class="grow">
+                <UInput v-model="state.from" type="time" :step="60" />
+              </UFormGroup>
+
+              <UFormGroup label="Bis" name="to" required class="grow">
+                <UInput v-model="state.to" type="time" :step="60" />
+              </UFormGroup>
+            </div>
+          </div>
+
+          <div
+            class="flex flex-col justify-between gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
+          >
+            <UFormGroup
+              label="Knockout Interval"
+              name="knockout_interval"
+              description="Matchlänge für Matches nach der Gruppenphase."
+              required
+            >
             </UFormGroup>
+            <UInput v-model="state.knockout_interval" type="number" />
           </div>
         </div>
       </div>

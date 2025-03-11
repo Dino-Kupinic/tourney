@@ -22,6 +22,7 @@ type Body = {
     last_edited_by_id: string
     groups: number
     group_teams: number
+    knockout_interval: number
   }
 }
 

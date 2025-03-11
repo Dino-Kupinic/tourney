@@ -21,6 +21,7 @@ type Body = {
   last_edited_by_id: string
   groups: number
   group_teams: number
+  knockout_interval: number
 }
 
 export default defineEventHandler(async (event) => {
@@ -39,6 +40,7 @@ export default defineEventHandler(async (event) => {
     last_edited_by_id,
     groups,
     group_teams,
+    knockout_interval,
   } = await readBody<Body>(event)
 
   if (
@@ -53,7 +55,8 @@ export default defineEventHandler(async (event) => {
     !location ||
     !last_edited_by_id ||
     !groups ||
-    !group_teams
+    !group_teams ||
+    !knockout_interval
   ) {
     throw createError({
       statusCode: 400,
@@ -76,6 +79,7 @@ export default defineEventHandler(async (event) => {
     last_edited_by_id,
     groups,
     group_teams,
+    knockout_interval,
   }
 
   const { data, error: tournamentError } = await supabase

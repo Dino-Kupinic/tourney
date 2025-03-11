@@ -12,7 +12,6 @@ DECLARE
   interval_minutes   INTERVAL := (p_interval_minutes || ' minutes')::INTERVAL;
   quarterfinal_teams REFCURSOR;
 BEGIN
-  -- Step 1: Identify the top 2 teams from each group
   CREATE TEMP TABLE top_teams AS
   WITH ranked_teams AS (SELECT t.id                                                                                              AS team_id,
                                t.name                                                                                            AS team_name,
@@ -38,7 +37,6 @@ BEGIN
   FROM ranked_teams
   WHERE rank <= 2;
 
-  -- Step 2: Generate quarter-final matches
   OPEN quarterfinal_teams FOR
     SELECT a.team_id AS team1,
            b.team_id AS team2
@@ -76,7 +74,6 @@ BEGIN
       AND b.group_name = 'Gruppe C'
       AND b.rank = 2;
 
-  -- Insert quarter-final matches
   LOOP
     FETCH quarterfinal_teams INTO team1, team2;
     EXIT WHEN NOT FOUND;
@@ -87,13 +84,11 @@ BEGIN
     start_time := start_time + interval_minutes;
   END LOOP;
 
-  -- Clean up temporary table
   CLOSE quarterfinal_teams;
   DROP TABLE top_teams;
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger to generate quarter-finals after group stage results
 CREATE OR REPLACE FUNCTION trigger_generate_quarterfinals()
   RETURNS TRIGGER AS
 $$
@@ -102,26 +97,23 @@ DECLARE
   v_round                   TEXT;
   group_stage_count         INT;
   group_stage_results_count INT;
+  v_knockout_interval       INT;
 BEGIN
-  -- Retrieve tournament_id and round from the match table
   SELECT m.tournament_id, m.round
   INTO v_tournament_id, v_round
   FROM public.match m
   WHERE m.id = NEW.match_id;
 
-  -- Ensure we have a valid tournament ID and that this match is from the group stage
   IF v_tournament_id IS NULL OR v_round <> 'Gruppenphase' THEN
     RETURN NEW;
   END IF;
 
-  -- Count the total number of group stage matches
   SELECT COUNT(*)
   INTO group_stage_count
   FROM public.match
   WHERE tournament_id = v_tournament_id
     AND round = 'Gruppenphase';
 
-  -- Count the number of group stage matches with results
   SELECT COUNT(*)
   INTO group_stage_results_count
   FROM public.match m
@@ -130,12 +122,16 @@ BEGIN
     AND m.round = 'Gruppenphase'
     AND r.id IS NOT NULL;
 
-  -- If all group stage results are available, generate quarter-finals
   IF group_stage_count = group_stage_results_count THEN
+    SELECT knockout_interval
+    INTO v_knockout_interval
+    FROM public.tournament
+    WHERE id = v_tournament_id;
+
     PERFORM generate_quarterfinals(
       v_tournament_id,
-      NOW()::TIME, -- Use the current time as the start time
-      15 -- Interval in minutes between matches
+      NOW()::TIME,
+      COALESCE(v_knockout_interval, 15)
             );
   END IF;
 
@@ -143,7 +139,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create the trigger
 CREATE OR REPLACE TRIGGER trigger_group_stage_results
   AFTER INSERT OR UPDATE
   ON public.result
