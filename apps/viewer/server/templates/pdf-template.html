@@ -5,135 +5,274 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anmeldung PDF</title>
   <style>
+    :root {
+      --background: #ffffff;
+      --foreground: #020817;
+      --muted: #eaeaea;
+      --muted-foreground: #717171;
+      --border: #b1b1b1;
+      --primary: #000000;
+      --primary-foreground: #ffffff;
+      --card-foreground: #020817;
+      --radius: 0.5rem;
+      --link-color: #0066cc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      margin: 64px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 48px;
+      color: var(--foreground);
+      background-color: var(--background);
+      line-height: 1.2;
+      font-size: 12pt;
+    }
+
+    h1 {
+      font-size: 28pt;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.7rem;
+    }
+
+    h2 {
+      font-size: 16pt;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-top: 1rem;
+      margin-bottom: 0.7rem;
+    }
+
+    p {
+      margin-bottom: 0.7rem;
+    }
+
+    strong {
+      font-weight: 600;
+    }
+
+    .section {
+      margin-bottom: 1.2rem;
     }
 
     table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 1rem;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    tr:last-child td:first-child {
+      border-bottom-left-radius: calc(var(--radius) - 1px);
+    }
+
+    tr:last-child td:last-child {
+      border-bottom-right-radius: calc(var(--radius) - 1px);
+    }
+
+    tr:first-child th:first-child {
+      border-top-left-radius: calc(var(--radius) - 1px);
+    }
+
+    tr:first-child th:last-child {
+      border-top-right-radius: calc(var(--radius) - 1px);
     }
 
     tr, td, th {
-      padding: 6px;
-      border: 1px solid black;
+      padding: 0.5rem 0.7rem;
+      text-align: left;
+    }
+
+    td, th {
+      border-bottom: 1px solid var(--border);
+    }
+
+    td:not(:last-child), th:not(:last-child) {
+      border-right: 1px solid var(--border);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    th {
+      background-color: var(--muted);
+      font-weight: 600;
+      color: var(--foreground);
+    }
+
+    td {
+      vertical-align: middle;
     }
 
     #info {
-      margin-top: 32px;
+      margin-top: 20px;
       float: right;
-      font-size: 12px;
+      font-size: 8pt;
       line-height: 1;
       width: auto;
-      border: 1px black solid;
-      padding: 8px;
+      border: 1px solid var(--border);
+      padding: 10px;
+      border-radius: var(--radius);
+      color: var(--muted-foreground);
+    }
+
+    code {
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+
+    .footer {
+      margin-top: 1rem;
+      padding-top: 0.7rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted-foreground);
+      font-size: 10pt;
+    }
+
+    .highlight {
+      background-color: var(--muted);
+      padding: 0.2rem 0.4rem;
+      border-radius: var(--radius);
+      display: inline-block;
+    }
+
+    .website-link {
+      color: var(--link-color);
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+
+    .website-link:hover {
+      text-decoration: underline;
+    }
+
+    .arrow {
+      display: inline-block;
+      margin-left: 4px;
     }
   </style>
 </head>
 <body>
-<h1>Anmeldung HTL-{{ sport }}turnier </h1>
-<h2>Termin: {{ date }}</h2>
+<div class="section">
+  <h1>Anmeldung HTL-{{ sport }}turnier </h1>
+  <h2>Termin: <code>{{ date }}</code></h2>
 
-<p>Die Klasse <strong>{{ schoolClass }}</strong> meldet sich hiermit verbindlich zum {{ sport }}-Turnier der HTL Steyr
-  an. Die
-  Teilnahmegebühr beträgt <strong>25€</strong>.
-</p>
+  <p>Die Klasse <strong>{{ schoolClass }}</strong> meldet sich hiermit verbindlich zum {{ sport }}-Turnier der HTL Steyr
+    an. Die
+    Teilnahmegebühr beträgt <strong>{{ money }}€</strong>.
+  </p>
+</div>
 
-<h2>Spielerliste</h2>
+<div class="section">
+  <h2>Spielerliste</h2>
 
-<table>
-  <tbody>
-  <tr>
-    <td>1. {{getPlayer players 0}}</td>
-    <td>6. {{getPlayer players 5}}</td>
-  </tr>
-  <tr>
-    <td>2. {{getPlayer players 1}}</td>
-    <td>7. {{getPlayer players 6}}</td>
-  </tr>
-  <tr>
-    <td>3. {{getPlayer players 2}}</td>
-    <td>8. {{getPlayer players 7}}</td>
-  </tr>
-  <tr>
-    <td>4. {{getPlayer players 3}}</td>
-    <td>9. {{getPlayer players 8}}</td>
-  </tr>
-  <tr>
-    <td>5. {{getPlayer players 4}}</td>
-    <td>10. {{getPlayer players 9}}</td>
-  </tr>
-  </tbody>
-</table>
+  <table>
+    <tbody>
+    <tr>
+      <td>1. {{ getPlayer players 0 }}</td>
+      <td>6. {{ getPlayer players 5 }}</td>
+    </tr>
+    <tr>
+      <td>2. {{ getPlayer players 1 }}</td>
+      <td>7. {{ getPlayer players 6 }}</td>
+    </tr>
+    <tr>
+      <td>3. {{ getPlayer players 2 }}</td>
+      <td>8. {{ getPlayer players 7 }}</td>
+    </tr>
+    <tr>
+      <td>4. {{ getPlayer players 3 }}</td>
+      <td>9. {{ getPlayer players 8 }}</td>
+    </tr>
+    <tr>
+      <td>5. {{ getPlayer players 4 }}</td>
+      <td>10. {{ getPlayer players 9 }}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
 
-<h2>Freistellung</h2>
+<div class="section">
+  <h2>Freistellung</h2>
 
-<table>
-  <thead>
-  <tr>
-    <th>Einheit / Gegenstand</th>
-    <th>Lehrer/-in</th>
-    <th>Unterschrift</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr>
-    <td>1.</td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>2.</td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>3.</td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>4.</td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>5.</td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>6.</td>
-    <td></td>
-    <td></td>
-  </tr>
-  </tbody>
-</table>
+  <table>
+    <thead>
+    <tr>
+      <th>Einheit / Gegenstand</th>
+      <th>Lehrer/-in</th>
+      <th>Unterschrift</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>1.</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>2.</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>3.</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>4.</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>5.</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>6.</td>
+      <td></td>
+      <td></td>
+    </tr>
+    </tbody>
+  </table>
 
-<p>Die an diesem Tag unterrichtenden Lehrer stimmen der Teilnahme zu.</p>
-<p>
-  Auswahlkriterien der Mannschaften bei mehr als 20 Teams:
-</p>
-<ul>
-  <li>Organisationsklasse und Vorjahressieger haben einen Fixplatz! Danach gleichmäßige Aufteilung auf alle Abteilungen
-    der HTL mit Losentscheid! Falls in einer Abteilung Startplätze übrig bleiben, werden sie den anderen Abteilungen
-    zugelost.
-  </li>
-  <li>Eine ev. Damenmannschaft hat einen fixen Starplatz.</li>
-</ul>
+  <p>Die an diesem Tag unterrichtenden Lehrer stimmen der Teilnahme zu.</p>
+</div>
 
-ARGE BSP {{ year }}
+<div class="section">
+  <strong class="highlight">Die Anmeldung ist bis spätestens {{ deadline }} abzugeben.</strong>
+  <p>Genauere Informationen befinden sich in der <strong>tourney</strong> app unter "Turniere" und "Medien"!</p>
+</div>
+
+<div class="footer">
+  ARGE BSP {{ year }}
+</div>
 
 <div id="info">
-  <p>Generiert von <code>TOURNEY</code></p>
+  <p>Dynamisch generiert von <code>TOURNEY</code></p>
   <p>
     <code>Timestamp: {{ timestamp }}</code>
   </p>
   <p>
     <code>id: {{ id }}</code>
   </p>
+  <p>Gefällt dir Tourney? Mehr auf:</p>
+  <p><a href="https://dino-kupinic.dev" class="website-link">https://dino-kupinic.dev <span class="arrow">↗</span></a></p>
 </div>
 
 </body>
 </html>
+

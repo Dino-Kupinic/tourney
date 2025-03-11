@@ -2,11 +2,19 @@ import puppeteer from "puppeteer"
 import Handlebars from "handlebars"
 import { H3Event } from "h3"
 import { useDateFormat } from "@vueuse/core"
-import type { Tables } from "~/types/database.types"
+import type { Enums, Tables } from "~/types/database.types"
 
 export default defineEventHandler(async (event: H3Event) => {
-  const { pdfName, sport, year, date, schoolClass, registration_id, team_id } =
-    await readBody(event)
+  const {
+    pdfName,
+    sport,
+    year,
+    date,
+    schoolClass,
+    registration_id,
+    team_id,
+    deadline,
+  } = await readBody(event)
 
   if (
     !sport ||
@@ -14,7 +22,8 @@ export default defineEventHandler(async (event: H3Event) => {
     !date ||
     !schoolClass ||
     !registration_id ||
-    !team_id
+    !team_id ||
+    !deadline
   ) {
     throw createError({
       statusCode: 400,
@@ -23,6 +32,7 @@ export default defineEventHandler(async (event: H3Event) => {
   }
   const timestamp = new Date().toISOString()
   const formattedDate = useDateFormat(date, "DD.MM.YYYY")
+  const formattedDeadline = useDateFormat(deadline, "DD.MM.YYYY")
   const players = await $fetch<Tables<"player">[]>(
     `/api/players/query/find-by-team/${team_id}`,
   )
@@ -34,9 +44,24 @@ export default defineEventHandler(async (event: H3Event) => {
   Handlebars.registerHelper("getPlayer", function (array, index) {
     return array[index] || ""
   })
+
+  let money
+  switch (sport as Enums<"sport_type">) {
+    case "Fußball":
+      money = 25
+      break
+    case "Basketball":
+      money = 12
+      break
+    case "Volleyball":
+      money = 15
+      break
+  }
+
   const template = Handlebars.compile(t)
   const html = template({
     date: formattedDate.value,
+    deadline: formattedDeadline.value,
     players: formattedPlayers,
     id: registration_id,
     pdfName,
@@ -44,6 +69,7 @@ export default defineEventHandler(async (event: H3Event) => {
     year,
     schoolClass,
     timestamp,
+    money,
   })
 
   const browser = await puppeteer.launch({
