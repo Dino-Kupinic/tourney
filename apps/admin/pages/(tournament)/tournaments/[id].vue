@@ -219,6 +219,7 @@ const editSchema = z.object({
   location: z.string(),
   groups: z.number(),
   group_teams: z.number(),
+  knockout_interval: z.number(),
 })
 
 const editState = reactive({
@@ -239,6 +240,7 @@ const editState = reactive({
   location: tournament.value.location,
   groups: tournament.value.groups,
   group_teams: tournament.value.group_teams,
+  knockout_interval: tournament.value.knockout_interval,
 })
 
 const isOpenEdit = ref<boolean>(false)
@@ -435,6 +437,10 @@ const canGoLive = computed(() => {
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-identification" />
               <p>{{ tournament?.group_teams }} Teams pro Gruppe</p>
+            </div>
+            <div class="flex items-center space-x-1">
+              <UIcon name="i-heroicons-clock" />
+              <p>{{ tournament?.knockout_interval }}min Knockout Spiele</p>
             </div>
           </div>
         </div>
