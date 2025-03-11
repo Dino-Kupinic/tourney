@@ -435,6 +435,7 @@ export type Database = {
           groups: number
           id: string
           is_live: boolean
+          knockout_interval: number | null
           last_edited_by_id: string
           location: string
           name: string
@@ -453,6 +454,7 @@ export type Database = {
           groups: number
           id?: string
           is_live?: boolean
+          knockout_interval?: number | null
           last_edited_by_id: string
           location?: string
           name: string
@@ -471,6 +473,7 @@ export type Database = {
           groups?: number
           id?: string
           is_live?: boolean
+          knockout_interval?: number | null
           last_edited_by_id?: string
           location?: string
           name?: string

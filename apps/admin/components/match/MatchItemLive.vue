@@ -159,7 +159,7 @@ const completeMatch = async () => {
         />
       </ClientOnly>
     </div>
-    <div class="flex flex-col items-center justify-between gap-1 px-6 py-3">
+    <div class="flex flex-col items-center justify-between px-6 py-2">
       <div class="flex w-full items-center justify-between">
         <div class="flex flex-col items-center space-y-1">
           <NuxtImg
@@ -170,8 +170,10 @@ const completeMatch = async () => {
               'dark:invert dark:filter': match.team1?.logo_variant === null,
             }"
           />
-          <p class="text-xs">{{ match.team1?.name }}</p>
-          <p class="text-xs text-gray-500">{{ match.team1?.group?.name }}</p>
+          <div class="flex flex-col items-center justify-center">
+            <p class="text-xs">{{ match.team1?.name }}</p>
+            <p class="text-xs text-gray-500">{{ match.team1?.group?.name }}</p>
+          </div>
           <div class="space-x-0.5">
             <UButton
               :ui="{ rounded: 'rounded-full' }"
@@ -205,8 +207,10 @@ const completeMatch = async () => {
               'dark:invert dark:filter': match.team2?.logo_variant === null,
             }"
           />
-          <p class="text-xs">{{ match.team2?.name }}</p>
-          <p class="text-xs text-gray-500">{{ match.team2?.group?.name }}</p>
+          <div class="flex flex-col items-center justify-center">
+            <p class="text-xs">{{ match.team2?.name }}</p>
+            <p class="text-xs text-gray-500">{{ match.team2?.group?.name }}</p>
+          </div>
           <div class="space-x-0.5">
             <UButton
               :ui="{ rounded: 'rounded-full' }"
