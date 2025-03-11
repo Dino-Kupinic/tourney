@@ -367,7 +367,7 @@ export type Database = {
           logo_variant_id: string | null
           name: string
           registration_id: string
-          tournament_id: string
+          tournament_id: string | null
         }
         Insert: {
           created_at?: string
@@ -377,7 +377,7 @@ export type Database = {
           logo_variant_id?: string | null
           name: string
           registration_id: string
-          tournament_id: string
+          tournament_id?: string | null
         }
         Update: {
           created_at?: string
@@ -387,7 +387,7 @@ export type Database = {
           logo_variant_id?: string | null
           name?: string
           registration_id?: string
-          tournament_id?: string
+          tournament_id?: string | null
         }
         Relationships: [
           {
@@ -654,6 +654,10 @@ export type Database = {
       }
     }
     Functions: {
+      add_rls_policies_for_misc: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_final: {
         Args: {
           p_tournament_id: string
@@ -692,6 +696,10 @@ export type Database = {
           p_team1_score: number
           p_team2_score: number
         }
+        Returns: undefined
+      }
+      update_registration_status: {
+        Args: Record<PropertyKey, never>
         Returns: undefined
       }
       update_tournament_results: {

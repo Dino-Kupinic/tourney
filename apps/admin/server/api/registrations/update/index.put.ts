@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     if (teams && teams.length > 0) {
       const { error: updateError } = await supabase
         .from("team")
-        .update({ group_id: null })
+        .update({ group_id: null, tournament_id: null })
         .in("registration_id", registrations)
 
       if (updateError) {

@@ -13,7 +13,7 @@ useHead({
   title: () => title.value,
 })
 const route = useRoute()
-const { data: tournament, refresh } =
+const { data: tournament, refresh: tournamentRefresh } =
   await useFetch<ParsedJsonTournament | null>(
     `/api/tournaments/${route.params.id}`,
   )
@@ -24,7 +24,9 @@ if (!tournament.value) {
   })
 }
 const tournamentName = ref<string>(tournament.value?.name ?? "Turnier")
-const { data } = await useFetch(`/api/tournaments/${tournament.value.id}/teams`)
+const { data, refresh: teamsRefresh } = await useFetch(
+  `/api/tournaments/${tournament.value.id}/teams`,
+)
 
 const maxTeams = computed(() => {
   switch (tournament.value?.sport) {
@@ -80,7 +82,7 @@ const onSetLive = async () => {
       },
     })
     isOpenLive.value = false
-    await refresh()
+    await tournamentRefresh()
     await fetchLiveTournaments()
     displaySuccessNotification(
       "Erfolgreich",
@@ -95,8 +97,10 @@ const onSetLive = async () => {
   }
 }
 
-const refreshTournament = () => {
-  refresh()
+const refreshTournament = async () => {
+  await tournamentRefresh()
+  await refreshGroups()
+  await teamsRefresh()
   displaySuccessNotification("Aktualisiert", "Die Daten wurde aktualisiert.")
 }
 
@@ -248,7 +252,7 @@ const onSubmitEdit = async () => {
       },
     })
     isOpenEdit.value = false
-    await refresh()
+    await tournamentRefresh()
     displaySuccessNotification(
       "Turnier bearbeitet",
       "Das Turnier wurde erfolgreich bearbeitet.",
