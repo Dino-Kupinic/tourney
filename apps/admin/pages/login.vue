@@ -16,16 +16,9 @@ const schema = z.object({
 })
 
 type Schema = z.output<typeof schema>
-
-// const state = reactive({
-//   email: undefined,
-//   password: undefined,
-// })
-
-// TODO: remove and use code above
 const state = reactive({
-  email: "dkupinic@htl-steyr.ac.at",
-  password: "a",
+  email: undefined,
+  password: undefined,
 })
 
 const { login } = useUser()
