@@ -125,23 +125,27 @@ If it works, great! You can now log in in the admin dashboard with the created u
 
 ### Further Steps
 
-#### Image Bucket
+#### Image Buckets
 
-1. Create `images` bucket like below:
+1. Create `images` and `misc` bucket like below:
 
 > [!NOTE]
 > This step might be automated in the future.
 
 ![img.png](.github/image_bucket.png)
+![img.png](.github/misc_bucket.png)
+*The `images` and `misc` bucket*
 
 2. Create the following folders in the `images` bucket:
 
 - `logos`
 - `variants`
+- `tournament`
 
-3. Move the images from `/resources/base` to the `logos` folder in the bucket.
-4. Move the images from `/resources/variants` to the `variants` folder in the bucket.
-5. It should look like this:
+3. Move the contents from `/resources/logos` to the `logos` folder in the bucket.
+4. Move the contents from `/resources/variants` to the `variants` folder in the bucket.
+5. Move the contents from `/resources/tournament` to the `tournament` folder in the bucket.
+6. It should look like this:
 
 ![img.png](.github/image_bucket_logos.png)
 *.svg logos in the logos folder*
@@ -149,9 +153,44 @@ If it works, great! You can now log in in the admin dashboard with the created u
 ![img.png](.github/image_bucket_variants.png)
 *.svg logo variants grouped in the variants folder*
 
+3. Add the `news.md` file to the `misc` bucket.
+
+![img.png](.github/news_file.png)
+
+![img.png](.github/misc_news.png)
+*The `news.md` file in the `misc` bucket*
+
+This file will be used to display news in the viewer app. It is written in markdown and edited in the dashboard.
+
+4. configure RLS policies
+
+Allow the public role to read from the `images` and `misc` bucket. In `Policies under storage.buckets` add the following policy:
+
+![img.png](.github/buckets_policy_read.png)
+
+Allow everyone to read the `images` bucket.
+
+![img.png](.github/image_bucket_policy.png)
+
+Allow authenticated users to do everything in the `misc` bucket.
+
+![img.png](.github/misc_policy.png)
+
+#### Cron Jobs
+
+1. enable cron in supabase
+
+![img.png](.github/cron_page.png)
+
+2. create the cron job to update registration status after expiration:
+
+![img.png](.github/cron_query.png)
+*The cron job query, can be found in `/resources/update_registration_status.sql`*
+
 #### Realtime
 
 Enable realtime for the table `match` and `result`.
+You can do this in the supabase dashboard by navigating to the table and enabling the realtime toggle.
 
 ## 🚀 Deployment
 
@@ -179,8 +218,6 @@ pnpm run app:monitor
 
 4. enjoy the app!
 
-// WIP
-
 ## 😄 Author
 
 - [@Dino Kupinic](https://www.github.com/Dino-Kupinic)
@@ -194,7 +231,8 @@ pnpm run app:monitor
 
 ## Contributing
 
-// WIP
+Contributions are always welcome! Feel free to create an issue or submit a pull request.
+Please follow coding standards and commit message conventions.
 
 ## 😊 License
 
