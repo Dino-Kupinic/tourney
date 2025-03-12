@@ -197,7 +197,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
             description="Matchlänge in Minuten, nach dieser Zeit folgt das nächste Match."
             required
           >
-            <UInput v-model="state.interval" />
+            <UInput v-model="state.interval" type="number" />
           </UFormGroup>
 
           <UFormGroup
