@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex flex-col gap-1 overflow-auto pb-12 pt-2">
+  <div class="flex flex-col gap-1 overflow-auto pt-2">
     <div
       class="shrink-0 overflow-hidden rounded-md border border-gray-300 dark:border-gray-700"
     >
