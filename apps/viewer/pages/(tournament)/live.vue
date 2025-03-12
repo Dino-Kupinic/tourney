@@ -95,13 +95,28 @@ const first = getTeamName(0)
 const second = getTeamName(1)
 const third = getTeamName(2)
 const fourth = getTeamName(3)
+
+const { isDesktop } = useDevice()
 </script>
 
 <template>
-  <div class="h-full w-full">
+  <PageHeader
+    v-if="isDesktop"
+    title="Live"
+    description="Verfolge hier das Turnier"
+  />
+  <div
+    :class="[
+      'h-full w-full',
+      isDesktop && 'rounded-md border dark:border-gray-800',
+    ]"
+  >
     <template v-if="tournaments.length">
       <div
-        class="w-full border-b bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900"
+        :class="[
+          'w-full border-b bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900',
+          isDesktop ? 'rounded-t-md' : '',
+        ]"
       >
         <USelect
           :options="tournaments"
@@ -116,18 +131,27 @@ const fourth = getTeamName(3)
       >
         <p>Visualisierung fehlgeschlagen</p>
       </div>
-      <div class="flex flex-col gap-2 p-3">
+
+      <div
+        :class="[
+          isDesktop ? 'lg:grid lg:grid-cols-2 lg:gap-4' : 'flex flex-col gap-2',
+          'p-3',
+        ]"
+      >
         <template v-if="results?.length">
-          <PageHeading>Gewinner</PageHeading>
-          <TournamentPlaces
-            :first="first"
-            :second="second"
-            :third="third"
-            :fourth="fourth"
-          />
+          <div class="lg:col-span-2">
+            <PageHeading>Gewinner</PageHeading>
+            <TournamentPlaces
+              :first="first"
+              :second="second"
+              :third="third"
+              :fourth="fourth"
+            />
+          </div>
         </template>
+
         <template v-else>
-          <div class="flex flex-col gap-1.5">
+          <div class="flex flex-col gap-1.5 lg:col-span-2">
             <div>
               <div
                 class="flex items-center justify-center space-x-1.5 rounded-md bg-red-50 px-2.5 py-0.5 ring-1 ring-inset ring-red-500 ring-opacity-25 dark:bg-red-500 dark:bg-opacity-10 dark:ring-red-400 dark:ring-opacity-25"
@@ -149,11 +173,16 @@ const fourth = getTeamName(3)
               class="flex flex-col gap-1.5 rounded-md bg-gray-50 p-3 dark:bg-gray-900"
             >
               <template v-if="liveMatches?.length">
-                <MatchItemLive
-                  v-for="match in liveMatches"
-                  :key="match.match_id!"
-                  :match
-                />
+                <div
+                  :class="[isDesktop ? 'lg:grid lg:grid-cols-2 lg:gap-3' : '']"
+                >
+                  <MatchItemLive
+                    v-for="match in liveMatches"
+                    :key="match.match_id!"
+                    :match
+                    class="lg:min-w-0"
+                  />
+                </div>
               </template>
               <template v-else>
                 <UAlert
@@ -166,6 +195,7 @@ const fourth = getTeamName(3)
               </template>
             </div>
           </div>
+
           <div class="flex flex-col gap-1.5">
             <UDivider>Anstehende Spiele</UDivider>
             <div
@@ -179,23 +209,25 @@ const fourth = getTeamName(3)
               />
             </div>
           </div>
-        </template>
-        <div class="flex flex-col gap-1.5">
-          <UDivider>Historie</UDivider>
-          <div
-            class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md bg-gray-50 p-3 pb-8 dark:bg-gray-900"
-          >
-            <!-- @vue-ignore -->
-            <ResultItem
-              v-for="result in history"
-              :match="result.match as Match"
-              :id="result.id"
-              :score1="result.team1_score"
-              :score2="result.team2_score"
-              :winner="result.winner_id"
-            />
-          </div>
+
           <div class="flex flex-col gap-1.5">
+            <UDivider>Historie</UDivider>
+            <div
+              class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md bg-gray-50 p-3 pb-8 dark:bg-gray-900"
+            >
+              <!-- @vue-ignore -->
+              <ResultItem
+                v-for="result in history"
+                :match="result.match as Match"
+                :id="result.id"
+                :score1="result.team1_score"
+                :score2="result.team2_score"
+                :winner="result.winner_id"
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5 lg:col-span-2">
             <UDivider>Platzierungen</UDivider>
             <USelect
               v-if="groups"
@@ -205,9 +237,13 @@ const fourth = getTeamName(3)
               value-attribute="id"
               option-attribute="name"
             />
-            <StandingsTable v-if="standings" :standings="standings" />
+            <StandingsTable
+              v-if="standings"
+              :standings="standings"
+              class="lg:max-w-full"
+            />
           </div>
-        </div>
+        </template>
       </div>
     </template>
     <template v-else>
