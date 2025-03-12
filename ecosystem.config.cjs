@@ -20,6 +20,7 @@ module.exports = {
       instances: 2,
       env: {
         NODE_ENV: "production",
+        NUXT_PUBLIC_CLIENT_URL: "http://localhost:3001",
       },
     },
   ],
