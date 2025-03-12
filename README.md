@@ -127,43 +127,6 @@ If it works, great! You can now log in in the admin dashboard with the created u
 
 #### Image Buckets
 
-1. Create `images` and `misc` bucket like below:
-
-> [!NOTE]
-> This step might be automated in the future.
-
-![img.png](.github/image_bucket.png)
-![img.png](.github/misc_bucket.png)
-*The `images` and `misc` bucket*
-
-2. Create the following folders in the `images` bucket:
-
-- `logos`
-- `variants`
-- `tournament`
-
-3. Move the contents from `/resources/logos` to the `logos` folder in the bucket.
-4. Move the contents from `/resources/variants` to the `variants` folder in the bucket.
-5. Move the contents from `/resources/tournament` to the `tournament` folder in the bucket.
-6. It should look like this:
-
-![img.png](.github/image_bucket_logos.png)
-*.svg logos in the logos folder*
-
-![img.png](.github/image_bucket_variants.png)
-*.svg logo variants grouped in the variants folder*
-
-3. Add the `news.md` file to the `misc` bucket.
-
-![img.png](.github/news_file.png)
-
-![img.png](.github/misc_news.png)
-*The `news.md` file in the `misc` bucket*
-
-This file will be used to display news in the viewer app. It is written in markdown and edited in the dashboard.
-
-4. configure RLS policies
-
 Allow the public role to read from the `images` and `misc` bucket. In `Policies under storage.buckets` add the following policy:
 
 ![img.png](.github/buckets_policy_read.png)
