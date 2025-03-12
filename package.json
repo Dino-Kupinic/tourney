@@ -1,6 +1,6 @@
 {
   "name": "tourney",
-  "version": "0.22.4",
+  "version": "0.22.5",
   "description": "This project is a web application for managing tournaments.",
   "workspaces": [
     "packages/*",
