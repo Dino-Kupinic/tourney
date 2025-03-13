@@ -62,12 +62,15 @@ const years = Array.from(
 const classYear = ref<string>(years[0])
 const encodedYear = computed(() => encodeURIComponent(classYear.value))
 
-const { data: classes } = await useFetch(
-  () => `/api/classes/${encodedYear.value}`,
+const { data: classes } = await useFetch<
   {
-    watch: [classYear],
-  },
-)
+    id: string
+    name: string
+    year: string
+  }[]
+>(() => `/api/classes/${encodedYear.value}`, {
+  watch: [classYear],
+})
 
 const creationSchemaMultiple = z.object({
   expire_date: z.string().date(),
