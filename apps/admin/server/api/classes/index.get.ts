@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient<Database>(event)
   const { data } = await supabase
     .from("class")
-    .select("name, year")
+    .select("*")
     .order("name", { ascending: false })
 
   return data

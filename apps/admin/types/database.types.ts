@@ -657,10 +657,6 @@ export type Database = {
       }
     }
     Functions: {
-      add_rls_policies_for_misc: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
       generate_final: {
         Args: {
           p_tournament_id: string
