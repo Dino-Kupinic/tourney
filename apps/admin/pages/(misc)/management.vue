@@ -7,7 +7,6 @@ useHead({
   title: () => title.value,
 })
 
-// State for managing classes
 const { data, refresh, status } = await useFetch("/api/classes", {
   transform: (item) => {
     if (!item) return []
@@ -19,9 +18,14 @@ const { data, refresh, status } = await useFetch("/api/classes", {
   },
 })
 
-// Selected rows for batch operations
-const selectedRows = ref<Tables<"class">[]>([])
-function select(row: Tables<"class">) {
+type ClassColumn = {
+  id: string
+  name: string
+  year: string
+}
+
+const selectedRows = ref<ClassColumn[]>([])
+function select(row: ClassColumn) {
   const index = selectedRows.value.findIndex((item) => item.id === row.id)
   if (index === -1) {
     selectedRows.value.push(row)
@@ -30,7 +34,6 @@ function select(row: Tables<"class">) {
   }
 }
 
-// Search functionality
 const search = ref<string>("")
 const tableData = computed(() => data.value || [])
 const filteredRows = computed(() => {
@@ -366,11 +369,6 @@ const onDelete = async () => {
           :rows="filteredRows"
           :columns="[
             {
-              key: 'select',
-              label: '',
-              sortable: false,
-            },
-            {
               key: 'name',
               label: 'Klasse',
               sortable: true,
@@ -382,7 +380,6 @@ const onDelete = async () => {
             {
               key: 'actions',
               label: 'Aktionen',
-              sortable: false,
             },
           ]"
           :sort="{ column: 'name', direction: 'asc' }"
@@ -399,14 +396,9 @@ const onDelete = async () => {
             },
             td: { base: 'max-w-[0] truncate', padding: 'py-2' },
           }"
+          v-model="selectedRows"
           @select="select"
         >
-          <template #select-data="{ row }">
-            <UCheckbox
-              :model-value="selectedRows.some((item) => item.id === row.id)"
-              @change="select(row)"
-            />
-          </template>
           <template #actions-data="{ row }">
             <div class="flex items-center gap-2">
               <UButton
@@ -418,16 +410,25 @@ const onDelete = async () => {
               />
             </div>
           </template>
+          <template #empty-state>
+            <EmptyState
+              v-model="search"
+              title="Keine Klassen gefunden"
+              description="Schulklassen für das ausgewählte Schuljahr wurden nicht gefunden."
+            />
+          </template>
         </UTable>
       </template>
       <template v-else>
-        <UAlert
-          icon="i-heroicons-information-circle"
-          color="primary"
-          variant="soft"
-          title="Keine Klassen gefunden"
-          description="Für das ausgewählte Schuljahr wurden keine Klassen gefunden. Erstellen Sie neue Klassen mit dem Button 'Neue Klasse...' oder 'Mehrere Klassen...'."
-        />
+        <div class="h-full w-full items-center justify-center">
+          <UAlert
+            icon="i-heroicons-information-circle"
+            color="primary"
+            variant="soft"
+            title="Keine Klassen gefunden"
+            description="Für das ausgewählte Schuljahr wurden keine Klassen gefunden. Erstellen Sie neue Klassen mit dem Button 'Neue Klasse...' oder 'Mehrere Klassen...'."
+          />
+        </div>
       </template>
     </div>
   </BasePageContent>
