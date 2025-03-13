@@ -3,35 +3,18 @@ import type { Database } from "~/types/database.types"
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient<Database>(event)
-  const body = await readBody(event)
+  const { classes, year } = await readBody(event)
 
-  const { prefix, count, year } = body
-
-  if (!prefix || !count || !year) {
+  if (!classes || !year) {
     throw createError({
-      message: "Prefix, count, and year are required",
+      message: "classes and year are required",
       statusCode: 400,
     })
   }
 
-  if (count < 1 || count > 20) {
-    throw createError({
-      message: "Count must be between 1 and 20",
-      statusCode: 400,
-    })
-  }
+  const insert = classes.map((name: string) => ({ name: name, year: year }))
 
-  const classes = []
-  for (let i = 1; i <= count; i++) {
-    // Create class names like "10a", "10b", etc.
-    const className = `${prefix}${String.fromCharCode(96 + i)}`
-    classes.push({ name: className, year })
-  }
-
-  const { data, error } = await supabase
-    .from("class")
-    .insert(classes)
-    .select()
+  const { data, error } = await supabase.from("class").insert(insert).select()
 
   if (error) {
     throw createError({

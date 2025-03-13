@@ -7,7 +7,29 @@ useHead({
   title: () => title.value,
 })
 
-const { data, refresh, status } = await useFetch("/api/classes", {
+const years = Array.from(
+  { length: 11 },
+  (_, i) =>
+    `${new Date().getFullYear() + i - 1}/${(new Date().getFullYear() + i).toString().slice(2)}`,
+)
+const selectedYear = ref<string>(years[0])
+const encodedYear = computed(() => encodeURIComponent(selectedYear.value))
+
+watch(selectedYear, () => {
+  selectedRows.value = []
+})
+
+const {
+  data,
+  refresh: refreshClasses,
+  status,
+} = await useFetch<
+  {
+    id: string
+    name: string
+    year: string
+  }[]
+>(() => `/api/classes/${encodedYear.value}`, {
   transform: (item) => {
     if (!item) return []
     return item.map((item) => ({
@@ -47,30 +69,23 @@ const filteredRows = computed(() => {
   })
 })
 
-// Modal states
 const isOpenDelete = ref<boolean>(false)
 const isOpenEdit = ref<boolean>(false)
 const isOpenCreate = ref<boolean>(false)
 const isOpenMultipleCreate = ref<boolean>(false)
+const isOpenInfo = ref<boolean>(false)
+const selectedClass = ref<ClassColumn | null>(null)
 
-// Year selection
-const years = Array.from(
-  { length: 11 },
-  (_, i) =>
-    `${new Date().getFullYear() + i - 1}/${(new Date().getFullYear() + i).toString().slice(2)}`,
-)
-const selectedYear = ref<string>(years[0])
-const encodedYear = computed(() => encodeURIComponent(selectedYear.value))
-
-// Fetch classes for selected year
-const { data: yearClasses, refresh: refreshYearClasses } = await useFetch(
-  () => `/api/classes/${encodedYear.value}`,
+const { data: yearClasses, refresh: refreshYearClasses } = await useFetch<
   {
-    watch: [selectedYear],
-  },
-)
+    id: string
+    name: string
+    year: string
+  }[]
+>(() => `/api/classes/${encodedYear.value}`, {
+  watch: [selectedYear],
+})
 
-// Schema for creating a single class
 const creationSchemaSingle = z.object({
   name: z.string().min(1, "Klassenname ist erforderlich"),
   year: z.string(),
@@ -81,23 +96,77 @@ const creationStateSingle = reactive({
   year: selectedYear.value,
 })
 
-// Schema for creating multiple classes
+const predefinedClasses = ref([
+  "1AHITN",
+  "2AHITN",
+  "3AHITN",
+  "4AHITN",
+  "1AHEL",
+  "2AHEL",
+  "3AHEL",
+  "4AHEL",
+  "1AHME",
+  "2AHME",
+  "3AHME",
+  "4AHME",
+  "1BHME",
+  "2BHME",
+  "3BHME",
+  "4BHME",
+  "1AHMBZ",
+  "2AHMBZ",
+  "3AHMBZ",
+  "4AHMBZ",
+  "1BHMBZ",
+  "2BHMBZ",
+  "3BHMBZ",
+  "4BHMBZ",
+  "1YHKUG",
+  "2YHKUG",
+  "3YHKUG",
+  "4YHKUG",
+  "1YHKUJ",
+  "2YHKUJ",
+  "3YHKUJ",
+  "4YHKUJ",
+  "1YHKUP",
+  "2YHKUP",
+  "3YHKUP",
+  "4YHKUP",
+  "1AFMBZ",
+  "2AFMBZ",
+  "3AFMBZ",
+  "4AFMBZ",
+])
+
 const creationSchemaMultiple = z.object({
-  prefix: z.string().min(1, "Präfix ist erforderlich"),
-  count: z
-    .number()
-    .min(1, "Mindestens eine Klasse")
-    .max(20, "Maximal 20 Klassen"),
+  classes: z.array(z.string()).min(1, "Mindestens eine Klasse"),
   year: z.string(),
 })
 
 const creationStateMultiple = reactive({
-  prefix: "",
-  count: 1,
+  classes: predefinedClasses.value,
   year: selectedYear.value,
 })
 
-// Schema for editing a class
+const customClassName = ref<string>("")
+const addCustomClass = () => {
+  if (
+    customClassName.value.trim() &&
+    !creationStateMultiple.classes.includes(customClassName.value.trim())
+  ) {
+    creationStateMultiple.classes.push(customClassName.value.trim())
+    customClassName.value = ""
+  }
+}
+
+const removeClass = (className: string) => {
+  const index = creationStateMultiple.classes.indexOf(className)
+  if (index !== -1) {
+    creationStateMultiple.classes.splice(index, 1)
+  }
+}
+
 const editSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Klassenname ist erforderlich"),
@@ -110,7 +179,6 @@ const editState = reactive({
   year: "",
 })
 
-// Create a single class
 const onSubmitCreateSingle = async () => {
   try {
     creationSchemaSingle.parse(creationStateSingle)
@@ -119,7 +187,7 @@ const onSubmitCreateSingle = async () => {
       body: creationStateSingle,
     })
     isOpenCreate.value = false
-    await refresh()
+    await refreshClasses()
     await refreshYearClasses()
     displaySuccessNotification(
       "Klasse erstellt",
@@ -134,7 +202,6 @@ const onSubmitCreateSingle = async () => {
   }
 }
 
-// Create multiple classes
 const onSubmitCreateMultiple = async () => {
   try {
     creationSchemaMultiple.parse(creationStateMultiple)
@@ -143,7 +210,7 @@ const onSubmitCreateMultiple = async () => {
       body: creationStateMultiple,
     })
     isOpenMultipleCreate.value = false
-    await refresh()
+    await refreshClasses()
     await refreshYearClasses()
     displaySuccessNotification(
       "Klassen erstellt",
@@ -158,7 +225,11 @@ const onSubmitCreateMultiple = async () => {
   }
 }
 
-// Edit a class
+const onInfo = (row: ClassColumn) => {
+  selectedClass.value = row
+  isOpenInfo.value = true
+}
+
 const onEdit = async (row: Tables<"class">) => {
   isOpenEdit.value = true
   editState.id = row.id
@@ -174,7 +245,7 @@ const onSubmitEdit = async () => {
       body: editState,
     })
     isOpenEdit.value = false
-    await refresh()
+    await refreshClasses()
     await refreshYearClasses()
     displaySuccessNotification(
       "Klasse aktualisiert",
@@ -189,7 +260,6 @@ const onSubmitEdit = async () => {
   }
 }
 
-// Delete selected classes
 const classIds = computed(() => selectedRows.value.map((row) => row.id))
 const onDelete = async () => {
   try {
@@ -199,7 +269,7 @@ const onDelete = async () => {
     })
     isOpenDelete.value = false
     selectedRows.value = []
-    await refresh()
+    await refreshClasses()
     await refreshYearClasses()
     displaySuccessNotification(
       "Klassen gelöscht",
@@ -212,6 +282,16 @@ const onDelete = async () => {
       "Die Klassen konnten nicht gelöscht werden.",
     )
   }
+}
+
+const { columns, items } = useClassTable(onEdit, onInfo, onDelete)
+const refresh = async () => {
+  await refreshClasses()
+  await refreshYearClasses()
+  displaySuccessNotification(
+    "Daten aktualisiert",
+    "Die Daten wurden aktualisiert.",
+  )
 }
 </script>
 
@@ -245,14 +325,13 @@ const onDelete = async () => {
         label="Mehrere Klassen..."
       />
       <UButton
-        v-if="selectedRows.length > 0"
+        v-if="selectedRows.length > 1"
         size="xs"
         color="red"
         variant="soft"
         @click="isOpenDelete = true"
-        label="Löschen"
+        label="Löschen..."
       />
-      <!-- Create Single Class Modal -->
       <ModalCreate
         title="Neue Klasse"
         v-model="isOpenCreate"
@@ -267,67 +346,71 @@ const onDelete = async () => {
             />
           </UFormGroup>
           <UFormGroup label="Klassenname">
-            <UInput v-model="creationStateSingle.name" placeholder="z.B. 10a" />
+            <UInput
+              v-model="creationStateSingle.name"
+              placeholder="z.B. 1AHITN"
+            />
           </UFormGroup>
         </div>
       </ModalCreate>
 
-      <!-- Create Multiple Classes Modal -->
       <ModalCreate
         title="Mehrere Klassen erstellen"
         v-model="isOpenMultipleCreate"
         @create="onSubmitCreateMultiple"
       >
         <div class="space-y-4">
-          <UFormGroup label="Schuljahr">
-            <USelect
-              v-model="creationStateMultiple.year"
-              :options="years"
-              placeholder="Schuljahr auswählen"
-            />
-          </UFormGroup>
-          <UFormGroup label="Präfix">
-            <UInput
-              v-model="creationStateMultiple.prefix"
-              placeholder="z.B. 10"
-            />
-          </UFormGroup>
-          <UFormGroup label="Anzahl">
-            <UInput
-              v-model.number="creationStateMultiple.count"
-              type="number"
-              min="1"
-              max="20"
-            />
-          </UFormGroup>
-          <UAlert
-            v-if="
-              creationStateMultiple.prefix && creationStateMultiple.count > 0
-            "
-            icon="i-heroicons-information-circle"
-            color="primary"
-            variant="soft"
-            title="Vorschau"
-          >
-            <p>Es werden folgende Klassen erstellt:</p>
-            <ul class="list-disc pl-5">
-              <li
-                v-for="i in Math.min(creationStateMultiple.count, 20)"
-                :key="i"
+          <div class="flex items-center justify-between gap-3">
+            <UFormGroup label="Schuljahr" class="grow">
+              <USelect
+                v-model="creationStateMultiple.year"
+                :options="years"
+                placeholder="Schuljahr auswählen"
+              />
+            </UFormGroup>
+            <UFormGroup label="Neue Klasse hinzufügen">
+              <div class="flex gap-2">
+                <UInput
+                  v-model="customClassName"
+                  placeholder="z.B. 1AHITN"
+                  @keyup.enter="addCustomClass"
+                />
+                <UButton
+                  icon="i-heroicons-plus"
+                  variant="soft"
+                  @click="addCustomClass"
+                />
+              </div>
+            </UFormGroup>
+          </div>
+
+          <UFormGroup label="Klassen">
+            <div
+              class="max-h-60 overflow-y-auto rounded border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-900"
+            >
+              <div
+                v-for="className in creationStateMultiple.classes"
+                :key="className"
+                class="group flex items-center justify-between border-b px-2 py-1 dark:border-gray-700"
               >
-                {{ creationStateMultiple.prefix
-                }}{{ String.fromCharCode(96 + i) }}
-              </li>
-            </ul>
-          </UAlert>
+                <span>{{ className }}</span>
+                <UButton
+                  icon="i-heroicons-x-mark"
+                  color="red"
+                  variant="ghost"
+                  size="xs"
+                  @click="removeClass(className)"
+                />
+              </div>
+            </div>
+          </UFormGroup>
         </div>
       </ModalCreate>
 
-      <!-- Edit Class Modal -->
-      <ModalCreate
+      <ModalEdit
         title="Klasse bearbeiten"
         v-model="isOpenEdit"
-        @create="onSubmitEdit"
+        @edit="onSubmitEdit"
       >
         <div class="space-y-4">
           <UFormGroup label="Schuljahr">
@@ -341,9 +424,16 @@ const onDelete = async () => {
             <UInput v-model="editState.name" placeholder="z.B. 10a" />
           </UFormGroup>
         </div>
-      </ModalCreate>
+      </ModalEdit>
 
-      <!-- Delete Classes Modal -->
+      <ModalInfo v-model="isOpenInfo">
+        <div class="space-y-4">
+          <pre class="overflow-auto rounded bg-gray-100 p-4 dark:bg-gray-800">{{
+            selectedClass
+          }}</pre>
+        </div>
+      </ModalInfo>
+
       <ModalDelete v-model="isOpenDelete" @delete="onDelete">
         <div class="space-y-4">
           <p>
@@ -363,25 +453,11 @@ const onDelete = async () => {
     </ToolbarContainer>
   </BasePageHeader>
   <BasePageContent>
-    <div class="h-full overflow-auto">
+    <div class="h-full overflow-auto pb-1">
       <template v-if="yearClasses && yearClasses.length > 0">
         <UTable
           :rows="filteredRows"
-          :columns="[
-            {
-              key: 'name',
-              label: 'Klasse',
-              sortable: true,
-            },
-            {
-              key: 'year',
-              label: 'Schuljahr',
-            },
-            {
-              key: 'actions',
-              label: 'Aktionen',
-            },
-          ]"
+          :columns="columns"
           :sort="{ column: 'name', direction: 'asc' }"
           :loading="status === 'pending'"
           :loading-state="{
@@ -401,13 +477,15 @@ const onDelete = async () => {
         >
           <template #actions-data="{ row }">
             <div class="flex items-center gap-2">
-              <UButton
-                color="primary"
-                variant="ghost"
-                icon="i-heroicons-pencil-square"
-                size="xs"
-                @click="onEdit(row)"
-              />
+              <UDropdown :items="items(row).value" :ui="{ width: 'w-auto' }">
+                <UButton
+                  color="gray"
+                  variant="ghost"
+                  icon="i-heroicons-ellipsis-horizontal-20-solid"
+                  size="2xs"
+                  square
+                />
+              </UDropdown>
             </div>
           </template>
           <template #empty-state>
@@ -420,15 +498,10 @@ const onDelete = async () => {
         </UTable>
       </template>
       <template v-else>
-        <div class="h-full w-full items-center justify-center">
-          <UAlert
-            icon="i-heroicons-information-circle"
-            color="primary"
-            variant="soft"
-            title="Keine Klassen gefunden"
-            description="Für das ausgewählte Schuljahr wurden keine Klassen gefunden. Erstellen Sie neue Klassen mit dem Button 'Neue Klasse...' oder 'Mehrere Klassen...'."
-          />
-        </div>
+        <EmptyState
+          title="Keine Klassen gefunden"
+          description="Schulklassen für das ausgewählte Schuljahr wurden nicht gefunden."
+        />
       </template>
     </div>
   </BasePageContent>

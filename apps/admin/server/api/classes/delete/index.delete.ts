@@ -12,10 +12,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { error } = await supabase
-    .from("class")
-    .delete()
-    .in("id", classIds)
+  const { error } = await supabase.from("class").delete().in("id", classIds)
 
   if (error) {
     throw createError({
@@ -23,6 +20,4 @@ export default defineEventHandler(async (event) => {
       statusCode: 500,
     })
   }
-
-  return { success: true }
 })
