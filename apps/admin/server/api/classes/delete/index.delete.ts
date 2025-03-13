@@ -2,13 +2,17 @@ import { serverSupabaseClient } from "#supabase/server"
 import type { Database } from "~/types/database.types"
 
 export default defineEventHandler(async (event) => {
-  const data = await readBody<string[]>(event)
   const supabase = await serverSupabaseClient<Database>(event)
+  const classIds = await readBody(event)
 
-  const { error } = await supabase
-    .from("registration")
-    .update({ hidden: true })
-    .in("id", data)
+  if (!classIds || !Array.isArray(classIds) || classIds.length === 0) {
+    throw createError({
+      message: "Class IDs are required",
+      statusCode: 400,
+    })
+  }
+
+  const { error } = await supabase.from("class").delete().in("id", classIds)
 
   if (error) {
     throw createError({

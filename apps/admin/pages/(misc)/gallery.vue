@@ -135,7 +135,7 @@ await fetchImages()
     </ToolbarContainer>
   </BasePageHeader>
 
-  <div class="p-6">
+  <div class="p-3">
     <div
       v-if="images.length === 0 && !isUploading"
       class="flex h-64 items-center justify-center rounded-md border border-dashed border-gray-300 dark:border-gray-700"
@@ -153,7 +153,7 @@ await fetchImages()
 
     <div
       v-else
-      class="grid max-h-[calc(100vh-120px)] grid-cols-2 gap-4 overflow-y-auto sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+      class="grid max-h-[calc(100vh-120px)] grid-cols-2 gap-4 overflow-y-auto p-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
     >
       <div
         v-for="image in images"
