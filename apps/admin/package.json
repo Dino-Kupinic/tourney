@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@nuxt/content": "2.13.4",
+    "@unovis/ts": "^1.5.1",
+    "@unovis/vue": "^1.5.1",
     "@vue-flow/background": "^1.3.2",
     "@vue-flow/controls": "^1.1.2",
     "@vue-flow/core": "^1.42.1",
