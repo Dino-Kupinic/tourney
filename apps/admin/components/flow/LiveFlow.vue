@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { Node, Edge } from "@vue-flow/core"
-import { VueFlow, useVueFlow } from "@vue-flow/core"
+import { VueFlow, useVueFlow, type Node, type Edge } from "@vue-flow/core"
 import { Background } from "@vue-flow/background"
 import { Controls } from "@vue-flow/controls"
 import { MiniMap } from "@vue-flow/minimap"
+import TeamNode from "./TeamNode.vue"
 import TournamentMatchNode from "./TournamentMatchNode.vue"
+import GroupNode from "./GroupNode.vue"
 
-// Import Vue Flow styles
 import "@vue-flow/core/dist/style.css"
 import "@vue-flow/core/dist/theme-default.css"
 import "@vue-flow/controls/dist/style.css"
@@ -16,164 +16,260 @@ const { tournamentId } = defineProps<{
   tournamentId: string
 }>()
 
-// Fetch tournament data by phases
-const {
-  data: tournamentData,
-  status,
-  error,
-} = await useFetch(`/api/tournaments/${tournamentId}/phases`)
+const { data: tournamentData } = await useFetch(
+  `/api/tournaments/${tournamentId}/phases`,
+)
 
-// Generate nodes for the tournament flow
-const generateNodes = () => {
-  if (!tournamentData.value) return []
+const nodes = ref<Node[]>([])
+const edges = ref<Edge[]>([])
 
-  const nodes: Node[] = []
-  const spacing = 200
-  const groupSpacing = 150
+// Create nodes and edges when tournament data is available
+watchEffect(() => {
+  if (!tournamentData.value) return
 
-  // Group stage nodes
-  tournamentData.value.groups.forEach((group, groupIndex) => {
-    // Group container node
-    nodes.push({
-      id: `group-${groupIndex}`,
+  const data = tournamentData.value
+  const nodeList: Node[] = []
+  const edgeList: Edge[] = []
+
+  // Constants for positioning
+  const HORIZONTAL_SPACING = 250
+  const GROUP_VERTICAL_SPACING = 300 // Increased from 250 to 400 for more spacing
+  const TEAM_HEIGHT = 30
+  const GROUP_PADDING = 100
+
+  // Create group nodes with teams as children
+  data.groups.forEach((group, groupIndex) => {
+    // Calculate group height based on number of teams
+    const groupHeight = GROUP_PADDING + group.teams.length * TEAM_HEIGHT
+
+    // Create group parent node
+    const groupNode: Node = {
+      id: `group-${group.id}`,
+      type: "group",
+      data: { label: group.name },
+      position: { x: 0, y: groupIndex * GROUP_VERTICAL_SPACING },
+      style: {
+        width: "200px",
+        height: `${groupHeight}px`,
+      },
+    }
+    nodeList.push(groupNode)
+
+    // Create team nodes as children of the group node
+    group.teams.forEach((team, teamIndex) => {
+      const teamNode: Node = {
+        id: `team-${group.id}-${team.id}`,
+        type: "team",
+        data: {
+          label: team.name,
+          teams: [team.name],
+          nodeType: "team",
+        },
+        position: { x: 25, y: 50 + teamIndex * TEAM_HEIGHT },
+        parentNode: `group-${group.id}`,
+        extent: "parent",
+      }
+      nodeList.push(teamNode)
+    })
+  })
+
+  // Create quarterfinal nodes
+  data.phases.quarterFinals.forEach((match, index) => {
+    const matchNode: Node = {
+      id: `quarterfinal-${match.match_id}`,
       type: "tournamentMatch",
       data: {
-        label: group.name,
-        teams: group.teams,
-        nodeType: "group",
+        label: "Viertelfinale",
+        teams: [match.team1_name, match.team2_name],
+        winner: match.result?.winner_id
+          ? match.result.winner_id === match.team1_id
+            ? match.team1_name
+            : match.team2_name
+          : undefined,
+        nodeType: "quarterfinal",
       },
-      position: { x: 0, y: groupIndex * groupSpacing },
-    })
+      position: { x: HORIZONTAL_SPACING, y: index * GROUP_VERTICAL_SPACING },
+    }
+    nodeList.push(matchNode)
+
+    // Connect group nodes to quarterfinals
+    // Connect each group to the quarterfinals based on the teams in the match
+    const team1GroupId = data.groups.find((group) =>
+      group.teams.some((team) => team.id === match.team1_id),
+    )?.id
+
+    const team2GroupId = data.groups.find((group) =>
+      group.teams.some((team) => team.id === match.team2_id),
+    )?.id
+
+    if (team1GroupId) {
+      edgeList.push({
+        id: `edge-group-${team1GroupId}-to-quarterfinal-${match.match_id}`,
+        source: `group-${team1GroupId}`,
+        target: `quarterfinal-${match.match_id}`,
+        type: "smoothstep",
+      })
+    }
+
+    if (team2GroupId && team2GroupId !== team1GroupId) {
+      edgeList.push({
+        id: `edge-group-${team2GroupId}-to-quarterfinal-${match.match_id}`,
+        source: `group-${team2GroupId}`,
+        target: `quarterfinal-${match.match_id}`,
+        type: "smoothstep",
+      })
+    }
   })
 
-  // Quarterfinal nodes
-  Object.entries(tournamentData.value.results.quarterfinals).forEach(
-    ([id, match], index) => {
-      nodes.push({
-        id,
-        type: "tournamentMatch",
-        data: {
-          label: `Viertelfinale ${index + 1}`,
-          teams: match.teams,
-          nodeType: "quarterfinal",
-          winner: match.winner,
-        },
-        position: { x: spacing, y: index * groupSpacing },
-      })
-    },
-  )
-
-  // Semifinal nodes
-  Object.entries(tournamentData.value.results.semifinals).forEach(
-    ([id, match], index) => {
-      nodes.push({
-        id,
-        type: "tournamentMatch",
-        data: {
-          label: `Semifinale ${index + 1}`,
-          teams: match.teams,
-          nodeType: "semifinal",
-          winner: match.winner,
-        },
-        position: {
-          x: spacing * 2,
-          y: index * groupSpacing + groupSpacing / 2,
-        },
-      })
-    },
-  )
-
-  // Final node
-  nodes.push({
-    id: "final",
-    type: "tournamentMatch",
-    data: {
-      label: "Finale",
-      teams: tournamentData.value.results.final.teams,
-      nodeType: "final",
-      winner: tournamentData.value.results.final.winner,
-    },
-    position: { x: spacing * 3, y: groupSpacing / 2 },
-  })
-
-  // Winner node (if there is a winner)
-  if (tournamentData.value.results.final.winner) {
-    nodes.push({
-      id: "winner",
+  // Create semifinal nodes
+  data.phases.semiFinals.forEach((match, index) => {
+    const matchNode: Node = {
+      id: `semifinal-${match.match_id}`,
       type: "tournamentMatch",
       data: {
-        label: "Turniersieger",
-        teams: [tournamentData.value.results.final.winner],
-        nodeType: "winner",
+        label: "Semifinale",
+        teams: [match.team1_name, match.team2_name],
+        winner: match.result?.winner_id
+          ? match.result.winner_id === match.team1_id
+            ? match.team1_name
+            : match.team2_name
+          : undefined,
+        nodeType: "semifinal",
       },
-      position: { x: spacing * 4, y: groupSpacing / 2 },
+      position: {
+        x: HORIZONTAL_SPACING * 2,
+        y: index * GROUP_VERTICAL_SPACING + GROUP_VERTICAL_SPACING / 2,
+      },
+    }
+    nodeList.push(matchNode)
+
+    // Connect quarterfinals to semifinals
+    edgeList.push({
+      id: `edge-to-semifinal-${index}-1`,
+      source: `quarterfinal-${data.phases.quarterFinals[index * 2]?.match_id}`,
+      target: `semifinal-${match.match_id}`,
+      type: "smoothstep",
     })
-  }
 
-  return nodes
-}
+    if (data.phases.quarterFinals[index * 2 + 1]) {
+      edgeList.push({
+        id: `edge-to-semifinal-${index}-2`,
+        source: `quarterfinal-${data.phases.quarterFinals[index * 2 + 1].match_id}`,
+        target: `semifinal-${match.match_id}`,
+        type: "smoothstep",
+      })
+    }
+  })
 
-// Generate edges for the tournament flow
-const generateEdges = () => {
-  if (!tournamentData.value) return []
+  // Create third place match node
+  if (data.phases.thirdPlace) {
+    const thirdPlaceNode: Node = {
+      id: `thirdplace-${data.phases.thirdPlace.match_id}`,
+      type: "tournamentMatch",
+      data: {
+        label: "Kleines Finale",
+        teams: [
+          data.phases.thirdPlace.team1_name,
+          data.phases.thirdPlace.team2_name,
+        ],
+        winner: data.phases.thirdPlace.result?.winner_id
+          ? data.phases.thirdPlace.result.winner_id ===
+            data.phases.thirdPlace.team1_id
+            ? data.phases.thirdPlace.team1_name
+            : data.phases.thirdPlace.team2_name
+          : undefined,
+        nodeType: "final",
+      },
+      position: { x: HORIZONTAL_SPACING * 3, y: GROUP_VERTICAL_SPACING },
+    }
+    nodeList.push(thirdPlaceNode)
 
-  const edges: Edge[] = []
-
-  // Connect group nodes to quarterfinals
-  const groupCount = tournamentData.value.groups.length
-  const qfCount = Object.keys(tournamentData.value.results.quarterfinals).length
-
-  if (groupCount > 0 && qfCount > 0) {
-    // Create connections from groups to quarterfinals
-    tournamentData.value.groups.forEach((_, groupIndex) => {
-      Object.keys(tournamentData.value.results.quarterfinals).forEach(
-        (qfId) => {
-          edges.push({
-            id: `e-g${groupIndex}-${qfId}`,
-            source: `group-${groupIndex}`,
-            target: qfId,
-          })
-        },
-      )
-    })
-  }
-
-  // Connect quarterfinals to semifinals
-  Object.keys(tournamentData.value.results.quarterfinals).forEach((qfId) => {
-    Object.keys(tournamentData.value.results.semifinals).forEach((sfId) => {
-      edges.push({
-        id: `e-${qfId}-${sfId}`,
-        source: qfId,
-        target: sfId,
+    // Connect semifinals to third place match
+    data.phases.semiFinals.forEach((match, index) => {
+      edgeList.push({
+        id: `edge-to-thirdplace-${index}`,
+        source: `semifinal-${match.match_id}`,
+        target: `thirdplace-${data.phases.thirdPlace.match_id}`,
+        type: "smoothstep",
+        style: { strokeDasharray: "5, 5" }, // Dashed line for losers
       })
     })
-  })
-
-  // Connect semifinals to final
-  Object.keys(tournamentData.value.results.semifinals).forEach((sfId) => {
-    edges.push({ id: `e-${sfId}-final`, source: sfId, target: "final" })
-  })
-
-  // Connect final to winner (if there is a winner)
-  if (tournamentData.value.results.final.winner) {
-    edges.push({ id: "e-final-winner", source: "final", target: "winner" })
   }
 
-  return edges
-}
+  // Create final match node
+  if (data.phases.final) {
+    const finalNode: Node = {
+      id: `final-${data.phases.final.match_id}`,
+      type: "tournamentMatch",
+      data: {
+        label: "Finale",
+        teams: [data.phases.final.team1_name, data.phases.final.team2_name],
+        winner: data.phases.final.result?.winner_id
+          ? data.phases.final.result.winner_id === data.phases.final.team1_id
+            ? data.phases.final.team1_name
+            : data.phases.final.team2_name
+          : undefined,
+        nodeType: "final",
+      },
+      position: { x: HORIZONTAL_SPACING * 3, y: 0 },
+    }
+    nodeList.push(finalNode)
 
-// Create reactive nodes and edges that update when tournament data changes
-const nodes = computed<Node[]>(() => generateNodes())
-const edges = computed<Edge[]>(() => generateEdges())
+    // Connect semifinals to final
+    data.phases.semiFinals.forEach((match, index) => {
+      edgeList.push({
+        id: `edge-to-final-${index}`,
+        source: `semifinal-${match.match_id}`,
+        target: `final-${data.phases.final.match_id}`,
+        type: "smoothstep",
+      })
+    })
 
-// Loading state for the flow visualization
-const isLoading = computed(() => status.value === "pending")
+    // Add winner node if there is one
+    if (data.winner) {
+      // Find the team name for the winner
+      let winnerTeamName = ""
+      data.groups.forEach((group) => {
+        group.teams.forEach((team) => {
+          if (team.id === data.winner.team_id) {
+            winnerTeamName = team.name
+          }
+        })
+      })
+
+      if (winnerTeamName) {
+        const winnerNode: Node = {
+          id: "tournament-winner",
+          type: "tournamentMatch",
+          data: {
+            label: "Turniersieger",
+            teams: [winnerTeamName],
+            nodeType: "winner",
+          },
+          position: { x: HORIZONTAL_SPACING * 4, y: 0 },
+        }
+        nodeList.push(winnerNode)
+
+        edgeList.push({
+          id: "edge-to-winner",
+          source: `final-${data.phases.final.match_id}`,
+          target: "tournament-winner",
+          type: "smoothstep",
+        })
+      }
+    }
+  }
+
+  nodes.value = nodeList
+  edges.value = edgeList
+})
 </script>
 
 <template>
   <VueFlow
-    :nodes="nodes"
-    :edges="edges"
+    v-if="tournamentData"
+    v-model:nodes="nodes"
+    v-model:edges="edges"
     class="bg-gray-100 dark:bg-gray-800"
     :default-viewport="{ zoom: 1.5 }"
     :min-zoom="0.2"
@@ -183,8 +279,17 @@ const isLoading = computed(() => status.value === "pending")
     <MiniMap pannable zoomable />
     <Controls position="top-left" />
 
-    <template #node-tournamentMatch="nodeProps">
-      <TournamentMatchNode v-bind="nodeProps" />
+    <template #node-tournamentMatch="matchNodeProps">
+      <TournamentMatchNode v-bind="matchNodeProps" />
+    </template>
+    <template #node-team="teamNodeProps">
+      <TeamNode v-bind="teamNodeProps" />
+    </template>
+    <template #node-group="groupNodeProps">
+      <GroupNode v-bind="groupNodeProps" />
     </template>
   </VueFlow>
+  <div v-else class="flex h-full items-center justify-center">
+    <p class="text-gray-500">Loading tournament data...</p>
+  </div>
 </template>

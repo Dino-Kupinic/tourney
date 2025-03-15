@@ -1,9 +1,5 @@
-import { serverSupabaseClient } from "#supabase/server"
-import type { Database } from "~/types/database.types"
-import type { Match } from "~/types/match"
-
 export default defineEventHandler(async (event) => {
-  const supabase = await serverSupabaseClient<Database>(event)
+  const supabase = await useDatabase(event)
   const id = getRouterParam(event, "id")
 
   if (!id) {
@@ -13,26 +9,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Fetch all matches for this tournament, grouped by phase
-  const { data: matches, error } = await supabase
-    .from("matches_status")
-    .select(
-      "*, team1:team1_id(*, group:group_id(*), logo:logo_id(*), logo_variant:logo_variant_id(*)), team2:team2_id(*, group:group_id(*), logo:logo_id(*), logo_variant:logo_variant_id(*))"
-    )
-    .eq("tournament_id", id)
-    .order("start_time", { ascending: true })
-
-  if (error) {
-    throw createError({
-      message: error.message,
-      statusCode: 500,
-    })
-  }
-
-  // Fetch groups for this tournament
+  // Get groups and teams for the tournament
   const { data: groups, error: groupsError } = await supabase
     .from("group")
-    .select("*, teams:team(name)")
+    .select("id, name")
     .eq("tournament_id", id)
 
   if (groupsError) {
@@ -42,85 +22,100 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Format groups data
-  const formattedGroups = groups?.map((group) => ({
-    name: group.name,
-    teams: group.teams?.map((team) => team.name) || [],
-  })) || []
+  // Get teams for each group
+  const groupsWithTeams = await Promise.all(
+    groups.map(async (group) => {
+      const { data: teams, error: teamsError } = await supabase
+        .from("team")
+        .select("id, name")
+        .eq("group_id", group.id)
 
-  // Group matches by tournament phase
-  const matchesByPhase = matches?.reduce((acc, match) => {
-    const phase = match.round
-    if (!acc[phase]) {
-      acc[phase] = []
-    }
-    acc[phase].push(match)
-    return acc
-  }, {} as Record<string, typeof matches>)
+      if (teamsError) {
+        throw createError({
+          message: teamsError.message,
+          statusCode: 500,
+        })
+      }
 
-  // Determine winners for each phase
-  const winners: Record<string, Record<string, string>> = {}
+      return {
+        id: group.id,
+        name: group.name,
+        teams: teams || [],
+      }
+    })
+  )
 
-  // Process group stage winners
-  if (matchesByPhase?.Gruppenphase) {
-    winners.Gruppenphase = {}
-    formattedGroups.forEach((group) => {
-      // In a real implementation, this would calculate group standings
-      // For now, we'll just take the first two teams from each group
-      winners.Gruppenphase[group.name] = group.teams.slice(0, 2)
+  // Get all matches for the tournament
+  const { data: matches, error: matchesError } = await supabase
+    .from("matches_status")
+    .select("*")
+    .eq("tournament_id", id)
+    .order("start_time", { ascending: true })
+
+  if (matchesError) {
+    throw createError({
+      message: matchesError.message,
+      statusCode: 500,
     })
   }
 
-  // Process knockout stage winners
-  const processPhaseWinners = (phase: string) => {
-    if (matchesByPhase?.[phase]) {
-      winners[phase] = {}
-      matchesByPhase[phase].forEach((match, index) => {
-        const matchId = `${phase.toLowerCase().replace(/[^a-z]/g, '')}_${index + 1}`
-        if (match.team1_score !== null && match.team2_score !== null) {
-          const winnerTeam = match.team1_score > match.team2_score 
-            ? match.team1?.name 
-            : match.team2?.name
-          winners[phase][matchId] = winnerTeam || ''
-        }
-      })
-    }
+  // Get results for matches
+  const { data: results, error: resultsError } = await supabase
+    .from("result")
+    .select("match_id, team1_score, team2_score, winner_id")
+    .in(
+      "match_id",
+      matches.map((match) => match.match_id)
+    )
+
+  if (resultsError) {
+    throw createError({
+      message: resultsError.message,
+      statusCode: 500,
+    })
   }
 
-  processPhaseWinners('Viertelfinale')
-  processPhaseWinners('Semifinale')
-  processPhaseWinners('Finale')
+  // Get tournament winner if exists
+  const { data: tournamentResults, error: tournamentResultsError } = await supabase
+    .from("tournament_result")
+    .select("team_id, position")
+    .eq("tournament_id", id)
+    .eq("position", 1)
+    .limit(1)
+
+  if (tournamentResultsError) {
+    throw createError({
+      message: tournamentResultsError.message,
+      statusCode: 500,
+    })
+  }
+
+  // Organize matches by phase
+  const groupPhaseMatches = matches.filter((match) => match.round === "Gruppenphase")
+  const quarterFinalMatches = matches.filter((match) => match.round === "Viertelfinale")
+  const semiFinalMatches = matches.filter((match) => match.round === "Semifinale")
+  const finalMatch = matches.find((match) => match.round === "Finale")
+  const thirdPlaceMatch = matches.find((match) => match.round === "Kleines Finale")
+
+  // Add results to matches
+  const matchesWithResults = matches.map((match) => {
+    const result = results.find((r) => r.match_id === match.match_id)
+    return {
+      ...match,
+      result: result || null,
+    }
+  })
 
   return {
-    groups: formattedGroups,
-    results: {
-      groupWinners: winners.Gruppenphase || {},
-      quarterfinals: matchesByPhase?.Viertelfinale?.reduce((acc, match, index) => {
-        const id = `qf${index + 1}`
-        acc[id] = {
-          teams: [match.team1?.name || 'Pending', match.team2?.name || 'Pending'],
-          winner: winners.Viertelfinale?.[`viertelfinale_${index + 1}`] || null
-        }
-        return acc
-      }, {} as Record<string, {teams: string[], winner: string | null}>) || {},
-      semifinals: matchesByPhase?.Semifinale?.reduce((acc, match, index) => {
-        const id = `sf${index + 1}`
-        acc[id] = {
-          teams: [match.team1?.name || 'Pending', match.team2?.name || 'Pending'],
-          winner: winners.Semifinale?.[`semifinale_${index + 1}`] || null
-        }
-        return acc
-      }, {} as Record<string, {teams: string[], winner: string | null}>) || {},
-      final: matchesByPhase?.Finale?.[0] ? {
-        teams: [
-          matchesByPhase.Finale[0].team1?.name || 'Pending',
-          matchesByPhase.Finale[0].team2?.name || 'Pending'
-        ],
-        winner: winners.Finale?.finale_1 || null
-      } : {
-        teams: ['Pending', 'Pending'],
-        winner: null
-      }
-    }
+    groups: groupsWithTeams,
+    matches: matchesWithResults,
+    phases: {
+      groupPhase: groupPhaseMatches,
+      quarterFinals: quarterFinalMatches,
+      semiFinals: semiFinalMatches,
+      final: finalMatch || null,
+      thirdPlace: thirdPlaceMatch || null,
+    },
+    winner: tournamentResults && tournamentResults.length > 0 ? tournamentResults[0] : null,
   }
 })
