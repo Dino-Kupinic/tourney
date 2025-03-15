@@ -246,7 +246,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
   </BasePageHeader>
   <BasePageContent>
     <div class="h-full w-full">
-      <div class="h-2/3">
+      <div class="h-1/3">
         <ClientOnly>
           <LiveFlow :tournament-id="tournament?.id as string" />
           <template #fallback>
@@ -259,7 +259,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
         </ClientOnly>
       </div>
       <div
-        class="flex h-1/3 justify-between gap-6 border-t border-gray-200 p-6 pt-3 dark:border-gray-700"
+        class="flex h-2/3 justify-between gap-6 border-t border-gray-200 p-6 pt-3 dark:border-gray-700"
       >
         <div class="flex w-1/3 flex-col gap-0.5">
           <UTabs

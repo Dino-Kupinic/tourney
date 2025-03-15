@@ -139,7 +139,7 @@ const completeMatch = async () => {
         />
         <UBadge
           :label="match.start_time!"
-          color="indigo"
+          color="white"
           size="xs"
           variant="subtle"
           icon="i-heroicons-clock"
@@ -150,7 +150,7 @@ const completeMatch = async () => {
         <UBadge
           :label="formattedTime"
           icon="i-heroicons-clock"
-          color="primary"
+          color="white"
           size="xs"
           variant="subtle"
           :trailing="false"
