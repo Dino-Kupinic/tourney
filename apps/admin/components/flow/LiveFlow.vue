@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { VueFlow, useVueFlow, type Node, type Edge } from "@vue-flow/core"
+import { VueFlow, type Node, type Edge } from "@vue-flow/core"
 import { Background } from "@vue-flow/background"
 import { Controls } from "@vue-flow/controls"
 import { MiniMap } from "@vue-flow/minimap"
-import TeamNode from "./TeamNode.vue"
-import TournamentMatchNode from "./TournamentMatchNode.vue"
-import GroupNode from "./GroupNode.vue"
 
 import "@vue-flow/core/dist/style.css"
 import "@vue-flow/core/dist/theme-default.css"
@@ -23,6 +20,11 @@ const { data: tournamentData } = await useFetch(
 const nodes = ref<Node[]>([])
 const edges = ref<Edge[]>([])
 
+const HORIZONTAL_SPACING = 250
+const GROUP_VERTICAL_SPACING = 300
+const TEAM_HEIGHT = 35
+const GROUP_PADDING = 75
+
 // Create nodes and edges when tournament data is available
 watchEffect(() => {
   if (!tournamentData.value) return
@@ -30,12 +32,6 @@ watchEffect(() => {
   const data = tournamentData.value
   const nodeList: Node[] = []
   const edgeList: Edge[] = []
-
-  // Constants for positioning
-  const HORIZONTAL_SPACING = 250
-  const GROUP_VERTICAL_SPACING = 300 // Increased from 250 to 400 for more spacing
-  const TEAM_HEIGHT = 30
-  const GROUP_PADDING = 100
 
   // Create group nodes with teams as children
   data.groups.forEach((group, groupIndex) => {
@@ -59,7 +55,7 @@ watchEffect(() => {
     group.teams.forEach((team, teamIndex) => {
       const teamNode: Node = {
         id: `team-${group.id}-${team.id}`,
-        type: "team",
+        type: "teamNoHandles",
         data: {
           label: team.name,
           teams: [team.name],
@@ -267,9 +263,8 @@ watchEffect(() => {
 
 <template>
   <VueFlow
-    v-if="tournamentData"
-    v-model:nodes="nodes"
-    v-model:edges="edges"
+    :nodes="nodes"
+    :edges="edges"
     class="bg-gray-100 dark:bg-gray-800"
     :default-viewport="{ zoom: 1.5 }"
     :min-zoom="0.2"
@@ -279,17 +274,20 @@ watchEffect(() => {
     <MiniMap pannable zoomable />
     <Controls position="top-left" />
 
-    <template #node-tournamentMatch="matchNodeProps">
-      <TournamentMatchNode v-bind="matchNodeProps" />
-    </template>
     <template #node-team="teamNodeProps">
       <TeamNode v-bind="teamNodeProps" />
     </template>
+
+    <template #node-teamNoHandles="teamNodeNoHandlesProps">
+      <TeamNodeNoHandles v-bind="teamNodeNoHandlesProps" />
+    </template>
+
+    <template #node-tournamentMatch="tournamentMatchProps">
+      <TournamentMatchNode v-bind="tournamentMatchProps" />
+    </template>
+
     <template #node-group="groupNodeProps">
       <GroupNode v-bind="groupNodeProps" />
     </template>
   </VueFlow>
-  <div v-else class="flex h-full items-center justify-center">
-    <p class="text-gray-500">Loading tournament data...</p>
-  </div>
 </template>
