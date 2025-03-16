@@ -3,6 +3,7 @@ import { VueFlow, type Node, type Edge } from "@vue-flow/core"
 import { Background } from "@vue-flow/background"
 import { Controls } from "@vue-flow/controls"
 import { MiniMap } from "@vue-flow/minimap"
+import type { TournamentPhases } from "~/types/phases"
 
 import "@vue-flow/core/dist/style.css"
 import "@vue-flow/core/dist/theme-default.css"
@@ -13,7 +14,7 @@ const { tournamentId } = defineProps<{
   tournamentId: string
 }>()
 
-const { data: tournamentData } = await useFetch(
+const { data: tournamentData } = await useFetch<TournamentPhases>(
   `/api/tournaments/${tournamentId}/phases`,
 )
 
@@ -77,11 +78,12 @@ watchEffect(() => {
       data: {
         label: "Viertelfinale",
         teams: [match.team1_name, match.team2_name],
-        winner: match.result?.winner_id
-          ? match.result.winner_id === match.team1_id
-            ? match.team1_name
-            : match.team2_name
-          : undefined,
+        winner:
+          match.result && "winner_id" in match.result
+            ? match.result.winner_id === match.team1_id
+              ? match.team1_name
+              : match.team2_name
+            : undefined,
         nodeType: "quarterfinal",
       },
       position: { x: HORIZONTAL_SPACING, y: index * GROUP_VERTICAL_SPACING },
@@ -125,11 +127,12 @@ watchEffect(() => {
       data: {
         label: "Semifinale",
         teams: [match.team1_name, match.team2_name],
-        winner: match.result?.winner_id
-          ? match.result.winner_id === match.team1_id
-            ? match.team1_name
-            : match.team2_name
-          : undefined,
+        winner:
+          match.result && "winner_id" in match.result
+            ? match.result.winner_id === match.team1_id
+              ? match.team1_name
+              : match.team2_name
+            : undefined,
         nodeType: "semifinal",
       },
       position: {
@@ -168,12 +171,14 @@ watchEffect(() => {
           data.phases.thirdPlace.team1_name,
           data.phases.thirdPlace.team2_name,
         ],
-        winner: data.phases.thirdPlace.result?.winner_id
-          ? data.phases.thirdPlace.result.winner_id ===
-            data.phases.thirdPlace.team1_id
-            ? data.phases.thirdPlace.team1_name
-            : data.phases.thirdPlace.team2_name
-          : undefined,
+        winner:
+          data.phases.thirdPlace.result &&
+          "winner_id" in data.phases.thirdPlace.result
+            ? data.phases.thirdPlace.result.winner_id ===
+              data.phases.thirdPlace.team1_id
+              ? data.phases.thirdPlace.team1_name
+              : data.phases.thirdPlace.team2_name
+            : undefined,
         nodeType: "final",
       },
       position: { x: HORIZONTAL_SPACING * 3, y: GROUP_VERTICAL_SPACING },
@@ -185,7 +190,7 @@ watchEffect(() => {
       edgeList.push({
         id: `edge-to-thirdplace-${index}`,
         source: `semifinal-${match.match_id}`,
-        target: `thirdplace-${data.phases.thirdPlace.match_id}`,
+        target: `thirdplace-${data.phases.thirdPlace?.match_id}`,
         type: "smoothstep",
         style: { strokeDasharray: "5, 5" }, // Dashed line for losers
       })
@@ -200,11 +205,12 @@ watchEffect(() => {
       data: {
         label: "Finale",
         teams: [data.phases.final.team1_name, data.phases.final.team2_name],
-        winner: data.phases.final.result?.winner_id
-          ? data.phases.final.result.winner_id === data.phases.final.team1_id
-            ? data.phases.final.team1_name
-            : data.phases.final.team2_name
-          : undefined,
+        winner:
+          data.phases.final.result && "winner_id" in data.phases.final.result
+            ? data.phases.final.result.winner_id === data.phases.final.team1_id
+              ? data.phases.final.team1_name
+              : data.phases.final.team2_name
+            : undefined,
         nodeType: "final",
       },
       position: { x: HORIZONTAL_SPACING * 3, y: 0 },
@@ -216,18 +222,18 @@ watchEffect(() => {
       edgeList.push({
         id: `edge-to-final-${index}`,
         source: `semifinal-${match.match_id}`,
-        target: `final-${data.phases.final.match_id}`,
+        target: `final-${data.phases.final?.match_id}`,
         type: "smoothstep",
       })
     })
 
     // Add winner node if there is one
-    if (data.winner) {
+    if (data.winner && "team_id" in data.winner) {
       // Find the team name for the winner
       let winnerTeamName = ""
       data.groups.forEach((group) => {
         group.teams.forEach((team) => {
-          if (team.id === data.winner.team_id) {
+          if (team.id === data.winner?.team_id) {
             winnerTeamName = team.name
           }
         })
