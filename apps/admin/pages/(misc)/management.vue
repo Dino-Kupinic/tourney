@@ -386,7 +386,7 @@ const refresh = async () => {
 
           <UFormGroup label="Klassen">
             <div
-              class="max-h-60 overflow-y-auto rounded border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-900"
+              class="max-h-60 overflow-y-auto rounded border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
             >
               <div
                 v-for="className in creationStateMultiple.classes"

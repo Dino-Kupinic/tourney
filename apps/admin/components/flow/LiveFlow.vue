@@ -18,13 +18,6 @@ const { data: tournamentData, refresh } = await useFetch<TournamentPhases>(
   `/api/tournaments/${tournamentId}/phases`,
 )
 
-if (!tournamentData.value) {
-  throw createError({
-    statusCode: 404,
-    message: "Turnier für Visualisierung nicht gefunden",
-  })
-}
-
 const supabase = useSupabaseClient()
 supabase
   .channel("channel-match")
@@ -52,213 +45,217 @@ const GROUP_VERTICAL_SPACING = 300
 const TEAM_HEIGHT = 35
 const GROUP_PADDING = 75
 
-const data = tournamentData.value
-const nodeList: Node[] = []
-const edgeList: Edge[] = []
+watchEffect(() => {
+  if (!tournamentData.value) return
 
-data.groups.forEach((group, groupIndex) => {
-  const groupHeight = GROUP_PADDING + group.teams.length * TEAM_HEIGHT
+  const data = tournamentData.value
+  const nodeList: Node[] = []
+  const edgeList: Edge[] = []
 
-  const groupNode: Node = {
-    id: `group-${group.id}`,
-    type: "group",
-    data: {
-      label: group.name,
-      teams: group.teams.map((team) => team.name),
-      nodeType: "group",
-    },
-    position: { x: 0, y: groupIndex * GROUP_VERTICAL_SPACING },
-    style: {
-      width: "200px",
-      height: `${groupHeight}px`,
-    },
-  }
-  nodeList.push(groupNode)
-})
+  data.groups.forEach((group, groupIndex) => {
+    const groupHeight = GROUP_PADDING + group.teams.length * TEAM_HEIGHT
 
-data.phases.quarterFinals.forEach((match, index) => {
-  const matchNode: Node = {
-    id: `quarterfinal-${match.match_id}`,
-    type: "tournamentMatch",
-    data: {
-      label: "Viertelfinale",
-      teams: [match.team1_name, match.team2_name],
-      winner:
-        match.result && "winner_id" in match.result
-          ? match.result.winner_id === match.team1_id
-            ? match.team1_name
-            : match.team2_name
-          : undefined,
-      nodeType: "quarterfinal",
-    },
-    position: { x: HORIZONTAL_SPACING, y: index * GROUP_VERTICAL_SPACING },
-  }
-  nodeList.push(matchNode)
-
-  const team1GroupId = data.groups.find((group) =>
-    group.teams.some((team) => team.id === match.team1_id),
-  )?.id
-
-  const team2GroupId = data.groups.find((group) =>
-    group.teams.some((team) => team.id === match.team2_id),
-  )?.id
-
-  if (team1GroupId) {
-    edgeList.push({
-      id: `edge-group-${team1GroupId}-to-quarterfinal-${match.match_id}`,
-      source: `group-${team1GroupId}`,
-      target: `quarterfinal-${match.match_id}`,
-      type: "smoothstep",
-    })
-  }
-
-  if (team2GroupId && team2GroupId !== team1GroupId) {
-    edgeList.push({
-      id: `edge-group-${team2GroupId}-to-quarterfinal-${match.match_id}`,
-      source: `group-${team2GroupId}`,
-      target: `quarterfinal-${match.match_id}`,
-      type: "smoothstep",
-    })
-  }
-})
-
-data.phases.semiFinals.forEach((match, index) => {
-  const matchNode: Node = {
-    id: `semifinal-${match.match_id}`,
-    type: "tournamentMatch",
-    data: {
-      label: "Semifinale",
-      teams: [match.team1_name, match.team2_name],
-      winner:
-        match.result && "winner_id" in match.result
-          ? match.result.winner_id === match.team1_id
-            ? match.team1_name
-            : match.team2_name
-          : undefined,
-      nodeType: "semifinal",
-    },
-    position: {
-      x: HORIZONTAL_SPACING * 2,
-      y: index * GROUP_VERTICAL_SPACING + GROUP_VERTICAL_SPACING / 2,
-    },
-  }
-  nodeList.push(matchNode)
-
-  edgeList.push({
-    id: `edge-to-semifinal-${index}-1`,
-    source: `quarterfinal-${data.phases.quarterFinals[index * 2]?.match_id}`,
-    target: `semifinal-${match.match_id}`,
-    type: "smoothstep",
+    const groupNode: Node = {
+      id: `group-${group.id}`,
+      type: "group",
+      data: {
+        label: group.name,
+        teams: group.teams.map((team) => team.name),
+        nodeType: "group",
+      },
+      position: { x: 0, y: groupIndex * GROUP_VERTICAL_SPACING },
+      style: {
+        width: "200px",
+        height: `${groupHeight}px`,
+      },
+    }
+    nodeList.push(groupNode)
   })
 
-  if (data.phases.quarterFinals[index * 2 + 1]) {
-    edgeList.push({
-      id: `edge-to-semifinal-${index}-2`,
-      source: `quarterfinal-${data.phases.quarterFinals[index * 2 + 1].match_id}`,
-      target: `semifinal-${match.match_id}`,
-      type: "smoothstep",
-    })
-  }
-})
+  data.phases.quarterFinals.forEach((match, index) => {
+    const matchNode: Node = {
+      id: `quarterfinal-${match.match_id}`,
+      type: "tournamentMatch",
+      data: {
+        label: "Viertelfinale",
+        teams: [match.team1_name, match.team2_name],
+        winner:
+          match.result && "winner_id" in match.result
+            ? match.result.winner_id === match.team1_id
+              ? match.team1_name
+              : match.team2_name
+            : undefined,
+        nodeType: "quarterfinal",
+      },
+      position: { x: HORIZONTAL_SPACING, y: index * GROUP_VERTICAL_SPACING },
+    }
+    nodeList.push(matchNode)
 
-if (data.phases.thirdPlace) {
-  const thirdPlaceNode: Node = {
-    id: `thirdplace-${data.phases.thirdPlace.match_id}`,
-    type: "tournamentMatch",
-    data: {
-      label: "Kleines Finale",
-      teams: [
-        data.phases.thirdPlace.team1_name,
-        data.phases.thirdPlace.team2_name,
-      ],
-      winner:
-        data.phases.thirdPlace.result &&
-        "winner_id" in data.phases.thirdPlace.result
-          ? data.phases.thirdPlace.result.winner_id ===
-            data.phases.thirdPlace.team1_id
-            ? data.phases.thirdPlace.team1_name
-            : data.phases.thirdPlace.team2_name
-          : undefined,
-      nodeType: "final",
-    },
-    position: { x: HORIZONTAL_SPACING * 3, y: GROUP_VERTICAL_SPACING },
-  }
-  nodeList.push(thirdPlaceNode)
+    const team1GroupId = data.groups.find((group) =>
+      group.teams.some((team) => team.id === match.team1_id),
+    )?.id
 
-  data.phases.semiFinals.forEach((match, index) => {
-    edgeList.push({
-      id: `edge-to-thirdplace-${index}`,
-      source: `semifinal-${match.match_id}`,
-      target: `thirdplace-${data.phases.thirdPlace?.match_id}`,
-      type: "smoothstep",
-      style: { strokeDasharray: "5, 5" }, // Dashed line for losers
-    })
-  })
-}
+    const team2GroupId = data.groups.find((group) =>
+      group.teams.some((team) => team.id === match.team2_id),
+    )?.id
 
-if (data.phases.final) {
-  const finalNode: Node = {
-    id: `final-${data.phases.final.match_id}`,
-    type: "tournamentMatch",
-    data: {
-      label: "Finale",
-      teams: [data.phases.final.team1_name, data.phases.final.team2_name],
-      winner:
-        data.phases.final.result && "winner_id" in data.phases.final.result
-          ? data.phases.final.result.winner_id === data.phases.final.team1_id
-            ? data.phases.final.team1_name
-            : data.phases.final.team2_name
-          : undefined,
-      nodeType: "final",
-    },
-    position: { x: HORIZONTAL_SPACING * 3, y: 0 },
-  }
-  nodeList.push(finalNode)
-
-  data.phases.semiFinals.forEach((match, index) => {
-    edgeList.push({
-      id: `edge-to-final-${index}`,
-      source: `semifinal-${match.match_id}`,
-      target: `final-${data.phases.final?.match_id}`,
-      type: "smoothstep",
-    })
-  })
-
-  if (data.winner && "team_id" in data.winner) {
-    let winnerTeamName = ""
-    data.groups.forEach((group) => {
-      group.teams.forEach((team) => {
-        if (team.id === data.winner?.team_id) {
-          winnerTeamName = team.name
-        }
-      })
-    })
-
-    if (winnerTeamName) {
-      const winnerNode: Node = {
-        id: "tournament-winner",
-        type: "tournamentMatch",
-        data: {
-          label: "Turniersieger",
-          teams: [winnerTeamName],
-          nodeType: "winner",
-        },
-        position: { x: HORIZONTAL_SPACING * 4, y: 0 },
-      }
-      nodeList.push(winnerNode)
-
+    if (team1GroupId) {
       edgeList.push({
-        id: "edge-to-winner",
-        source: `final-${data.phases.final.match_id}`,
-        target: "tournament-winner",
+        id: `edge-group-${team1GroupId}-to-quarterfinal-${match.match_id}`,
+        source: `group-${team1GroupId}`,
+        target: `quarterfinal-${match.match_id}`,
         type: "smoothstep",
       })
     }
-  }
-}
 
-nodes.value = nodeList
-edges.value = edgeList
+    if (team2GroupId && team2GroupId !== team1GroupId) {
+      edgeList.push({
+        id: `edge-group-${team2GroupId}-to-quarterfinal-${match.match_id}`,
+        source: `group-${team2GroupId}`,
+        target: `quarterfinal-${match.match_id}`,
+        type: "smoothstep",
+      })
+    }
+  })
+
+  data.phases.semiFinals.forEach((match, index) => {
+    const matchNode: Node = {
+      id: `semifinal-${match.match_id}`,
+      type: "tournamentMatch",
+      data: {
+        label: "Semifinale",
+        teams: [match.team1_name, match.team2_name],
+        winner:
+          match.result && "winner_id" in match.result
+            ? match.result.winner_id === match.team1_id
+              ? match.team1_name
+              : match.team2_name
+            : undefined,
+        nodeType: "semifinal",
+      },
+      position: {
+        x: HORIZONTAL_SPACING * 2,
+        y: index * GROUP_VERTICAL_SPACING + GROUP_VERTICAL_SPACING / 2,
+      },
+    }
+    nodeList.push(matchNode)
+
+    edgeList.push({
+      id: `edge-to-semifinal-${index}-1`,
+      source: `quarterfinal-${data.phases.quarterFinals[index * 2]?.match_id}`,
+      target: `semifinal-${match.match_id}`,
+      type: "smoothstep",
+    })
+
+    if (data.phases.quarterFinals[index * 2 + 1]) {
+      edgeList.push({
+        id: `edge-to-semifinal-${index}-2`,
+        source: `quarterfinal-${data.phases.quarterFinals[index * 2 + 1].match_id}`,
+        target: `semifinal-${match.match_id}`,
+        type: "smoothstep",
+      })
+    }
+  })
+
+  if (data.phases.thirdPlace) {
+    const thirdPlaceNode: Node = {
+      id: `thirdplace-${data.phases.thirdPlace.match_id}`,
+      type: "tournamentMatch",
+      data: {
+        label: "Kleines Finale",
+        teams: [
+          data.phases.thirdPlace.team1_name,
+          data.phases.thirdPlace.team2_name,
+        ],
+        winner:
+          data.phases.thirdPlace.result &&
+          "winner_id" in data.phases.thirdPlace.result
+            ? data.phases.thirdPlace.result.winner_id ===
+              data.phases.thirdPlace.team1_id
+              ? data.phases.thirdPlace.team1_name
+              : data.phases.thirdPlace.team2_name
+            : undefined,
+        nodeType: "final",
+      },
+      position: { x: HORIZONTAL_SPACING * 3, y: GROUP_VERTICAL_SPACING },
+    }
+    nodeList.push(thirdPlaceNode)
+
+    data.phases.semiFinals.forEach((match, index) => {
+      edgeList.push({
+        id: `edge-to-thirdplace-${index}`,
+        source: `semifinal-${match.match_id}`,
+        target: `thirdplace-${data.phases.thirdPlace?.match_id}`,
+        type: "smoothstep",
+        style: { strokeDasharray: "5, 5" }, // Dashed line for losers
+      })
+    })
+  }
+
+  if (data.phases.final) {
+    const finalNode: Node = {
+      id: `final-${data.phases.final.match_id}`,
+      type: "tournamentMatch",
+      data: {
+        label: "Finale",
+        teams: [data.phases.final.team1_name, data.phases.final.team2_name],
+        winner:
+          data.phases.final.result && "winner_id" in data.phases.final.result
+            ? data.phases.final.result.winner_id === data.phases.final.team1_id
+              ? data.phases.final.team1_name
+              : data.phases.final.team2_name
+            : undefined,
+        nodeType: "final",
+      },
+      position: { x: HORIZONTAL_SPACING * 3, y: 0 },
+    }
+    nodeList.push(finalNode)
+
+    data.phases.semiFinals.forEach((match, index) => {
+      edgeList.push({
+        id: `edge-to-final-${index}`,
+        source: `semifinal-${match.match_id}`,
+        target: `final-${data.phases.final?.match_id}`,
+        type: "smoothstep",
+      })
+    })
+
+    if (data.winner && "team_id" in data.winner) {
+      let winnerTeamName = ""
+      data.groups.forEach((group) => {
+        group.teams.forEach((team) => {
+          if (team.id === data.winner?.team_id) {
+            winnerTeamName = team.name
+          }
+        })
+      })
+
+      if (winnerTeamName) {
+        const winnerNode: Node = {
+          id: "tournament-winner",
+          type: "tournamentMatch",
+          data: {
+            label: "Turniersieger",
+            teams: [winnerTeamName],
+            nodeType: "winner",
+          },
+          position: { x: HORIZONTAL_SPACING * 4, y: 0 },
+        }
+        nodeList.push(winnerNode)
+
+        edgeList.push({
+          id: "edge-to-winner",
+          source: `final-${data.phases.final.match_id}`,
+          target: "tournament-winner",
+          type: "smoothstep",
+        })
+      }
+    }
+  }
+
+  nodes.value = nodeList
+  edges.value = edgeList
+})
 </script>
 
 <template>
