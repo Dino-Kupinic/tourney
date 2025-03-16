@@ -594,10 +594,7 @@ const canGoLive = computed(() => {
       </div>
       <div class="w-1/2">
         <ClientOnly>
-          <TournamentFlow
-            :groups="flowGroups"
-            :key="JSON.stringify(flowGroups)"
-          />
+          <LiveFlow :tournament-id="tournament?.id as string" />
           <template #fallback>
             <div
               class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
