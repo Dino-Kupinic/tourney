@@ -1,52 +1,270 @@
 <script setup lang="ts">
-import type { Node } from "@vue-flow/core"
-import { VueFlow } from "@vue-flow/core"
+import { VueFlow, type Node, type Edge } from "@vue-flow/core"
 import { Background } from "@vue-flow/background"
 import { Controls } from "@vue-flow/controls"
 import { MiniMap } from "@vue-flow/minimap"
+import type { TournamentPhases } from "~/types/phases"
 
-// Define nodes for the tournament flow
-const nodes = ref([
-  { id: "5bhmbz", label: "5bhmbz", position: { x: 0, y: 0 } },
-  { id: "4bhmbz", label: "4bhmbz", position: { x: 0, y: 100 } },
-  { id: "4yhkuj", label: "4yhkuj", position: { x: 0, y: 200 } },
-  { id: "1bhmbz", label: "1bhmbz", position: { x: 0, y: 300 } },
-  { id: "2ahmbz", label: "2ahmbz", position: { x: 0, y: 400 } },
-  { id: "2bhmbz", label: "2bhmbz", position: { x: 0, y: 500 } },
-  { id: "2yhkuj", label: "2yhkuj", position: { x: 0, y: 600 } },
-  { id: "1yhkug", label: "1yhkug", position: { x: 0, y: 700 } },
-  { id: "qf1", label: "Quarter Final 1", position: { x: 300, y: 50 } },
-  { id: "qf2", label: "Quarter Final 2", position: { x: 300, y: 250 } },
-  { id: "qf3", label: "Quarter Final 3", position: { x: 300, y: 450 } },
-  { id: "qf4", label: "Quarter Final 4", position: { x: 300, y: 650 } },
-  { id: "sf1", label: "Semi Final 1", position: { x: 600, y: 150 } },
-  { id: "sf2", label: "Semi Final 2", position: { x: 600, y: 550 } },
-  { id: "final", label: "Final", position: { x: 900, y: 350 } },
-  { id: "winner", label: "Winner", position: { x: 1200, y: 350 } },
-])
+import "@vue-flow/core/dist/style.css"
+import "@vue-flow/core/dist/theme-default.css"
+import "@vue-flow/controls/dist/style.css"
+import "@vue-flow/minimap/dist/style.css"
 
-// Define edges for the tournament flow
-const edges = ref([
-  { id: "e1", source: "5bhmbz", target: "qf1" },
-  { id: "e2", source: "4bhmbz", target: "qf1" },
-  { id: "e3", source: "4yhkuj", target: "qf2" },
-  { id: "e4", source: "1bhmbz", target: "qf2" },
-  { id: "e5", source: "2ahmbz", target: "qf3" },
-  { id: "e6", source: "2bhmbz", target: "qf3" },
-  { id: "e7", source: "2yhkuj", target: "qf4" },
-  { id: "e8", source: "1yhkug", target: "qf4" },
-  { id: "qf1-sf1", source: "qf1", target: "sf1" },
-  { id: "qf2-sf1", source: "qf2", target: "sf1" },
-  { id: "qf3-sf2", source: "qf3", target: "sf2" },
-  { id: "qf4-sf2", source: "qf4", target: "sf2" },
-  { id: "sf1-final", source: "sf1", target: "final" },
-  { id: "sf2-final", source: "sf2", target: "final" },
-  { id: "final-winner", source: "final", target: "winner" },
-])
+const { tournamentId } = defineProps<{
+  tournamentId: string
+}>()
+
+const { data: tournamentData, refresh } = await useFetch<TournamentPhases>(
+  `/api/tournaments/${tournamentId}/phases`,
+)
+
+if (!tournamentData.value) {
+  throw createError({
+    statusCode: 404,
+    message: "Turnier für Visualisierung nicht gefunden",
+  })
+}
+
+const supabase = useSupabaseClient()
+supabase
+  .channel("channel-match")
+  .on(
+    "postgres_changes",
+    { event: "*", schema: "public", table: "match" },
+    async () => {
+      await refresh()
+    },
+  )
+  .on(
+    "postgres_changes",
+    { event: "*", schema: "public", table: "result" },
+    async () => {
+      await refresh()
+    },
+  )
+  .subscribe()
+
+const nodes = ref<Node[]>([])
+const edges = ref<Edge[]>([])
+
+const HORIZONTAL_SPACING = 250
+const GROUP_VERTICAL_SPACING = 300
+const TEAM_HEIGHT = 35
+const GROUP_PADDING = 75
+
+const data = tournamentData.value
+const nodeList: Node[] = []
+const edgeList: Edge[] = []
+
+data.groups.forEach((group, groupIndex) => {
+  const groupHeight = GROUP_PADDING + group.teams.length * TEAM_HEIGHT
+
+  const groupNode: Node = {
+    id: `group-${group.id}`,
+    type: "group",
+    data: {
+      label: group.name,
+      teams: group.teams.map((team) => team.name),
+      nodeType: "group",
+    },
+    position: { x: 0, y: groupIndex * GROUP_VERTICAL_SPACING },
+    style: {
+      width: "200px",
+      height: `${groupHeight}px`,
+    },
+  }
+  nodeList.push(groupNode)
+})
+
+data.phases.quarterFinals.forEach((match, index) => {
+  const matchNode: Node = {
+    id: `quarterfinal-${match.match_id}`,
+    type: "tournamentMatch",
+    data: {
+      label: "Viertelfinale",
+      teams: [match.team1_name, match.team2_name],
+      winner:
+        match.result && "winner_id" in match.result
+          ? match.result.winner_id === match.team1_id
+            ? match.team1_name
+            : match.team2_name
+          : undefined,
+      nodeType: "quarterfinal",
+    },
+    position: { x: HORIZONTAL_SPACING, y: index * GROUP_VERTICAL_SPACING },
+  }
+  nodeList.push(matchNode)
+
+  const team1GroupId = data.groups.find((group) =>
+    group.teams.some((team) => team.id === match.team1_id),
+  )?.id
+
+  const team2GroupId = data.groups.find((group) =>
+    group.teams.some((team) => team.id === match.team2_id),
+  )?.id
+
+  if (team1GroupId) {
+    edgeList.push({
+      id: `edge-group-${team1GroupId}-to-quarterfinal-${match.match_id}`,
+      source: `group-${team1GroupId}`,
+      target: `quarterfinal-${match.match_id}`,
+      type: "smoothstep",
+    })
+  }
+
+  if (team2GroupId && team2GroupId !== team1GroupId) {
+    edgeList.push({
+      id: `edge-group-${team2GroupId}-to-quarterfinal-${match.match_id}`,
+      source: `group-${team2GroupId}`,
+      target: `quarterfinal-${match.match_id}`,
+      type: "smoothstep",
+    })
+  }
+})
+
+data.phases.semiFinals.forEach((match, index) => {
+  const matchNode: Node = {
+    id: `semifinal-${match.match_id}`,
+    type: "tournamentMatch",
+    data: {
+      label: "Semifinale",
+      teams: [match.team1_name, match.team2_name],
+      winner:
+        match.result && "winner_id" in match.result
+          ? match.result.winner_id === match.team1_id
+            ? match.team1_name
+            : match.team2_name
+          : undefined,
+      nodeType: "semifinal",
+    },
+    position: {
+      x: HORIZONTAL_SPACING * 2,
+      y: index * GROUP_VERTICAL_SPACING + GROUP_VERTICAL_SPACING / 2,
+    },
+  }
+  nodeList.push(matchNode)
+
+  edgeList.push({
+    id: `edge-to-semifinal-${index}-1`,
+    source: `quarterfinal-${data.phases.quarterFinals[index * 2]?.match_id}`,
+    target: `semifinal-${match.match_id}`,
+    type: "smoothstep",
+  })
+
+  if (data.phases.quarterFinals[index * 2 + 1]) {
+    edgeList.push({
+      id: `edge-to-semifinal-${index}-2`,
+      source: `quarterfinal-${data.phases.quarterFinals[index * 2 + 1].match_id}`,
+      target: `semifinal-${match.match_id}`,
+      type: "smoothstep",
+    })
+  }
+})
+
+if (data.phases.thirdPlace) {
+  const thirdPlaceNode: Node = {
+    id: `thirdplace-${data.phases.thirdPlace.match_id}`,
+    type: "tournamentMatch",
+    data: {
+      label: "Kleines Finale",
+      teams: [
+        data.phases.thirdPlace.team1_name,
+        data.phases.thirdPlace.team2_name,
+      ],
+      winner:
+        data.phases.thirdPlace.result &&
+        "winner_id" in data.phases.thirdPlace.result
+          ? data.phases.thirdPlace.result.winner_id ===
+            data.phases.thirdPlace.team1_id
+            ? data.phases.thirdPlace.team1_name
+            : data.phases.thirdPlace.team2_name
+          : undefined,
+      nodeType: "final",
+    },
+    position: { x: HORIZONTAL_SPACING * 3, y: GROUP_VERTICAL_SPACING },
+  }
+  nodeList.push(thirdPlaceNode)
+
+  data.phases.semiFinals.forEach((match, index) => {
+    edgeList.push({
+      id: `edge-to-thirdplace-${index}`,
+      source: `semifinal-${match.match_id}`,
+      target: `thirdplace-${data.phases.thirdPlace?.match_id}`,
+      type: "smoothstep",
+      style: { strokeDasharray: "5, 5" }, // Dashed line for losers
+    })
+  })
+}
+
+if (data.phases.final) {
+  const finalNode: Node = {
+    id: `final-${data.phases.final.match_id}`,
+    type: "tournamentMatch",
+    data: {
+      label: "Finale",
+      teams: [data.phases.final.team1_name, data.phases.final.team2_name],
+      winner:
+        data.phases.final.result && "winner_id" in data.phases.final.result
+          ? data.phases.final.result.winner_id === data.phases.final.team1_id
+            ? data.phases.final.team1_name
+            : data.phases.final.team2_name
+          : undefined,
+      nodeType: "final",
+    },
+    position: { x: HORIZONTAL_SPACING * 3, y: 0 },
+  }
+  nodeList.push(finalNode)
+
+  data.phases.semiFinals.forEach((match, index) => {
+    edgeList.push({
+      id: `edge-to-final-${index}`,
+      source: `semifinal-${match.match_id}`,
+      target: `final-${data.phases.final?.match_id}`,
+      type: "smoothstep",
+    })
+  })
+
+  if (data.winner && "team_id" in data.winner) {
+    let winnerTeamName = ""
+    data.groups.forEach((group) => {
+      group.teams.forEach((team) => {
+        if (team.id === data.winner?.team_id) {
+          winnerTeamName = team.name
+        }
+      })
+    })
+
+    if (winnerTeamName) {
+      const winnerNode: Node = {
+        id: "tournament-winner",
+        type: "tournamentMatch",
+        data: {
+          label: "Turniersieger",
+          teams: [winnerTeamName],
+          nodeType: "winner",
+        },
+        position: { x: HORIZONTAL_SPACING * 4, y: 0 },
+      }
+      nodeList.push(winnerNode)
+
+      edgeList.push({
+        id: "edge-to-winner",
+        source: `final-${data.phases.final.match_id}`,
+        target: "tournament-winner",
+        type: "smoothstep",
+      })
+    }
+  }
+}
+
+nodes.value = nodeList
+edges.value = edgeList
 </script>
 
 <template>
   <VueFlow
+    :nodes="nodes"
+    :edges="edges"
     class="bg-gray-100 dark:bg-gray-800"
     :default-viewport="{ zoom: 1.5 }"
     :min-zoom="0.2"
@@ -55,12 +273,17 @@ const edges = ref([
     <Background pattern-color="#aaa" :gap="16" />
     <MiniMap pannable zoomable />
     <Controls position="top-left" />
+
+    <template #node-team="teamNodeProps">
+      <TeamNode v-bind="teamNodeProps" />
+    </template>
+
+    <template #node-tournamentMatch="tournamentMatchProps">
+      <TournamentMatchNode v-bind="tournamentMatchProps" />
+    </template>
+
+    <template #node-group="groupNodeProps">
+      <GroupNode v-bind="groupNodeProps" />
+    </template>
   </VueFlow>
 </template>
-
-<style scoped>
-@import "@vue-flow/core/dist/style.css";
-@import "@vue-flow/core/dist/theme-default.css";
-@import "@vue-flow/controls/dist/style.css";
-@import "@vue-flow/minimap/dist/style.css";
-</style>

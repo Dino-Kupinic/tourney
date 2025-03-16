@@ -248,7 +248,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
     <div class="h-full w-full">
       <div class="h-1/3">
         <ClientOnly>
-          <LiveFlow />
+          <LiveFlow :tournament-id="tournament?.id as string" />
           <template #fallback>
             <div
               class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
