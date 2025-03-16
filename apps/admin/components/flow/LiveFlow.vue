@@ -14,9 +14,28 @@ const { tournamentId } = defineProps<{
   tournamentId: string
 }>()
 
-const { data: tournamentData } = await useFetch<TournamentPhases>(
+const { data: tournamentData, refresh } = await useFetch<TournamentPhases>(
   `/api/tournaments/${tournamentId}/phases`,
 )
+
+const supabase = useSupabaseClient()
+supabase
+  .channel("channel-match")
+  .on(
+    "postgres_changes",
+    { event: "*", schema: "public", table: "match" },
+    async () => {
+      await refresh()
+    },
+  )
+  .on(
+    "postgres_changes",
+    { event: "*", schema: "public", table: "result" },
+    async () => {
+      await refresh()
+    },
+  )
+  .subscribe()
 
 const nodes = ref<Node[]>([])
 const edges = ref<Edge[]>([])

@@ -141,7 +141,6 @@ const completeMatch = async () => {
           :label="match.start_time!"
           color="white"
           size="xs"
-          variant="subtle"
           icon="i-heroicons-clock"
           block
         />
@@ -152,7 +151,6 @@ const completeMatch = async () => {
           icon="i-heroicons-clock"
           color="white"
           size="xs"
-          variant="subtle"
           :trailing="false"
           class="w-[90px]"
           block

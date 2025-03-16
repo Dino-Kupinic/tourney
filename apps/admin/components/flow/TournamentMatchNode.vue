@@ -46,7 +46,6 @@ defineProps<NodeProps>()
   font-weight: bold;
   text-align: center;
   padding-bottom: 5px;
-  border-bottom: 1px solid #eee;
 }
 
 .teams-container {
