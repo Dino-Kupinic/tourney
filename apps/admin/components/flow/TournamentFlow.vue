@@ -5,6 +5,8 @@ import { Background } from "@vue-flow/background"
 import { MiniMap } from "@vue-flow/minimap"
 import { Controls } from "@vue-flow/controls"
 import type { Group } from "~/types/group"
+import TeamNode from "./TeamNode.vue"
+import GroupNode from "./GroupNode.vue"
 
 const { groups } = defineProps<{
   groups: Group[]
@@ -17,27 +19,19 @@ const generateNodes = (groups: Group[]) => {
   groups.forEach((group, groupIndex) => {
     const groupNode: Node = {
       id: `group-${groupIndex}`,
-      data: { label: group.name },
+      type: "group",
+      data: {
+        label: group.name,
+        teams: group.teams,
+        nodeType: "group",
+      },
       position: { x: groupIndex * 250, y: 0 },
       style: {
-        backgroundColor: "rgba(16, 185, 129, 0.5)",
         width: "200px",
-        height: `${75 + group.teams.length * 50}px`,
+        height: `${75 + group.teams.length * 30}px`,
       },
     }
     generatedNodes.push(groupNode)
-
-    group.teams.forEach((team, teamIndex) => {
-      const teamNode: Node = {
-        id: `team-${groupIndex}-${teamIndex}`,
-        data: { label: team },
-        type: "special",
-        position: { x: 25, y: 50 + teamIndex * 50 },
-        parentNode: `group-${groupIndex}`,
-        extent: "parent",
-      }
-      generatedNodes.push(teamNode)
-    })
   })
 
   return generatedNodes
@@ -58,8 +52,12 @@ nodes.value = generateNodes(groups)
     <MiniMap pannable zoomable />
     <Controls position="top-left" />
 
-    <template #node-special="specialNodeProps">
-      <SpecialNode v-bind="specialNodeProps" />
+    <template #node-team="teamNodeProps">
+      <TeamNode v-bind="teamNodeProps" />
+    </template>
+
+    <template #node-group="groupNodeProps">
+      <GroupNode v-bind="groupNodeProps" />
     </template>
   </VueFlow>
 </template>
