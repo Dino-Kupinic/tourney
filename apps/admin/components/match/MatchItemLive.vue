@@ -66,8 +66,11 @@ const winner = computed(() => {
 const emit = defineEmits(["finish"])
 const isOpenConfirm = ref<boolean>(false)
 const supabase = useSupabaseClient()
+
+const isLoading = ref<boolean>(false)
 const completeMatch = async () => {
   try {
+    isLoading.value = true
     const { error: endTimeError } = await supabase
       .from("match")
       .update({
@@ -100,9 +103,11 @@ const completeMatch = async () => {
       "Match beendet",
       "Das Match wurde erfolgreich beendet.",
     )
+    isLoading.value = false
     isOpenConfirm.value = false
   } catch (error) {
     const err = error as Error
+    isLoading.value = false
     displayFailureNotification("Fehler", err.message)
     throw createError({
       statusMessage: err.message,
@@ -112,7 +117,11 @@ const completeMatch = async () => {
 </script>
 
 <template>
-  <ModalMatch v-model="isOpenConfirm" @confirm="completeMatch">
+  <ModalMatch
+    v-model="isOpenConfirm"
+    @confirm="completeMatch"
+    v-model:loading="isLoading"
+  >
     <p>
       {{ match.team1?.name }} hat <strong>{{ score1 }}</strong> Punkt(e) <br />
       {{ match.team2?.name }} hat <strong>{{ score2 }}</strong> Punkt(e)

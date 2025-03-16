@@ -3,6 +3,8 @@ const isOpenConfirm = defineModel<boolean>()
 defineEmits<{
   confirm: () => void
 }>()
+
+const loading = defineModel<boolean>("loading")
 </script>
 
 <template>
@@ -35,6 +37,7 @@ defineEmits<{
             color="fuchsia"
             @click="$emit('confirm')"
             label="Beenden"
+            :loading="loading"
           />
           <UButton
             color="gray"

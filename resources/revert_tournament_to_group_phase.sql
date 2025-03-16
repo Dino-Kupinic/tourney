@@ -53,7 +53,5 @@ BEGIN
   SET is_live = true
   FROM last_group_match
   WHERE match.id = last_group_match.id;
-
-  RAISE NOTICE 'Tournament % has been reverted to the group phase', p_tournament_id;
 END;
 $$ LANGUAGE plpgsql;

@@ -79,7 +79,7 @@ watchEffect(() => {
         data: {
           label: team.name,
           teams: [team.name],
-          nodeType: "team",
+          nodeType: "teamNoHandles",
         },
         position: { x: 25, y: 50 + teamIndex * TEAM_HEIGHT },
         parentNode: `group-${group.id}`,

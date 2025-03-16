@@ -6,30 +6,13 @@ defineProps<NodeProps>()
 </script>
 
 <template>
-  <div class="team-node">
+  <div class="w-[150px] rounded bg-white px-2 py-1 shadow-sm">
     <Handle type="target" :position="Position.Left" />
-    <div class="team-content">
+    <div
+      class="overflow-hidden text-ellipsis whitespace-nowrap text-center text-xs"
+    >
       {{ data.teams[0] }}
     </div>
     <Handle type="source" :position="Position.Right" />
   </div>
 </template>
-
-<style scoped>
-.team-node {
-  padding: 4px 8px;
-  border-radius: 4px;
-  background-color: white;
-  border: 1px solid #e5e7eb;
-  width: 150px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.team-content {
-  font-size: 12px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-</style>
