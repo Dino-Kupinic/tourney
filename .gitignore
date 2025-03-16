@@ -17,3 +17,4 @@ logs
 node_modules
 .nuxt
 docs/.vitepress/cache
+.turbo

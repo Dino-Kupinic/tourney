@@ -8,7 +8,10 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "generate-pwa-assets": "pwa-assets-generator --preset minimal-2023 public/logo.svg"
+    "generate-pwa-assets": "pwa-assets-generator --preset minimal-2023 public/logo.svg",
+    "format": "prettier . --check",
+    "format:write": "prettier . --write",
+    "check-types": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@nuxt/content": "2.13.4",
