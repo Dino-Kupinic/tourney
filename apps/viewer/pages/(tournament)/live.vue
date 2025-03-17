@@ -127,9 +127,18 @@ const { isDesktop } = useDevice()
         />
       </div>
       <div
-        class="flex h-48 items-center justify-center border-b bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
+        class="flex h-56 items-center justify-center border-b bg-gray-50 sm:h-96 dark:border-gray-700 dark:bg-gray-900"
       >
-        <p>Visualisierung fehlgeschlagen</p>
+        <ClientOnly>
+          <LiveFlow :tournament-id="tournament?.id as string" />
+          <template #fallback>
+            <div
+              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
+            >
+              <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
+            </div>
+          </template>
+        </ClientOnly>
       </div>
 
       <div
