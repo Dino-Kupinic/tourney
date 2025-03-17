@@ -72,7 +72,11 @@ watchEffect(() => {
     nodeList.push(groupNode)
   })
 
-  data.phases.quarterFinals.forEach((match, index) => {
+  const sortedQuarterFinals = [...data.phases.quarterFinals].sort((a, b) => {
+    return String(a.match_id).localeCompare(String(b.match_id))
+  })
+
+  sortedQuarterFinals.forEach((match, index) => {
     const matchNode: Node = {
       id: `quarterfinal-${match.match_id}`,
       type: "tournamentMatch",
@@ -118,7 +122,11 @@ watchEffect(() => {
     }
   })
 
-  data.phases.semiFinals.forEach((match, index) => {
+  const sortedSemiFinals = [...data.phases.semiFinals].sort((a, b) => {
+    return String(a.match_id).localeCompare(String(b.match_id))
+  })
+
+  sortedSemiFinals.forEach((match, index) => {
     const matchNode: Node = {
       id: `semifinal-${match.match_id}`,
       type: "tournamentMatch",
@@ -140,20 +148,42 @@ watchEffect(() => {
     }
     nodeList.push(matchNode)
 
-    edgeList.push({
-      id: `edge-to-semifinal-${index}-1`,
-      source: `quarterfinal-${data.phases.quarterFinals[index * 2]?.match_id}`,
-      target: `semifinal-${match.match_id}`,
-      type: "smoothstep",
-    })
+    if (index === 0) {
+      if (sortedQuarterFinals[0]) {
+        edgeList.push({
+          id: `edge-to-semifinal-${index}-1`,
+          source: `quarterfinal-${sortedQuarterFinals[0].match_id}`,
+          target: `semifinal-${match.match_id}`,
+          type: "smoothstep",
+        })
+      }
 
-    if (data.phases.quarterFinals[index * 2 + 1]) {
-      edgeList.push({
-        id: `edge-to-semifinal-${index}-2`,
-        source: `quarterfinal-${data.phases.quarterFinals[index * 2 + 1].match_id}`,
-        target: `semifinal-${match.match_id}`,
-        type: "smoothstep",
-      })
+      if (sortedQuarterFinals[2]) {
+        edgeList.push({
+          id: `edge-to-semifinal-${index}-2`,
+          source: `quarterfinal-${sortedQuarterFinals[2].match_id}`,
+          target: `semifinal-${match.match_id}`,
+          type: "smoothstep",
+        })
+      }
+    } else if (index === 1) {
+      if (sortedQuarterFinals[1]) {
+        edgeList.push({
+          id: `edge-to-semifinal-${index}-1`,
+          source: `quarterfinal-${sortedQuarterFinals[1].match_id}`,
+          target: `semifinal-${match.match_id}`,
+          type: "smoothstep",
+        })
+      }
+
+      if (sortedQuarterFinals[3]) {
+        edgeList.push({
+          id: `edge-to-semifinal-${index}-2`,
+          source: `quarterfinal-${sortedQuarterFinals[3].match_id}`,
+          target: `semifinal-${match.match_id}`,
+          type: "smoothstep",
+        })
+      }
     }
   })
 
@@ -181,7 +211,7 @@ watchEffect(() => {
     }
     nodeList.push(thirdPlaceNode)
 
-    data.phases.semiFinals.forEach((match, index) => {
+    sortedSemiFinals.forEach((match, index) => {
       edgeList.push({
         id: `edge-to-thirdplace-${index}`,
         source: `semifinal-${match.match_id}`,
@@ -211,7 +241,7 @@ watchEffect(() => {
     }
     nodeList.push(finalNode)
 
-    data.phases.semiFinals.forEach((match, index) => {
+    sortedSemiFinals.forEach((match, index) => {
       edgeList.push({
         id: `edge-to-final-${index}`,
         source: `semifinal-${match.match_id}`,
