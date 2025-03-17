@@ -293,12 +293,11 @@ watchEffect(() => {
     :nodes="nodes"
     :edges="edges"
     class="bg-gray-100 dark:bg-gray-800"
-    :default-viewport="{ zoom: 1.5 }"
+    :default-viewport="{ zoom: 0.3 }"
     :min-zoom="0.2"
     :max-zoom="4"
   >
     <Background pattern-color="#aaa" :gap="16" />
-    <MiniMap pannable zoomable />
     <Controls position="top-left" />
 
     <template #node-team="teamNodeProps">

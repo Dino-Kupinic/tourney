@@ -66,8 +66,11 @@ const winner = computed(() => {
 const emit = defineEmits(["finish"])
 const isOpenConfirm = ref<boolean>(false)
 const supabase = useSupabaseClient()
+
+const isLoading = ref<boolean>(false)
 const completeMatch = async () => {
   try {
+    isLoading.value = true
     const { error: endTimeError } = await supabase
       .from("match")
       .update({
@@ -100,9 +103,11 @@ const completeMatch = async () => {
       "Match beendet",
       "Das Match wurde erfolgreich beendet.",
     )
+    isLoading.value = false
     isOpenConfirm.value = false
   } catch (error) {
     const err = error as Error
+    isLoading.value = false
     displayFailureNotification("Fehler", err.message)
     throw createError({
       statusMessage: err.message,
@@ -112,7 +117,11 @@ const completeMatch = async () => {
 </script>
 
 <template>
-  <ModalMatch v-model="isOpenConfirm" @confirm="completeMatch">
+  <ModalMatch
+    v-model="isOpenConfirm"
+    @confirm="completeMatch"
+    v-model:loading="isLoading"
+  >
     <p>
       {{ match.team1?.name }} hat <strong>{{ score1 }}</strong> Punkt(e) <br />
       {{ match.team2?.name }} hat <strong>{{ score2 }}</strong> Punkt(e)
@@ -139,9 +148,8 @@ const completeMatch = async () => {
         />
         <UBadge
           :label="match.start_time!"
-          color="indigo"
+          color="white"
           size="xs"
-          variant="subtle"
           icon="i-heroicons-clock"
           block
         />
@@ -150,9 +158,8 @@ const completeMatch = async () => {
         <UBadge
           :label="formattedTime"
           icon="i-heroicons-clock"
-          color="primary"
+          color="white"
           size="xs"
-          variant="subtle"
           :trailing="false"
           class="w-[90px]"
           block

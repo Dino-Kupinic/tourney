@@ -7,7 +7,10 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "format": "prettier . --check",
+    "format:write": "prettier . --write",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "nuxt": "^3.14.1592",
