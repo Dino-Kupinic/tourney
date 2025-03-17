@@ -72,7 +72,12 @@ watchEffect(() => {
     nodeList.push(groupNode)
   })
 
-  data.phases.quarterFinals.forEach((match, index) => {
+  // Sort quarterFinals by match_id to ensure consistent ordering
+  const sortedQuarterFinals = [...data.phases.quarterFinals].sort((a, b) => {
+    return String(a.match_id).localeCompare(String(b.match_id))
+  })
+
+  sortedQuarterFinals.forEach((match, index) => {
     const matchNode: Node = {
       id: `quarterfinal-${match.match_id}`,
       type: "tournamentMatch",
@@ -118,7 +123,12 @@ watchEffect(() => {
     }
   })
 
-  data.phases.semiFinals.forEach((match, index) => {
+  // Sort semiFinals by match_id to ensure consistent ordering
+  const sortedSemiFinals = [...data.phases.semiFinals].sort((a, b) => {
+    return String(a.match_id).localeCompare(String(b.match_id))
+  })
+
+  sortedSemiFinals.forEach((match, index) => {
     const matchNode: Node = {
       id: `semifinal-${match.match_id}`,
       type: "tournamentMatch",
@@ -142,15 +152,15 @@ watchEffect(() => {
 
     edgeList.push({
       id: `edge-to-semifinal-${index}-1`,
-      source: `quarterfinal-${data.phases.quarterFinals[index * 2]?.match_id}`,
+      source: `quarterfinal-${sortedQuarterFinals[index * 2]?.match_id}`,
       target: `semifinal-${match.match_id}`,
       type: "smoothstep",
     })
 
-    if (data.phases.quarterFinals[index * 2 + 1]) {
+    if (sortedQuarterFinals[index * 2 + 1]) {
       edgeList.push({
         id: `edge-to-semifinal-${index}-2`,
-        source: `quarterfinal-${data.phases.quarterFinals[index * 2 + 1].match_id}`,
+        source: `quarterfinal-${sortedQuarterFinals[index * 2 + 1].match_id}`,
         target: `semifinal-${match.match_id}`,
         type: "smoothstep",
       })
@@ -181,7 +191,7 @@ watchEffect(() => {
     }
     nodeList.push(thirdPlaceNode)
 
-    data.phases.semiFinals.forEach((match, index) => {
+    sortedSemiFinals.forEach((match, index) => {
       edgeList.push({
         id: `edge-to-thirdplace-${index}`,
         source: `semifinal-${match.match_id}`,
@@ -211,7 +221,7 @@ watchEffect(() => {
     }
     nodeList.push(finalNode)
 
-    data.phases.semiFinals.forEach((match, index) => {
+    sortedSemiFinals.forEach((match, index) => {
       edgeList.push({
         id: `edge-to-final-${index}`,
         source: `semifinal-${match.match_id}`,
