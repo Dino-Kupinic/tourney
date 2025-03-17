@@ -18,7 +18,7 @@ defineProps<NodeProps>()
         <div
           v-for="(team, index) in data.teams"
           :key="index"
-          class="rounded bg-gray-100 p-1.5"
+          class="rounded bg-gray-100 p-1.5 dark:bg-gray-900"
         >
           {{ team }}
         </div>
