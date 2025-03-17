@@ -1,6 +1,6 @@
 {
   "name": "tourney",
-  "version": "0.26.1",
+  "version": "0.27.0",
   "description": "This project is a web application for managing tournaments.",
   "packageManager": "pnpm@10.5.0",
   "workspaces": [
