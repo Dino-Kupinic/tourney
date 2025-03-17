@@ -70,9 +70,8 @@ const formattedTime = computed(() => {
         />
         <UBadge
           :label="match.start_time!"
-          color="indigo"
+          color="white"
           size="xs"
-          variant="subtle"
           icon="i-heroicons-clock"
           block
         />
@@ -81,9 +80,8 @@ const formattedTime = computed(() => {
         <UBadge
           :label="formattedTime"
           icon="i-heroicons-clock"
-          color="primary"
+          color="white"
           size="xs"
-          variant="subtle"
           :trailing="false"
           class="w-[90px]"
           block

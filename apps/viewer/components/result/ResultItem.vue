@@ -34,18 +34,16 @@ const logoTeam2 = computed(
           />
           <UBadge
             :label="match.start_time!"
-            color="indigo"
+            color="white"
             size="xs"
             icon="i-heroicons-clock"
-            variant="subtle"
             block
           />
           <UBadge
             :label="match.end_time!"
-            color="indigo"
+            color="white"
             size="xs"
             icon="i-heroicons-bell"
-            variant="subtle"
             block
           />
         </div>

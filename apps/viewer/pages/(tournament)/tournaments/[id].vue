@@ -164,6 +164,26 @@ const fourth = getTeamName(3)
     <div
       class="mt-4 max-w-2xl rounded-md border bg-white p-3 dark:border-gray-800 dark:bg-gray-900"
     >
+      <PageHeading>Visualisierung</PageHeading>
+      <div
+        class="flex h-64 items-center justify-center rounded-md border bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
+      >
+        <ClientOnly>
+          <LiveFlow :tournament-id="tournament?.id as string" />
+          <template #fallback>
+            <div
+              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
+            >
+              <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
+            </div>
+          </template>
+        </ClientOnly>
+      </div>
+    </div>
+
+    <div
+      class="mt-4 max-w-2xl rounded-md border bg-white p-3 dark:border-gray-800 dark:bg-gray-900"
+    >
       <PageHeading>Platzierungen</PageHeading>
       <USelect
         v-if="groups && groups.length"
