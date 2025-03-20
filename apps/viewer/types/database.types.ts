@@ -697,6 +697,12 @@ export type Database = {
         }
         Returns: undefined
       }
+      revert_tournament_to_group_phase: {
+        Args: {
+          p_tournament_id: string
+        }
+        Returns: undefined
+      }
       update_registration_status: {
         Args: Record<PropertyKey, never>
         Returns: undefined
