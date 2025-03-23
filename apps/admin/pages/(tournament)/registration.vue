@@ -201,11 +201,18 @@ const onUpdate = async (status: Enums<"registration_status">) => {
 const config = useRuntimeConfig()
 const onCopyLink = async (row: RegistrationColumn) => {
   const source: string = `${config.public.clientUrl}/registrations/${row.id}`
-  const { text, copy, copied } = useClipboard({ source })
+  const { text, copy, copied, isSupported } = useClipboard({
+    source,
+    legacy: true,
+  })
   await copy()
+  let description = text.value
+  if (!isSupported.value) {
+    description = "Ihr Browser unterstützt das Kopieren nicht."
+  }
   copied.value
-    ? displaySuccessNotification("Link kopiert", text.value)
-    : displayFailureNotification("Fehler beim Kopieren", text.value)
+    ? displaySuccessNotification("Link kopiert", description)
+    : displayFailureNotification("Fehler beim Kopieren", description)
 }
 
 const editSchema = z.object({
@@ -304,9 +311,15 @@ const onCopyEmail = async (classLinks: { links: Link[]; sent: boolean }) => {
   } else {
     source = links
   }
-  const { text, copy, copied } = useClipboard({ source })
+  const { text, copy, copied, isSupported } = useClipboard({
+    source,
+    legacy: true,
+  })
   await copy()
-  const description = text.value.slice(0, 150) + "\n... (Nachricht gekürzt)"
+  let description = text.value.slice(0, 150) + "\n... (Nachricht gekürzt)"
+  if (!isSupported.value) {
+    description = "Ihr Browser unterstützt das Kopieren nicht."
+  }
   copied.value
     ? displaySuccessNotification("E-Mail kopiert", description)
     : displayFailureNotification("Fehler beim Kopieren", description)
