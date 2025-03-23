@@ -20,6 +20,7 @@
     "build:admin": "turbo run build --filter=tourney-admin",
     "build:viewer": "turbo run build --filter=tourney-viewer",
     "build": "turbo run build",
+    "build:nocache": "turbo run build --force",
     "dev:admin": "turbo run dev --filter=tourney-admin",
     "dev:viewer": "turbo run dev --filter=tourney-viewer",
     "dev:core": "turbo run dev --filter=tourney-core",
