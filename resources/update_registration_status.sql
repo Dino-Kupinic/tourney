@@ -4,7 +4,8 @@ $$
 BEGIN
   UPDATE public.registration
   SET status = 'Abgelehnt'::public.registration_status
-  WHERE expire_date = CURRENT_DATE;
+  WHERE expire_date = CURRENT_DATE
+    AND status != 'Abgeschlossen'::public.registration_status;
 END;
 $$ LANGUAGE plpgsql;
 
