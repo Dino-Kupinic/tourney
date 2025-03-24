@@ -249,6 +249,16 @@ const submit = async () => {
         </div>
       </template>
       <template v-if="tournament && !isFormLocked">
+        <UAlert
+          icon="i-heroicons-information-circle"
+          variant="soft"
+          color="primary"
+          title="Info"
+          class="mb-6"
+          description="Alle Felder sind auszufüllen. Falls die maximale Anzahl nicht erreicht
+          werden kann, ist 'Leer' bei den übrigen Feldern einzutragen. Genauere
+        Informationen unter 'Medien' oder nachfragen!"
+        />
         <PageHeading>Spieler</PageHeading>
         <BaseForm
           v-model:players="formPlayers"
@@ -417,7 +427,10 @@ const submit = async () => {
               Name:
               <strong>{{ pdfName }}</strong>
             </p>
-            <p>Das Dokument kann so oft wie nötig runtergeladen werden.</p>
+            <p>
+              Das Dokument kann so oft wie nötig runtergeladen werden. Der
+              Download kann ein paar Sekunden dauern!
+            </p>
           </RegistrationItem>
           <UButton
             block
@@ -436,7 +449,7 @@ const submit = async () => {
             icon="i-heroicons-exclamation-circle"
             color="red"
             variant="soft"
-            title="Probleme beim runterladen?"
+            title="Probleme beim Runterladen?"
             description="Versuche es mit einem anderen Browser oder Gerät. Ansonsten wende dich
           an einen Verantwortlichen."
           />
