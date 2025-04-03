@@ -116,6 +116,7 @@ await fetchImages()
         :loading="isDeleting"
         @click="deleteSelectedImages"
       />
+      <!-- @vue-ignore -->
       <UButton
         label="Bilder hochladen"
         variant="soft"

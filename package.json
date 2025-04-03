@@ -46,6 +46,9 @@
     "turbo": "^2.4.4",
     "vitepress": "^1.6.3"
   },
+  "resolutions": {
+    "cookie": "0.7.2"
+  },
   "author": "Dino Kupinic",
   "license": "MIT"
 }
