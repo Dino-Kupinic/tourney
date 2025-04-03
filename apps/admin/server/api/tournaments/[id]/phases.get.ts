@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
     .select("match_id, team1_score, team2_score, winner_id")
     .in(
       "match_id",
-      matches.map((match) => match.match_id),
+      matches.map((match) => match.match_id!),
     )
 
   if (resultsError) {
