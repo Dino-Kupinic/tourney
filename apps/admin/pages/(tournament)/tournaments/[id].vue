@@ -436,11 +436,11 @@ const canGoLive = computed(() => {
             </div>
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-identification" />
-              <p>{{ tournament?.group_teams }} Teams pro Gruppe</p>
+              <p>{{ tournament?.group_teams }} Teams/Gruppe</p>
             </div>
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-clock" />
-              <p>{{ tournament?.knockout_interval }}min Knockout Spiele</p>
+              <p>{{ tournament?.knockout_interval }}min Knockout</p>
             </div>
           </div>
         </div>

@@ -27,8 +27,12 @@ const schema = ref(
     players: z
       .array(
         z.object({
-          firstName: z.string().min(1, "Vorname darf nicht leer sein"),
-          lastName: z.string().min(1, "Nachname darf nicht leer sein"),
+          firstName: z
+            .string()
+            .min(1, "Feld 'Vorname' muss einen Wert enthalten"),
+          lastName: z
+            .string()
+            .min(1, "Feld 'Nachname' muss einen Wert enthalten"),
           schoolClass: z.custom<Tables<"class">>(),
         }),
       )
@@ -52,8 +56,12 @@ watch(
       players: z
         .array(
           z.object({
-            firstName: z.string().min(1, "Vorname darf nicht leer sein"),
-            lastName: z.string().min(1, "Nachname darf nicht leer sein"),
+            firstName: z
+              .string()
+              .min(1, "Feld 'Vorname' muss einen Wert enthalten"),
+            lastName: z
+              .string()
+              .min(1, "Feld 'Nachname' muss einen Wert enthalten"),
             schoolClass: z.custom<Tables<"class">>(),
           }),
         )
