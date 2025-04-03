@@ -177,7 +177,7 @@ DECLARE
   group_b_matches  REFCURSOR;
   group_d_matches  REFCURSOR;
 BEGIN
-  -- Open cursors for each group's matches
+
   OPEN group_a_matches FOR
     SELECT t1.id AS team1, t2.id AS team2
     FROM public.team t1
@@ -210,48 +210,39 @@ BEGIN
     WHERE g.tournament_id = p_tournament_id
       AND g.name = 'Gruppe D';
 
-  -- Generate matches in parallel: A&C at the same time, B&D at the same time
+
   LOOP
-    -- Fetch the next match for Group A
+
     FETCH group_a_matches INTO team1, team2;
     EXIT WHEN NOT FOUND;
 
-    -- Insert the match for Group A
+
     INSERT INTO public.match (tournament_id, team1_id, team2_id, start_time, round)
     VALUES (p_tournament_id, team1, team2, start_time, 'Gruppenphase');
 
-    -- Fetch the next match for Group C
     FETCH group_c_matches INTO team1, team2;
     EXIT WHEN NOT FOUND;
 
-    -- Insert the match for Group C (same start time as Group A)
     INSERT INTO public.match (tournament_id, team1_id, team2_id, start_time, round)
     VALUES (p_tournament_id, team1, team2, start_time, 'Gruppenphase');
 
-    -- Increment the start time for the next round
     start_time := start_time + interval_minutes;
 
-    -- Fetch the next match for Group B
     FETCH group_b_matches INTO team1, team2;
     EXIT WHEN NOT FOUND;
 
-    -- Insert the match for Group B
     INSERT INTO public.match (tournament_id, team1_id, team2_id, start_time, round)
     VALUES (p_tournament_id, team1, team2, start_time, 'Gruppenphase');
 
-    -- Fetch the next match for Group D
     FETCH group_d_matches INTO team1, team2;
     EXIT WHEN NOT FOUND;
 
-    -- Insert the match for Group D (same start time as Group B)
     INSERT INTO public.match (tournament_id, team1_id, team2_id, start_time, round)
     VALUES (p_tournament_id, team1, team2, start_time, 'Gruppenphase');
 
-    -- Increment the start time for the next round
     start_time := start_time + interval_minutes;
   END LOOP;
 
-  -- Close cursors
   CLOSE group_a_matches;
   CLOSE group_c_matches;
   CLOSE group_b_matches;
@@ -406,16 +397,16 @@ $$
 DECLARE
   winner UUID;
 BEGIN
-  -- Determine the winner
+
   IF p_team1_score > p_team2_score THEN
     SELECT team1_id INTO winner FROM public.match WHERE id = p_match_id;
   ELSIF p_team1_score < p_team2_score THEN
     SELECT team2_id INTO winner FROM public.match WHERE id = p_match_id;
   ELSE
-    winner := NULL; -- Draw (no winner)
+    winner := NULL;
   END IF;
 
-  -- Insert result
+
   INSERT INTO public.result (match_id, team1_score, team2_score, winner_id)
   VALUES (p_match_id, p_team1_score, p_team2_score, winner);
 
@@ -615,18 +606,18 @@ DECLARE
   finale_results_count      INT;
   third_place_results_count INT;
 BEGIN
-  -- Retrieve tournament_id and round from the match table
+
   SELECT m.tournament_id, m.round
   INTO v_tournament_id, v_round
   FROM public.match m
   WHERE m.id = NEW.match_id;
 
-  -- Ensure we have a valid tournament ID and that this match is from the finale or 3rd place match
+
   IF v_tournament_id IS NULL OR (v_round <> 'Finale' AND v_round <> 'Kleines Finale') THEN
     RETURN NEW;
   END IF;
 
-  -- Count the number of results for the finale and 3rd place match
+
   SELECT COUNT(*)
   INTO finale_results_count
   FROM public.match m
@@ -643,7 +634,7 @@ BEGIN
     AND m.round = 'Kleines Finale'
     AND r.id IS NOT NULL;
 
-  -- If both the finale and 3rd place match have results, update the tournament results
+
   IF finale_results_count = 1 AND third_place_results_count = 1 THEN
     PERFORM update_tournament_results(v_tournament_id);
   END IF;
@@ -681,7 +672,7 @@ DECLARE
   third_place_winner_id UUID;
   third_place_loser_id  UUID;
 BEGIN
-  -- Get the winner and loser of the final
+
   SELECT CASE
            WHEN r.winner_id IS NOT NULL THEN r.winner_id
            WHEN r.team1_score > r.team2_score THEN m.team1_id
@@ -704,7 +695,7 @@ BEGIN
   WHERE m.tournament_id = p_tournament_id
     AND m.round = 'Finale';
 
-  -- Get the winner and loser of the 3rd place match
+
   SELECT CASE
            WHEN r.winner_id IS NOT NULL THEN r.winner_id
            WHEN r.team1_score > r.team2_score THEN m.team1_id
@@ -727,12 +718,12 @@ BEGIN
   WHERE m.tournament_id = p_tournament_id
     AND m.round = 'Kleines Finale';
 
-  -- Insert final rankings into tournament_results
+
   INSERT INTO public.tournament_result (tournament_id, team_id, position)
-  VALUES (p_tournament_id, final_winner_id, 1),       -- Champion
-         (p_tournament_id, final_loser_id, 2),        -- Runner-up
-         (p_tournament_id, third_place_winner_id, 3), -- 3rd place
-         (p_tournament_id, third_place_loser_id, 4); -- 4th place
+  VALUES (p_tournament_id, final_winner_id, 1),
+         (p_tournament_id, final_loser_id, 2),
+         (p_tournament_id, third_place_winner_id, 3),
+         (p_tournament_id, third_place_loser_id, 4);
 END;
 $$;
 
@@ -1651,9 +1642,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TAB
 
 RESET ALL;
 
---
--- Dumped schema changes for auth and storage
---
+
 
 CREATE POLICY "authenticated can do all 1zu98_0" ON "storage"."objects" FOR INSERT TO "authenticated" WITH CHECK (("bucket_id" = 'misc'::"text"));
 
