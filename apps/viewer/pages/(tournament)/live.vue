@@ -151,10 +151,10 @@ const { isDesktop } = useDevice()
           <div class="lg:col-span-2">
             <PageHeading>Gewinner</PageHeading>
             <TournamentPlaces
-              :first="first"
-              :second="second"
-              :third="third"
-              :fourth="fourth"
+              :first="first!"
+              :second="second!"
+              :third="third!"
+              :fourth="fourth!"
             />
           </div>
         </template>

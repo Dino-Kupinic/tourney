@@ -7,12 +7,11 @@ DECLARE
   third_place_winner_id UUID;
   third_place_loser_id  UUID;
 BEGIN
-  -- Get the winner and loser of the final
+
   SELECT CASE
            WHEN r.winner_id IS NOT NULL THEN r.winner_id
            WHEN r.team1_score > r.team2_score THEN m.team1_id
            WHEN r.team2_score > r.team1_score THEN m.team2_id
-           ELSE NULL
            END AS winner_id,
          CASE
            WHEN r.winner_id IS NOT NULL THEN
@@ -22,7 +21,6 @@ BEGIN
                END
            WHEN r.team1_score > r.team2_score THEN m.team2_id
            WHEN r.team2_score > r.team1_score THEN m.team1_id
-           ELSE NULL
            END AS loser_id
   INTO final_winner_id, final_loser_id
   FROM public.match m
@@ -30,7 +28,7 @@ BEGIN
   WHERE m.tournament_id = p_tournament_id
     AND m.round = 'Finale';
 
-  -- Get the winner and loser of the 3rd place match
+
   SELECT CASE
            WHEN r.winner_id IS NOT NULL THEN r.winner_id
            WHEN r.team1_score > r.team2_score THEN m.team1_id
@@ -53,12 +51,12 @@ BEGIN
   WHERE m.tournament_id = p_tournament_id
     AND m.round = 'Kleines Finale';
 
-  -- Insert final rankings into tournament_results
+
   INSERT INTO public.tournament_result (tournament_id, team_id, position)
-  VALUES (p_tournament_id, final_winner_id, 1),       -- Champion
-         (p_tournament_id, final_loser_id, 2),        -- Runner-up
-         (p_tournament_id, third_place_winner_id, 3), -- 3rd place
-         (p_tournament_id, third_place_loser_id, 4); -- 4th place
+  VALUES (p_tournament_id, final_winner_id, 1),
+         (p_tournament_id, final_loser_id, 2),
+         (p_tournament_id, third_place_winner_id, 3),
+         (p_tournament_id, third_place_loser_id, 4);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -71,18 +69,18 @@ DECLARE
   finale_results_count      INT;
   third_place_results_count INT;
 BEGIN
-  -- Retrieve tournament_id and round from the match table
+
   SELECT m.tournament_id, m.round
   INTO v_tournament_id, v_round
   FROM public.match m
   WHERE m.id = NEW.match_id;
 
-  -- Ensure we have a valid tournament ID and that this match is from the finale or 3rd place match
+
   IF v_tournament_id IS NULL OR (v_round <> 'Finale' AND v_round <> 'Kleines Finale') THEN
     RETURN NEW;
   END IF;
 
-  -- Count the number of results for the finale and 3rd place match
+
   SELECT COUNT(*)
   INTO finale_results_count
   FROM public.match m
@@ -99,7 +97,7 @@ BEGIN
     AND m.round = 'Kleines Finale'
     AND r.id IS NOT NULL;
 
-  -- If both the finale and 3rd place match have results, update the tournament results
+
   IF finale_results_count = 1 AND third_place_results_count = 1 THEN
     PERFORM update_tournament_results(v_tournament_id);
   END IF;
@@ -108,7 +106,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create the trigger
+
 CREATE OR REPLACE TRIGGER trigger_final_results
   AFTER INSERT OR UPDATE
   ON public.result

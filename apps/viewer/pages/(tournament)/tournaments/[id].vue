@@ -153,10 +153,10 @@ const fourth = getTeamName(3)
       >
         <PageHeading>Gewinner</PageHeading>
         <TournamentPlaces
-          :first="first"
-          :second="second"
-          :third="third"
-          :fourth="fourth"
+          :first="first!"
+          :second="second!"
+          :third="third!"
+          :fourth="fourth!"
         />
       </div>
     </div>

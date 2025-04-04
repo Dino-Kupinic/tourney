@@ -1,6 +1,6 @@
 {
   "name": "tourney",
-  "version": "0.27.4",
+  "version": "0.27.7",
   "description": "This project is a web application for managing tournaments.",
   "packageManager": "pnpm@10.5.0",
   "workspaces": [
@@ -45,6 +45,9 @@
     "prettier-plugin-tailwindcss": "^0.6.11",
     "turbo": "^2.4.4",
     "vitepress": "^1.6.3"
+  },
+  "resolutions": {
+    "cookie": "0.7.2"
   },
   "author": "Dino Kupinic",
   "license": "MIT"

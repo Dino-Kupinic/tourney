@@ -170,10 +170,10 @@ const { data: history, refresh: refreshHistory } = await useFetch(
       <ModalInfo v-model="isOpenWinners">
         <TournamentPlaces
           v-if="results?.length"
-          :first="first"
-          :second="second"
-          :third="third"
-          :fourth="fourth"
+          :first="first!"
+          :second="second!"
+          :third="third!"
+          :fourth="fourth!"
         />
       </ModalInfo>
       <UButton

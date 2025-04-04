@@ -2,14 +2,14 @@ import type { Database } from "~/types/database.types"
 
 export const useUser = () => {
   const supabase = useSupabaseClient<Database>()
-  const session = useSupabaseSession()
+  const session = useSupabaseUser()
 
-  const id = ref<string>(session.value?.user.id ?? "")
-  const name = ref<string>(formatUsername(session.value?.user.email))
-  const email = ref<string>(session.value?.user.email ?? "Unknown")
-  const role = ref<string>(session.value?.user.user_metadata.role)
+  const id = ref<string>(session.value?.id ?? "")
+  const name = ref<string>(formatUsername(session.value?.email))
+  const email = ref<string>(session.value?.email ?? "Unknown")
+  const role = ref<string>(session.value?.user_metadata.role)
   const last_sign_in: ComputedRef<string> = useDateFormat(
-    session.value?.user.last_sign_in_at ?? useNow(),
+    session.value?.last_sign_in_at ?? useNow(),
     "DD.MM.YYYY HH:mm:ss",
   )
 
