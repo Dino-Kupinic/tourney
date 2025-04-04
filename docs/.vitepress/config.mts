@@ -6,6 +6,7 @@ export default defineConfig({
   sitemap: {
     hostname: "https://tourney.htl-steyr.ac.at/docs",
   },
+  base: "/tourney/",
   lang: "de-DE",
   description: "Offizielle tourney Dokumentation",
   head: [
