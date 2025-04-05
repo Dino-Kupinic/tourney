@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "nuxt-monaco-editor",
     "@nuxt/content",
+    "@nuxt/test-utils/module",
   ],
   devtools: { enabled: true },
   devServer: {

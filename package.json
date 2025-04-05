@@ -28,6 +28,8 @@
     "dev:admin:host": "turbo run dev --filter=tourney-admin -- --host",
     "dev:viewer:host": "turbo run dev --filter=tourney-viewer -- --host",
     "generate-pwa-assets": "pnpm --filter=tourney-viewer run generate-pwa-assets",
+    "test:admin": "turbo run test --filter=tourney-admin",
+    "test:viewer": "turbo run test --filter=tourney-viewer",
     "start:supabase": "cd ./apps/api/supabase && npx supabase start --ignore-health-check",
     "stop:supabase": "cd ./apps/api/supabase && npx supabase stop",
     "types:supabase": "cd ./apps/api/supabase && npx supabase gen types --lang=typescript --local > ../../admin/types/database.types.ts && npx supabase gen types --lang=typescript --local > ../../viewer/types/database.types.ts",
@@ -43,7 +45,7 @@
   "devDependencies": {
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
-    "turbo": "^2.4.4",
+    "turbo": "^2.5.0",
     "vitepress": "^1.6.3"
   },
   "resolutions": {
