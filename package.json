@@ -1,6 +1,6 @@
 {
   "name": "tourney",
-  "version": "0.27.10",
+  "version": "0.27.11",
   "description": "This project is a web application for managing tournaments.",
   "packageManager": "pnpm@10.5.0",
   "workspaces": [
@@ -43,7 +43,7 @@
   "devDependencies": {
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
-    "turbo": "^2.4.4",
+    "turbo": "^2.5.4",
     "vitepress": "^1.6.3"
   },
   "resolutions": {
