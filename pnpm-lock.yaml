@@ -78,6 +78,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.50.3
         version: 2.50.3
+      '@tourney/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@vueuse/core':
         specifier: ^13.4.0
         version: 13.5.0(vue@3.5.13(typescript@5.8.3))
@@ -201,7 +204,7 @@ importers:
         specifier: 2.2.10
         version: 2.2.10(typescript@5.8.2)
 
-  packages/db:
+  packages/types:
     devDependencies:
       '@types/node':
         specifier: 24.0.4

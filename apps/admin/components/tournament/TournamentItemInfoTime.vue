@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ParsedJsonTournament } from "~/types/prizes"
+import type { ParsedJsonTournament } from "@tourney/types"
 
 const { arrowRight = false } = defineProps<{
   tournament: ParsedJsonTournament

@@ -1,4 +1,4 @@
-import type { Enums } from "~/types/database.types"
+import type { Enums } from "./database.types.js"
 
 export type RegistrationColumn = {
   id: string

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { z } from "zod"
-import type { Enums } from "~/types/database.types"
+import type { Enums } from "@tourney/types"
 
 const title = ref<string>("Turniere")
 useHead({

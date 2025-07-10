@@ -1,6 +1,4 @@
-import { serverSupabaseClient } from "#supabase/server"
-import type { Database, Enums } from "~/types/database.types"
-import type { TournamentDTO } from "~/types/dto"
+import type { Enums, TournamentDTO } from "@tourney/types"
 
 type Body = {
   name: string
@@ -25,7 +23,7 @@ type Body = {
 }
 
 export default defineEventHandler(async (event) => {
-  const supabase = await serverSupabaseClient<Database>(event)
+  const supabase = await useDatabase(event)
   const {
     name,
     rules,

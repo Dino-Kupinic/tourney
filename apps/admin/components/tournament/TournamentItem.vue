@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ParsedJsonTournament } from "~/types/prizes"
+import type { ParsedJsonTournament } from "@tourney/types"
 import {
   FOOTBALL_MAX_TEAMS,
   VOLLEYBALL_BASKETBALL_MAX_TEAMS,

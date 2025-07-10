@@ -1,9 +1,7 @@
-import { serverSupabaseClient } from "#supabase/server"
-import type { Database } from "~/types/database.types"
-import type { TournamentTeamSummary } from "~/types/tournament"
+import type { TournamentTeamSummary } from "@tourney/types"
 
 export default defineEventHandler(async (event) => {
-  const supabase = await serverSupabaseClient<Database>(event)
+  const supabase = await useDatabase(event)
   const id = getRouterParam(event, "id")
 
   if (!id) {

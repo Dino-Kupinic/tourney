@@ -1,5 +1,5 @@
 {
-  "name": "@tourney/db",
+  "name": "@tourney/types",
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -7,12 +7,10 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/database.types.d.ts",
-      "default": "./dist/database.types.js"
+      "types": "./dist/index.d.ts"
     }
   },
-  "types": "./dist/database.types.d.ts",
-  "main": "./dist/database.types.js",
+  "types": "./dist/index.d.ts",
   "devDependencies": {
     "@types/node": "24.0.4",
     "typescript": "^5.8.3"

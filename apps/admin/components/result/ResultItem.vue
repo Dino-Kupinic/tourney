@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Match } from "~/types/match"
+import type { Match } from "@tourney/types"
 import { z } from "zod"
 
 const { id, match, score1, score2, winner } = defineProps<{
@@ -36,7 +36,7 @@ const editState = reactive({
   winner: stateWinner,
 })
 
-const supabase = useSupabaseClient()
+const supabase = useDatabaseClient()
 const emit = defineEmits(["refresh"])
 const onSubmitEdit = async () => {
   try {
