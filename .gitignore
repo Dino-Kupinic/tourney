@@ -18,4 +18,4 @@ node_modules
 .nuxt
 docs/.vitepress/cache
 .turbo
-/docs/.vitepress/dist/
+dist

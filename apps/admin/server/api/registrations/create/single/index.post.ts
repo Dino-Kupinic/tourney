@@ -1,6 +1,4 @@
-import { serverSupabaseClient } from "#supabase/server"
-import type { Database, Tables } from "~/types/database.types"
-import type { RegistrationDTO } from "~/types/dto"
+import type { RegistrationDTO, Tables } from "@tourney/types"
 
 export default defineEventHandler(async (event) => {
   const { expire_date, name, schoolClass, allow_class_mixing } =
@@ -11,7 +9,7 @@ export default defineEventHandler(async (event) => {
       allow_class_mixing: boolean
     }>(event)
 
-  const supabase = await serverSupabaseClient<Database>(event)
+  const supabase = await useDatabase(event)
   const registration: RegistrationDTO = {
     class_id: schoolClass.id,
     expire_date,

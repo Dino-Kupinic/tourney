@@ -1,4 +1,4 @@
-import type { Database } from "~/types/database.types"
+import type { Database } from "./database.types.js"
 
 export interface TeamInGroup {
   id: string

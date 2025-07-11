@@ -1,4 +1,4 @@
-import type { Tables } from "~/types/database.types"
+import type { Tables } from "@tourney/types"
 
 export const useLiveTournaments = () => {
   const liveTournaments = useState<number>("liveTournamentsCount", () => 0)

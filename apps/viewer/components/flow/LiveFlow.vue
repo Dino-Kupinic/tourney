@@ -3,7 +3,7 @@ import { VueFlow, type Node, type Edge } from "@vue-flow/core"
 import { Background } from "@vue-flow/background"
 import { Controls } from "@vue-flow/controls"
 import { MiniMap } from "@vue-flow/minimap"
-import type { TournamentPhases } from "~/types/phases"
+import type { TournamentPhases } from "@tourney/types"
 
 import "@vue-flow/core/dist/style.css"
 import "@vue-flow/core/dist/theme-default.css"

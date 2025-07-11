@@ -1,6 +1,4 @@
-import { serverSupabaseClient } from "#supabase/server"
-import type { Database } from "~/types/database.types"
-import type { RegistrationDTO } from "~/types/dto"
+import type { RegistrationDTO } from "@tourney/types"
 
 export default defineEventHandler(async (event) => {
   const { expire_date, teams, year } = await readBody<{
@@ -9,7 +7,7 @@ export default defineEventHandler(async (event) => {
     year: string
   }>(event)
 
-  const supabase = await serverSupabaseClient<Database>(event)
+  const supabase = await useDatabase(event)
 
   const { data: classes, error: fetchError } = await supabase
     .from("class")

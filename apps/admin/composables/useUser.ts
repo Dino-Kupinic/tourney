@@ -1,4 +1,4 @@
-import type { Database } from "~/types/database.types"
+import type { Database } from "@tourney/types"
 
 export const useUser = () => {
   const supabase = useSupabaseClient<Database>()

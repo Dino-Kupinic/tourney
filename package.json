@@ -1,6 +1,6 @@
 {
   "name": "tourney",
-  "version": "0.27.11",
+  "version": "0.28.0",
   "description": "This project is a web application for managing tournaments.",
   "packageManager": "pnpm@10.5.0",
   "workspaces": [
@@ -28,9 +28,9 @@
     "dev:admin:host": "turbo run dev --filter=tourney-admin -- --host",
     "dev:viewer:host": "turbo run dev --filter=tourney-viewer -- --host",
     "generate-pwa-assets": "pnpm --filter=tourney-viewer run generate-pwa-assets",
-    "start:supabase": "cd ./apps/api/supabase && npx supabase start --ignore-health-check",
+    "start:supabase": "cd ./apps/api/supabase && npx supabase start",
     "stop:supabase": "cd ./apps/api/supabase && npx supabase stop",
-    "types:supabase": "cd ./apps/api/supabase && npx supabase gen types --lang=typescript --local > ../../admin/types/database.types.ts && npx supabase gen types --lang=typescript --local > ../../viewer/types/database.types.ts",
+    "types:supabase": "cd ./apps/api/supabase && npx supabase gen types --lang=typescript --local > ../../../packages/db/database.types.ts",
     "schema:supabase": "cd ./apps/api/supabase && supabase db diff -f --local",
     "format": "turbo run format",
     "format:write": "turbo run format:write"

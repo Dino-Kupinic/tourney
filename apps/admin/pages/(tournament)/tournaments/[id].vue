@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import type { ParsedJsonTournament } from "~/types/prizes"
 import {
   FOOTBALL_MAX_TEAMS,
   VOLLEYBALL_BASKETBALL_MAX_TEAMS,
 } from "~/misc/constants"
 import { z } from "zod"
-import type { Enums } from "~/types/database.types"
-import type { Group } from "~/types/group"
+import type { Enums, Group, ParsedJsonTournament } from "@tourney/types"
 
 const title = ref<string>("Turniere")
 useHead({

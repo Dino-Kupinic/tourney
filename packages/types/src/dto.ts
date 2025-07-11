@@ -1,4 +1,4 @@
-import type { Tables } from "~/types/database.types"
+import type { Tables } from "./database.types.js"
 
 type RegistrationDTO = Omit<Tables<"registration">, "id">
 type PlayerDTO = Omit<Tables<"player">, "id" | "created_at" | "note">

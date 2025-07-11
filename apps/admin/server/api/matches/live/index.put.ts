@@ -1,13 +1,10 @@
-import { serverSupabaseClient } from "#supabase/server"
-import type { Database } from "~/types/database.types"
-
 type Body = {
   id: string
   start_time?: string
 }
 
 export default defineEventHandler(async (event) => {
-  const supabase = await serverSupabaseClient<Database>(event)
+  const supabase = await useDatabase(event)
   const { id, start_time } = await readBody<Body>(event)
 
   if (!id) {

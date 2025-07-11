@@ -28,6 +28,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@tourney/types": "workspace:*",
     "@nuxtjs/device": "^3.2.4",
     "@nuxtjs/supabase": "^1.5.3",
     "@supabase/supabase-js": "^2.50.3",

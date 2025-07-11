@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import type { ParsedJsonTournament } from "~/types/prizes"
-import type { Match } from "~/types/match"
-import type { Standing } from "~/types/standing"
+import type { Match, ParsedJsonTournament, Standing } from "@tourney/types"
 
 const { tournaments, fetchTournaments } = useLiveTournaments()
 const selected = useState<string>("selectedTournament", () => "")

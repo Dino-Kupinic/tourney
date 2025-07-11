@@ -18,6 +18,9 @@
     "vue-router": "4.5.1"
   },
   "devDependencies": {
+    "@tourney/types": "workspace:*",
+    "@nuxtjs/supabase": "^1.5.3",
+    "@supabase/supabase-js": "^2.50.3",
     "@iconify-json/heroicons": "^1.2.0",
     "@nuxt/fonts": "^0.8.0",
     "@nuxt/image": "^1.8.1",

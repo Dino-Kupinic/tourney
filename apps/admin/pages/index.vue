@@ -17,11 +17,10 @@ useHead({
         </h1>
         <div class="mt-6 flex h-full w-full flex-col gap-3">
           <div class="flex h-1/2 gap-3">
-            <!-- TODO: add link -->
             <NuxtLink
               rel="noopener"
               target="_blank"
-              to=""
+              to="https://htl-steyr.github.io/tourney/"
               class="hover:border-primary-500 dark:hover:border-primary-500 flex h-full w-2/3 flex-col justify-between rounded-lg border bg-gray-50 p-8 font-serif text-xl tracking-tight dark:border-gray-700 dark:bg-gray-900"
             >
               <p>Dokumentation</p>
@@ -34,7 +33,7 @@ useHead({
             <NuxtLink
               rel="noopener"
               target="_blank"
-              to="https://github.com/Dino-Kupinic/tourney"
+              to="https://github.com/HTL-Steyr/tourney"
               class="hover:border-primary-500 dark:hover:border-primary-500 flex h-full w-1/3 flex-col justify-between rounded-lg border bg-gray-50 p-8 font-serif text-xl tracking-tight dark:border-gray-700 dark:bg-gray-900"
             >
               <p>GitHub</p>
@@ -45,11 +44,11 @@ useHead({
               />
             </NuxtLink>
           </div>
-          <!-- TODO: add link -->
+          <!-- TODO: update -->
           <NuxtLink
             rel="noopener"
             target="_blank"
-            to=""
+            to="https://tourney.htl-steyr.at"
             class="hover:border-primary-500 dark:hover:border-primary-500 flex h-1/3 w-full flex-col justify-between rounded-lg border bg-gray-50 p-8 font-serif text-xl tracking-tight dark:border-gray-700 dark:bg-gray-900"
           >
             <p>Schüler-App</p>
