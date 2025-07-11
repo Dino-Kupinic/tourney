@@ -2,7 +2,7 @@ import puppeteer from "puppeteer"
 import Handlebars from "handlebars"
 import { H3Event } from "h3"
 import { useDateFormat } from "@vueuse/core"
-import type { Enums, Tables } from "~/types/database.types"
+import type { Enums, Tables } from "@tourney/types"
 
 export default defineEventHandler(async (event: H3Event) => {
   const {

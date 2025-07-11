@@ -3,7 +3,6 @@ const appVersion = useAppVersion()
 
 const isOnline = useOnline()
 const { isSupported, memory } = useMemory()
-const formatted = useDateFormat(useNow(), "dddd HH:mm:ss")
 
 function size(v: number) {
   const kb = v / 1024 / 1024
@@ -16,20 +15,22 @@ function size(v: number) {
     <div
       class="flex w-full items-center justify-end gap-1 p-1 pr-0 font-mono tracking-tight"
     >
-      <!--
-      Rendered only on the client, because of time differing because of SSR.
-      There is a workaround but here it's not worth it.
-      https://github.com/danielroe/nuxt-time
-      - Dino 27.09.2024
-      -->
+      <UBadge v-if="isOnline" color="green" size="xs" variant="subtle">
+        Online
+      </UBadge>
+      <UBadge v-else color="red" size="xs" variant="subtle"> Offline </UBadge>
+      <UBadge color="purple" size="xs" variant="subtle">
+        <NuxtTime
+          :datetime="Date.now()"
+          year="numeric"
+          month="long"
+          day="numeric"
+          hour="2-digit"
+          locale="de-DE"
+          minute="2-digit"
+        />
+      </UBadge>
       <ClientOnly>
-        <UBadge v-if="isOnline" color="green" size="xs" variant="subtle">
-          Online
-        </UBadge>
-        <UBadge v-else color="red" size="xs" variant="subtle"> Offline </UBadge>
-        <UBadge color="purple" size="xs" variant="subtle">
-          {{ formatted }}
-        </UBadge>
         <UBadge
           v-if="isSupported && memory"
           color="yellow"
@@ -49,11 +50,11 @@ function size(v: number) {
         <UBadge v-else color="yellow" size="xs" variant="subtle">
           Kalkuliere...
         </UBadge>
-        <UBadge color="white" size="xs"> tourney v{{ appVersion }} </UBadge>
         <template #fallback>
-          <USkeleton class="h-5 w-96" />
+          <USkeleton class="h-5 w-24" />
         </template>
       </ClientOnly>
+      <UBadge color="white" size="xs"> tourney v{{ appVersion }} </UBadge>
     </div>
   </nav>
 </template>

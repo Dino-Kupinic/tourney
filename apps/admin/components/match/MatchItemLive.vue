@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Match } from "~/types/match"
+import type { Match } from "@tourney/types"
 
 const { match } = defineProps<{ match: Match }>()
 
@@ -65,7 +65,7 @@ const winner = computed(() => {
 
 const emit = defineEmits(["finish"])
 const isOpenConfirm = ref<boolean>(false)
-const supabase = useSupabaseClient()
+const supabase = useDatabaseClient()
 
 const isLoading = ref<boolean>(false)
 const completeMatch = async () => {

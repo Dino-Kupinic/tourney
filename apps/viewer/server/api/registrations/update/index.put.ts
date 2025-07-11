@@ -1,12 +1,11 @@
-import { serverSupabaseClient } from "#supabase/server"
-import type { Database, Enums } from "~/types/database.types"
+import type { Enums } from "@tourney/types"
 
 export default defineEventHandler(async (event) => {
   const { registration_id, status } = await readBody<{
     registration_id: string
     status: Enums<"registration_status">
   }>(event)
-  const supabase = await serverSupabaseClient<Database>(event)
+  const supabase = await useDatabase(event)
 
   const { error } = await supabase
     .from("registration")

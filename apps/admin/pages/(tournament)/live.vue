@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { ParsedJsonTournament } from "~/types/prizes"
-import type { Match } from "~/types/match"
-import type { Standing } from "~/types/standing"
 import { z } from "zod"
+import type { Database, Match, ParsedJsonTournament, Standing } from "@tourney/types"
+import { useDatabaseClient } from "~/composables/useDatabaseClient"
 
 const title = ref<string>("Live")
 useHead({
@@ -71,7 +70,7 @@ const state = reactive({
   start_time: tournament.value?.from,
 })
 
-const supabase = useSupabaseClient()
+const supabase = useDatabaseClient()
 const isOpenCreate = ref<boolean>(false)
 const generateGroupMatches = async () => {
   try {

@@ -1,9 +1,6 @@
-import { serverSupabaseClient } from "#supabase/server"
-import type { Database } from "~/types/database.types"
-import type { PlayerDTO } from "~/types/dto"
-
+import type { PlayerDTO } from "@tourney/types"
 export default defineEventHandler(async (event) => {
-  const supabase = await serverSupabaseClient<Database>(event)
+  const supabase = await useDatabase(event)
   const { players } = await readBody<{
     players: PlayerDTO[]
   }>(event)

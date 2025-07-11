@@ -1,4 +1,4 @@
-import type { Database } from "~/types/database.types"
+import type { Database } from "@tourney/types"
 import { serverSupabaseClient } from "#supabase/server"
 import { H3Event } from "h3"
 

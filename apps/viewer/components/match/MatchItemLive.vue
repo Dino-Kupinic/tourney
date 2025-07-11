@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Match } from "~/types/match"
+import type { Match } from "@tourney/types"
 
 const { match } = defineProps<{ match: Match }>()
 

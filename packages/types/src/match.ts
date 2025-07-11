@@ -1,4 +1,4 @@
-import type { Database } from "~/types/database.types"
+import type { Database } from "./database.types.js"
 
 export type Match = Database["public"]["Views"]["matches_status"]["Row"] & {
   status: "completed" | "live" | "upcoming"

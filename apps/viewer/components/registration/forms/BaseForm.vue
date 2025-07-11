@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { z } from "zod"
-import type { Tables } from "~/types/database.types"
-import type { FormPlayer } from "~/types/form"
 import type { Form } from "#ui/types"
+import type { FormPlayer, Tables } from "@tourney/types"
 
 const { playerCount, defaultClass } = defineProps<{
   playerCount: number
