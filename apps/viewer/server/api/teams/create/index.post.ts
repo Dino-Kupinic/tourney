@@ -1,8 +1,10 @@
-import { serverSupabaseClient } from "#supabase/server"
-import type { Database, Enums, Tables } from "~/types/database.types"
-import type { FormPlayer } from "~/types/form"
-import type { PlayerDTO } from "~/types/dto"
-import type { RegistrationWithClass } from "~/types/registration"
+import type {
+  Enums,
+  FormPlayer,
+  PlayerDTO,
+  RegistrationWithClass,
+  Tables,
+} from "@tourney/types"
 
 type Body = {
   formPlayers: FormPlayer[]
@@ -13,7 +15,7 @@ type Body = {
 }
 
 export default defineEventHandler(async (event) => {
-  const supabase = await serverSupabaseClient<Database>(event)
+  const supabase = await useDatabase(event)
   const { formPlayers, logo, logo_variant, registration, tournament } =
     await readBody<Body>(event)
 
