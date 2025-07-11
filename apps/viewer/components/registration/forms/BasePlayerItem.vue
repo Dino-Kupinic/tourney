@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Tables } from "~/types/database.types"
+import type { Tables } from "@tourney/types"
 import { formLocked } from "~/keys/isFormLocked"
 import { classMixing } from "~/keys/allowClassMixing"
 

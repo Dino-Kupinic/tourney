@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Enums } from "~/types/database.types"
+import type { Enums } from "@tourney/types"
 
 defineProps<{
   schema: any

@@ -1,4 +1,4 @@
-import type { Tables } from "~/types/database.types"
+import type { Tables } from "@tourney/types"
 
 export const useLiveTournaments = () => {
   const tournaments = useState<Tables<"tournament">[]>(

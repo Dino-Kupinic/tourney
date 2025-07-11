@@ -1,6 +1,5 @@
 import type { TableColumn } from "#ui/types"
-import type { RegistrationColumn } from "~/types/registration"
-import type { Enums } from "~/types/database.types"
+import type { Enums, RegistrationColumn } from "@tourney/types"
 
 export const useRegistrationTable = (
   onUpdate: (status: Enums<"registration_status">) => void,

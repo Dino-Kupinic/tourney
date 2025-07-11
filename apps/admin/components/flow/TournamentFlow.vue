@@ -4,9 +4,7 @@ import { VueFlow } from "@vue-flow/core"
 import { Background } from "@vue-flow/background"
 import { MiniMap } from "@vue-flow/minimap"
 import { Controls } from "@vue-flow/controls"
-import type { Group } from "~/types/group"
-import TeamNode from "./TeamNode.vue"
-import GroupNode from "./GroupNode.vue"
+import type { Group } from "@tourney/types"
 
 const { groups } = defineProps<{
   groups: Group[]

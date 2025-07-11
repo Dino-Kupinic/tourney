@@ -1,8 +1,5 @@
-import type { Database, Enums } from "~/types/database.types"
-import { serverSupabaseClient } from "#supabase/server"
-
 export default defineEventHandler(async (event) => {
-  const supabase = await serverSupabaseClient<Database>(event)
+  const supabase = await useDatabase(event)
   const { id, expire_date, allow_class_mixing } = await readBody<{
     id: string
     expire_date: string

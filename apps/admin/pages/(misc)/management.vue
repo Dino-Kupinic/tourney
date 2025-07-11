@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Tables } from "~/types/database.types"
+import type { Tables } from "@tourney/types"
 import { z } from "zod"
 
 const title = ref<string>("Klassenverwaltung")

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TournamentTeamSummary } from "~/types/tournament"
+import type { TournamentTeamSummary } from "@tourney/types"
 
 interface SummaryItem {
   icon: string

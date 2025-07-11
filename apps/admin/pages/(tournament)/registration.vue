@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import type { Enums, Tables } from "~/types/database.types"
-import type { Link, LinkGroup } from "~/types/link"
-import type { RegistrationColumn } from "~/types/registration"
 import { z } from "zod"
+import type { Enums, Link, LinkGroup, RegistrationColumn, Tables } from "@tourney/types"
 
 const title = ref<string>("Anmeldung")
 useHead({
