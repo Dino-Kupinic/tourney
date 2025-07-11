@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { formLocked } from "~/keys/isFormLocked"
 import { classMixing } from "~/keys/allowClassMixing"
-import type { ParsedJsonTournament } from "~/types/prizes"
-import type { Tables } from "~/types/database.types"
-import type { FormPlayer } from "~/types/form"
-import type { RegistrationWithClass } from "~/types/registration"
+import type { FormPlayer, ParsedJsonTournament, RegistrationWithClass, Tables } from "@tourney/types"
 
 useHead({
   title: "Anmeldung",
