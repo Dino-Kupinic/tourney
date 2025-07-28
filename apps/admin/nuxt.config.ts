@@ -1,7 +1,17 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   extends: ["../../packages/core"],
-  compatibilityDate: "2024-04-03",
+  build: {
+    transpile: ["monaco-editor"],
+  },
+  vite: {
+    define: {
+      global: "globalThis",
+    },
+    optimizeDeps: {
+      include: ["monaco-editor/esm/vs/editor/editor.worker"],
+    },
+  },
   modules: [
     "@vueuse/nuxt",
     "@nuxtjs/supabase",
