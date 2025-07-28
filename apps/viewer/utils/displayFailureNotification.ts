@@ -9,6 +9,6 @@ export default function (title: string, description: string) {
     title: title,
     description: description,
     color: "red",
-    icon: "i-material-symbols-error-circle-rounded-outline-sharp",
+    icon: "i-heroicons-exclamation-circle-solid",
   })
 }

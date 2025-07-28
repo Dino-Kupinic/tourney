@@ -1,6 +1,6 @@
 {
   "name": "tourney",
-  "version": "0.28.0",
+  "version": "0.29.0",
   "description": "This project is a web application for managing tournaments.",
   "packageManager": "pnpm@10.5.0",
   "workspaces": [
@@ -21,6 +21,7 @@
     "build:viewer": "turbo run build --filter=tourney-viewer",
     "build": "turbo run build",
     "build:nocache": "turbo run build --force",
+    "analyze:admin": "turbo run analyze --filter=tourney-admin",
     "dev:admin": "turbo run dev --filter=tourney-admin",
     "dev:viewer": "turbo run dev --filter=tourney-viewer",
     "dev:core": "turbo run dev --filter=tourney-core",
