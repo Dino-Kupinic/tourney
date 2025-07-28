@@ -79,12 +79,14 @@ async function saveContent() {
   </BasePageHeader>
   <ClientOnly>
     <div class="flex h-full w-full">
-      <MonacoEditor
-        v-model="content"
-        lang="markdown"
-        class="h-full w-3/5 border-r border-gray-200 dark:border-gray-700"
-        :options="{ theme: theme }"
-      />
+      <!-- TODO: Swap to light weight editor, monaco is heavy and overkill -->
+
+      <!--      <MonacoEditor-->
+      <!--        v-model="content"-->
+      <!--        lang="markdown"-->
+      <!--        class="h-full w-3/5 border-r border-gray-200 dark:border-gray-700"-->
+      <!--        :options="{ theme: theme }"-->
+      <!--      />-->
       <div class="h-full w-2/5">
         <MDC
           v-if="content"

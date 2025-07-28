@@ -17,6 +17,9 @@
       "outputs": [".output/**", "dist/**"],
       "cache": true
     },
+    "analyze": {
+      "cache": false
+    },
     "preview": {
       "dependsOn": ["build"],
       "cache": false
