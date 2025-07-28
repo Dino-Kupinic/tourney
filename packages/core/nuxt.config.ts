@@ -7,6 +7,7 @@ const currentDir = dirname(fileURLToPath(import.meta.url))
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  compatibilityDate: "2025-07-28",
   modules: [
     "@nuxt/ui",
     "@nuxt/fonts",

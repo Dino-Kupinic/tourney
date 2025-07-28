@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   extends: ["../../packages/core"],
+  compatibilityDate: "2025-07-28",
   devtools: { enabled: true },
   modules: [
     "@nuxtjs/device",
