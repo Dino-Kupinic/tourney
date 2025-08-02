@@ -1,5 +1,5 @@
 {
-  "name": "tourney-viewer",
+  "name": "@tourney/viewer",
   "private": true,
   "type": "module",
   "scripts": {
