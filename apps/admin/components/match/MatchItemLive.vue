@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Match } from "@tourney/types"
+import { getImageUrl } from "#imports"
 
 const { match } = defineProps<{ match: Match }>()
 

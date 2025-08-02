@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { ParsedJsonTournament } from "@tourney/types"
+import { useDateFormat } from "@vueuse/core"
+import { parseStringToDate } from "#imports"
 
 const { arrowRight = false } = defineProps<{
   tournament: ParsedJsonTournament

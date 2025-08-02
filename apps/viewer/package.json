@@ -1,5 +1,5 @@
 {
-  "name": "tourney-viewer",
+  "name": "@tourney/viewer",
   "private": true,
   "type": "module",
   "scripts": {
@@ -19,8 +19,8 @@
     "@iconify-json/svg-spinners": "^1.2.2",
     "@nuxt/content": "2.13.4",
     "@nuxtjs/device": "^3.2.4",
-    "@nuxtjs/supabase": "^1.5.3",
-    "@supabase/supabase-js": "^2.50.3",
+    "@nuxtjs/supabase": "^1.6.0",
+    "@supabase/supabase-js": "^2.53.0",
     "@vite-pwa/nuxt": "0.10.8",
     "@vue-flow/background": "^1.3.2",
     "@vue-flow/controls": "^1.1.2",
@@ -29,7 +29,7 @@
     "@vueuse/core": "^13.4.0",
     "@vueuse/nuxt": "^13.4.0",
     "handlebars": "^4.7.8",
-    "nuxt": "3.17.7",
+    "nuxt": "3.18.0",
     "puppeteer": "24.6.1",
     "vue": "3.5.13",
     "vue-router": "4.5.1",
@@ -39,6 +39,6 @@
     "@tourney/types": "workspace:*",
     "@types/k6": "^0.54.2",
     "@vite-pwa/assets-generator": "^0.2.6",
-    "vue-tsc": "2.2.10"
+    "vue-tsc": "3.0.5"
   }
 }

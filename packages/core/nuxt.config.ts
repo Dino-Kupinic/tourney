@@ -15,6 +15,9 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@nuxtjs/supabase",
   ],
+  devServer: {
+    port: 3003,
+  },
   css: [join(currentDir, "./assets/base.css")],
   runtimeConfig: {
     public: {

@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { z } from "zod"
-import type { Enums, Link, LinkGroup, RegistrationColumn, Tables } from "@tourney/types"
+import type {
+  Enums,
+  Link,
+  LinkGroup,
+  RegistrationColumn,
+  Tables,
+} from "@tourney/types"
+import { useDateFormat } from "@vueuse/core"
 
 const title = ref<string>("Anmeldung")
 useHead({
