@@ -21,6 +21,9 @@
     "analyze": {
       "cache": false
     },
+    "create": {
+      "cache": false
+    },
     "preview": {
       "dependsOn": ["build"],
       "cache": false

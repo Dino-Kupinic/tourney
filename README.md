@@ -7,9 +7,6 @@ Mono repository for the tourney project. This project is a web application for m
 It includes an admin dashboard for managing tournaments, teams/players, live scores, and a client app for tournament
 attendees.
 
-> [!CAUTION]
-> tourney is still in development. You will find bugs and broken/unfinished features.
-
 ## ⏳ Activity
 
 ![Alt](https://repobeats.axiom.co/api/embed/bd1b64dfb166474122230a0f147ea9f77e408ad1.svg "Repobeats analytics image")
@@ -28,25 +25,38 @@ tourney follows the [Semantic Versioning](https://semver.org/) guidelines.
 git clone https://github.com/Dino-Kupinic/tourney.git
 ```
 
+#### Quick Installation Script
+
+2. Run the installation script and follow the instructions
+
+```bash
+./scripts/setup.sh
+```
+
+> [!NOTE]
+> Windows users need WSL installed.
+
+Requirements:
+- Docker
+- Bun
+
+#### Manual Installation
+
 2. install packages
 
 ```bash
-pnpm i
+bun i
 ```
 
 > [!TIP]
-> If you don't have node.js installed, checkout https://nodejs.org to install for your operating system.
-> We recommend using the LTS version, preferably v20 or higher.
-
-> [!TIP]
-> If you don't have pnpm installed, checkout https://pnpm.io/installation to install for your operating system.
+> If you don't have bun installed, checkout https://bun.sh to install for your operating system.
 
 ### Backend
 
 1. run supabase
 
 ```bash
-pnpm run start:supabase
+bun run start:supabase
 ```
 
 > [!TIP]
@@ -75,7 +85,7 @@ Copy the content into your `.env` and replace the following fields with your own
 2. run dev server
 
 ```bash
-pnpm run dev:admin
+bun run dev:admin
 ```
 
 3. Head to http://localhost:3000/
@@ -96,7 +106,7 @@ Create a `.env` file and checkout the `.env.example`. Copy the content into your
 2. run dev server
 
 ```bash
-pnpm run dev:viewer
+bun run dev:viewer
 ```
 
 3. Head to http://localhost:3001/
@@ -118,7 +128,7 @@ Create a `.env` file and checkout the `.env.example`. Copy the content into your
 2. run the script
 
 ```bash
-pnpm run create:users
+bun run create:users
 ```
 
 If it works, great! You can now log in in the admin dashboard with the created users.
@@ -128,35 +138,43 @@ If it works, great! You can now log in in the admin dashboard with the created u
 1. build the app
 
 ```bash
-pnpm run build
+bun run build
 ```
+
+> [!CAUTION]
+> The following section will be deprecated in the future!
 
 2. start the app
 
 ```bash
-pnpm run app:start
+bun run app:start
 ```
 
 > [!TIP]
 > Didn't work?
 > Try installing pm2 globally with `npm install pm2 -g`.
+> For npm you need to install Node.js.
 
 3. monitor the app
 
 ```bash
-pnpm run app:monitor
+bun run app:monitor
 ```
 
 4. enjoy the app!
 
-## 😄 Author
+## 😄 Authors
 
+### Creator
 - [@Dino Kupinic](https://www.github.com/Dino-Kupinic)
+
+### Core Maintainer
+- [@Leon Arbeithuber](https://github.com/larbeith)
 
 ## 🛠️ Tech Stack
 
 - Nuxt 3
-- Supabase (Postgres)
+- Supabase
 - Docker
 - pm2
 
