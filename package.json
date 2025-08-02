@@ -2,12 +2,13 @@
   "name": "tourney",
   "version": "0.29.0",
   "description": "This project is a web application for managing tournaments.",
-  "packageManager": "pnpm@10.5.0",
+  "packageManager": "bun@1.2.19",
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
   "scripts": {
+    "clean": "git clean -xdf node_modules",
     "create:users": "pnpm --filter=tourney-user-creator run create",
     "install:browsers": "pnpm dlx puppeteer browsers install",
     "app:start": "pm2 start ecosystem.config.cjs",
@@ -26,6 +27,7 @@
     "dev:viewer": "turbo run dev --filter=tourney-viewer",
     "dev:core": "turbo run dev --filter=tourney-core",
     "dev:docs": "vitepress dev docs",
+    "dev": "turbo run dev",
     "dev:admin:host": "turbo run dev --filter=tourney-admin -- --host",
     "dev:viewer:host": "turbo run dev --filter=tourney-viewer -- --host",
     "generate-pwa-assets": "pnpm --filter=tourney-viewer run generate-pwa-assets",
@@ -42,9 +44,9 @@
     "vue"
   ],
   "devDependencies": {
-    "prettier": "^3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.11",
-    "turbo": "^2.5.4",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.6.14",
+    "turbo": "^2.5.5",
     "vitepress": "^1.6.3"
   },
   "resolutions": {
