@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "clean": "git clean -xdf node_modules",
-    "create:users": "pnpm --filter=tourney-user-creator run create",
+    "create:users": "pnpm --filter=@tourney/user-creator run create",
     "install:browsers": "pnpm dlx puppeteer browsers install",
     "app:start": "pm2 start ecosystem.config.cjs",
     "app:kill": "pm2 kill",
