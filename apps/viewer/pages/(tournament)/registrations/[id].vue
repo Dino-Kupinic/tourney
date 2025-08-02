@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { formLocked } from "~/keys/isFormLocked"
 import { classMixing } from "~/keys/allowClassMixing"
-import type { FormPlayer, ParsedJsonTournament, RegistrationWithClass, Tables } from "@tourney/types"
+import type {
+  FormPlayer,
+  ParsedJsonTournament,
+  RegistrationWithClass,
+  Tables,
+} from "@tourney/types"
+import { useDateFormat } from "@vueuse/core"
+import { getImageUrl } from "#imports"
 
 useHead({
   title: "Anmeldung",
