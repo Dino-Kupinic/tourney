@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { z } from "zod"
-import type { Database, Match, ParsedJsonTournament, Standing } from "@tourney/types"
+import type {
+  Database,
+  Match,
+  ParsedJsonTournament,
+  Standing,
+} from "@tourney/types"
 import { useDatabaseClient } from "~/composables/useDatabaseClient"
 
 const title = ref<string>("Live")

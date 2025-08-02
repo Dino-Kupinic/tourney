@@ -37,6 +37,7 @@ git clone https://github.com/Dino-Kupinic/tourney.git
 > Windows users need WSL installed.
 
 Requirements:
+
 - Docker
 - Bun
 
@@ -76,7 +77,7 @@ Create a `.env` file and checkout the `.env.example`.
 Copy the content into your `.env` and replace the following fields with your own.
 
 | Field                    | Description                                            |
-|--------------------------|--------------------------------------------------------|
+| ------------------------ | ------------------------------------------------------ |
 | `SUPABASE_URL`           | URL to Supabase API                                    |
 | `SUPABASE_KEY`           | Anon key                                               |
 | `SUPABASE_SERVICE_KEY`   | Service Role Key                                       |
@@ -99,7 +100,7 @@ If it works, great!
 Create a `.env` file and checkout the `.env.example`. Copy the content into your `.env` and replace the following fields
 
 | Field          | Description         |
-|----------------|---------------------|
+| -------------- | ------------------- |
 | `SUPABASE_URL` | URL to Supabase API |
 | `SUPABASE_KEY` | Anon key            |
 
@@ -120,7 +121,7 @@ If it works, great!
 Create a `.env` file and checkout the `.env.example`. Copy the content into your `.env` and replace the following fields
 
 | Field             | Description                   |
-|-------------------|-------------------------------|
+| ----------------- | ----------------------------- |
 | `SUPABASE_URL`    | URL to Supabase API           |
 | `SUPABASE_KEY`    | Anon key                      |
 | `USERS_TO_CREATE` | See comment in `.env.example` |
@@ -166,9 +167,11 @@ bun run app:monitor
 ## 😄 Authors
 
 ### Creator
+
 - [@Dino Kupinic](https://www.github.com/Dino-Kupinic)
 
 ### Core Maintainer
+
 - [@Leon Arbeithuber](https://github.com/larbeith)
 
 ## 🛠️ Tech Stack

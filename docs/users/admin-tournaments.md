@@ -9,7 +9,7 @@ Um ein neues Turnier zu erstellen, klicken Sie auf den Button `Neues Turnier...`
 ![Neues Turnier erstellen](/users/create-tournament.png)
 
 Füllen Sie das Formular aus und klicken Sie auf `Erstellen`, um das Turnier zu erstellen.
-Erforderliche Felder sind mit einem Sternchen (*) markiert.
+Erforderliche Felder sind mit einem Sternchen (\*) markiert.
 
 ## Turnier bearbeiten
 
