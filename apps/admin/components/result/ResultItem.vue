@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Match } from "@tourney/types"
 import { z } from "zod"
+import { getImageUrl } from "#imports"
 
 const { id, match, score1, score2, winner } = defineProps<{
   id: string
