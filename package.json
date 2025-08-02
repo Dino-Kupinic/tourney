@@ -1,7 +1,7 @@
 {
   "name": "tourney",
   "version": "0.30.0",
-  "description": "This project is a web application for managing tournaments.",
+  "description": "The next level of tournament management.",
   "packageManager": "bun@1.2.19",
   "workspaces": [
     "packages/*",
@@ -9,8 +9,8 @@
   ],
   "scripts": {
     "clean": "git clean -xdf node_modules",
-    "create:users": "pnpm --filter=@tourney/user-creator run create",
-    "install:browsers": "pnpm dlx puppeteer browsers install",
+    "create:users": "turbo run create --filter=@tourney/user-creator",
+    "install:browsers": "bunx puppeteer browsers install",
     "app:start": "pm2 start ecosystem.config.cjs",
     "app:kill": "pm2 kill",
     "app:monitor": "pm2 monit",
@@ -36,7 +36,8 @@
     "types:supabase": "cd ./apps/api/supabase && npx supabase gen types --lang=typescript --local > ../../../packages/db/database.types.ts",
     "schema:supabase": "cd ./apps/api/supabase && supabase db diff -f --local",
     "format": "turbo run format",
-    "format:write": "turbo run format:write"
+    "format:write": "turbo run format:write",
+    "prepare": "husky"
   },
   "keywords": [
     "tournaments",
@@ -44,10 +45,23 @@
     "vue"
   ],
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2",
+    "semantic-release": "^24.2.3",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "turbo": "^2.5.5",
     "vitepress": "^1.6.3"
+  },
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+      "prettier . --write"
+    ]
   },
   "resolutions": {
     "cookie": "0.7.2"

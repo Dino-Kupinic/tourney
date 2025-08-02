@@ -23,6 +23,7 @@ Du kannst die Platzierungen der Teams unten auf der Seite sehen.
 Mit dem Dropdown-Menü kannst du zwischen den verschiedenen Gruppen wechseln, um die Platzierungen zu sehen.
 
 Erklärung der Platzierungen:
+
 - `Pkt.`: Die Anzahl der Punkte, die das Team in der Gruppe gesammelt hat.
 - `S`: Die Anzahl der Siege, die das Team in der Gruppe erreicht hat.
 - `U`: Die Anzahl der Unentschieden, die das Team in der Gruppe erreicht hat.

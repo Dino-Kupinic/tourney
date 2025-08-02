@@ -19,7 +19,6 @@ hero:
     src: /htl-logo.svg
     alt: HTL Steyr
 
-
 features:
   - icon: 📑
     title: Anmeldungen verwalten
@@ -125,4 +124,3 @@ const partners = [
   }
 }
 </style>
-
