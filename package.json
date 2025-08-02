@@ -37,6 +37,7 @@
     "schema:supabase": "cd ./apps/api/supabase && supabase db diff -f --local",
     "format": "turbo run format",
     "format:write": "turbo run format:write",
+    "release": "semantic-release",
     "prepare": "husky"
   },
   "keywords": [
