@@ -9,5 +9,3 @@ Please follow conventional commits (https://conventionalcommits.org)
 ### 📚 Description
 
 <!-- Describe your changes in detail -->
-
-

@@ -1,10 +1,9 @@
 ---
 name: Feature Request
 about: Write down the requirements or what should be done
-title: ''
+title: ""
 labels: feature
-assignees: ''
-
+assignees: ""
 ---
 
 **Describe the Feature**
