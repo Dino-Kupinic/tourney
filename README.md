@@ -1,5 +1,12 @@
 ![tourney](./.github/assets/banner.png)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/github/v/release/HTL-Steyr/tourney?color=blue)](https://github.com/HTL-Steyr/tourney/releases)
+[![Last Commit](https://img.shields.io/github/last-commit/HTL-Steyr/tourney)](https://github.com/HTL-Steyr/tourney/commits)
+
+[![Instagram](https://img.shields.io/badge/Instagram-E1306C?logo=instagram&logoColor=white)](https://www.instagram.com/htlsteyr/)
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fwww.htl-steyr.ac.at&up_message=htl-steyr.ac.at&logo=google-chrome&logoColor=white)
+
 # tourney
 
 Mono repository for the tourney project. This project is a web application for managing tournaments.
