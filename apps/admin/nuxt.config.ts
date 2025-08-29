@@ -7,6 +7,9 @@ export default defineNuxtConfig({
   devServer: {
     port: 3000,
   },
+  nitro: {
+    preset: "bun",
+  },
   components: [
     {
       path: "~/components",

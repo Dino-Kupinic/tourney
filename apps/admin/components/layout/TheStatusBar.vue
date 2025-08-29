@@ -1,5 +1,6 @@
 <script setup lang="ts">
-const appVersion = useAppVersion()
+// const appVersion = useAppVersion() TODO: this is broken because package.json version field no longer exists because of semantic-release bot, we need to parse commits or something (or just display most recent commit hash)
+const appVersion = "UNDEFINED"
 
 const isOnline = useOnline()
 const { isSupported, memory } = useMemory()
