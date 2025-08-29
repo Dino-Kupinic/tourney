@@ -21,8 +21,11 @@ export default defineNuxtConfig({
   css: [join(currentDir, "./assets/base.css")],
   runtimeConfig: {
     public: {
-      clientVersion: pkg.version,
+      // clientVersion: pkg.version, TODO: workaround since using semantic-release bot we ditched package.json version
     },
+  },
+  nitro: {
+    preset: "bun",
   },
   fonts: {
     defaults: {
