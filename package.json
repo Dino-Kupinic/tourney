@@ -17,6 +17,7 @@
     "start:docs": "vitepress preview docs",
     "start:admin": "cd ./apps/admin && node .output/server/index.mjs",
     "start:viewer": "cd ./apps/viewer && node .output/server/index.mjs",
+    "start": "turbo run start",
     "build:docs": "vitepress build docs",
     "build:admin": "turbo run build --filter=@tourney/admin",
     "build:viewer": "turbo run build --filter=@tourney/viewer",
