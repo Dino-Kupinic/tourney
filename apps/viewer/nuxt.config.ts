@@ -20,6 +20,7 @@ export default defineNuxtConfig({
         dir: "./templates",
       },
     ],
+    preset: "bun",
   },
   devServer: {
     port: 3001,
