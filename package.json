@@ -1,6 +1,5 @@
 {
   "name": "tourney",
-  "version": "0.30.0",
   "description": "The next level of tournament management.",
   "packageManager": "bun@1.2.19",
   "workspaces": [
