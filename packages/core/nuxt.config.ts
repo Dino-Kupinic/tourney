@@ -40,7 +40,7 @@ export default defineNuxtConfig({
   colorMode: {
     preference: "light",
   },
-  typescript: {
-    typeCheck: true,
-  },
+  // typescript: {
+  //   typeCheck: true,
+  // },
 })
