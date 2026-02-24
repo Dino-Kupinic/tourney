@@ -1,3 +1,15 @@
+# [0.29.0](https://github.com/Dino-Kupinic/tourney/compare/v0.28.0...v0.29.0) (2026-02-24)
+
+
+### Bug Fixes
+
+* website link ([66c27fa](https://github.com/Dino-Kupinic/tourney/commit/66c27faa60036215b2b842a55f5742b138f331c3))
+
+
+### Features
+
+* change runtimes to bun, remove ([eeb2b04](https://github.com/Dino-Kupinic/tourney/commit/eeb2b042a671dfbb1f88e59ba3f21ec8bda7439c))
+
 # [0.31.0](https://github.com/HTL-Steyr/tourney/compare/v0.30.2...v0.31.0) (2025-08-29)
 
 
