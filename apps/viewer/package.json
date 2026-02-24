@@ -30,7 +30,7 @@
     "@vueuse/core": "^13.4.0",
     "@vueuse/nuxt": "^13.4.0",
     "handlebars": "^4.7.8",
-    "nuxt": "4.3.1",
+    "nuxt": "4.3.3",
     "puppeteer": "24.6.1",
     "vue": "3.5.13",
     "vue-router": "4.5.1",
@@ -39,7 +39,7 @@
   "devDependencies": {
     "@tourney/types": "workspace:*",
     "@types/k6": "^0.54.2",
-    "@vite-pwa/assets-generator": "^0.2.6",
+    "@vite-pwa/assets-generator": "^1.0.0",
     "vue-tsc": "3.0.5"
   }
 }

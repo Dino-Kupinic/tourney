@@ -15,7 +15,7 @@
     "check-types": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@dicebear/collection": "^9.2.2",
+    "@dicebear/collection": "^9.2.3",
     "@dicebear/core": "^9.2.1",
     "@iconify-json/heroicons": "^1.2.2",
     "@iconify-json/svg-spinners": "^1.2.2",
@@ -28,7 +28,7 @@
     "@vue-flow/minimap": "^1.5.2",
     "@vueuse/core": "^13.4.0",
     "@vueuse/nuxt": "^13.4.0",
-    "nuxt": "4.3.1",
+    "nuxt": "4.3.3",
     "vue": "3.5.13",
     "vue-router": "4.5.1",
     "zod": "^3.25.67"

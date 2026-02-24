@@ -5,7 +5,7 @@
 [![Last Commit](https://img.shields.io/github/last-commit/HTL-Steyr/tourney)](https://github.com/HTL-Steyr/tourney/commits)
 
 [![Instagram](https://img.shields.io/badge/Instagram-E1306C?logo=instagram&logoColor=white)](https://www.instagram.com/htlsteyr/)
-![Website](https://img.shields.io/website?url=https%3A%2F%2Fwww.htl-steyr.ac.at&up_message=htl-steyr.ac.at&logo=google-chrome&logoColor=white)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fwww.htl-steyr.ac.at&up_message=htl-steyr.ac.at&logo=google-chrome&logoColor=white)](https://www.htl-steyr.ac.at/)
 
 # tourney
 

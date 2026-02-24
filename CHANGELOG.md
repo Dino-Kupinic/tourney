@@ -1,10 +1,18 @@
-# [0.28.0](https://github.com/Dino-Kupinic/tourney/compare/v0.27.9...v0.28.0) (2025-08-29)
+# [0.31.0](https://github.com/HTL-Steyr/tourney/compare/v0.30.2...v0.31.0) (2025-08-29)
+
+
+### Features
+
+* change runtimes to bun, remove ([eeb2b04](https://github.com/HTL-Steyr/tourney/commit/eeb2b042a671dfbb1f88e59ba3f21ec8bda7439c))
+
+## [0.30.2](https://github.com/HTL-Steyr/tourney/compare/v0.30.1...v0.30.2) (2025-08-06)
+
 
 ### Bug Fixes
 
-- fixed ts errors ([235d9e2](https://github.com/Dino-Kupinic/tourney/commit/235d9e29fb6cce12f6a44b48d40fa75db57246d6))
-- formatting ([01bd883](https://github.com/Dino-Kupinic/tourney/commit/01bd8836c40892154bfefab2fb62c5b812dd41ec))
-- workflows ([9c61afb](https://github.com/Dino-Kupinic/tourney/commit/9c61afbad0d90355057b27f00aa649ff4da01cb3))
+* website link ([66c27fa](https://github.com/HTL-Steyr/tourney/commit/66c27faa60036215b2b842a55f5742b138f331c3))
+
+## [0.30.1](https://github.com/HTL-Steyr/tourney/compare/v0.30.0...v0.30.1) (2025-08-02)
 
 ### Features
 
