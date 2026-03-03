@@ -155,14 +155,18 @@ await fetchImages()
   <div class="p-3">
     <div
       v-if="images.length === 0 && !isUploading"
-      class="flex h-64 items-center justify-center rounded-md border border-dashed border-gray-300 dark:border-gray-700"
+      class="flex h-64 items-center justify-center rounded-md border border-dashed border-neutral-300 dark:border-neutral-700"
     >
       <div class="text-center">
-        <UIcon name="i-heroicons-photo" class="mb-2 text-gray-400" size="32" />
-        <p class="text-sm text-gray-500 dark:text-gray-400">
+        <UIcon
+          name="i-heroicons-photo"
+          class="mb-2 text-neutral-400"
+          size="32"
+        />
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">
           Keine Bilder vorhanden
         </p>
-        <p class="mt-2 text-xs text-gray-400 dark:text-gray-500">
+        <p class="mt-2 text-xs text-neutral-400 dark:text-neutral-500">
           Klicken Sie auf "Bilder hochladen", um Bilder hinzuzufügen
         </p>
       </div>
@@ -175,7 +179,7 @@ await fetchImages()
       <div
         v-for="image in images"
         :key="image.name"
-        class="group relative aspect-square overflow-hidden rounded-md border border-gray-200 dark:border-gray-700"
+        class="group relative aspect-square overflow-hidden rounded-md border border-neutral-200 dark:border-neutral-700"
         :class="{
           'ring-primary-500 ring-2': selectedImages.includes(image.name),
         }"

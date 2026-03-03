@@ -2,7 +2,9 @@
 const runtimeConfig = useRuntimeConfig()
 const appVersion = computed(() => runtimeConfig.public.clientVersion || "dev")
 const isOnline = useOnline()
+
 const { isSupported, memory } = useMemory()
+
 const memoryLabel = computed(() => {
   if (!isSupported.value) {
     return "Nicht verfügbar"
@@ -49,11 +51,7 @@ function size(v: number) {
           <USkeleton class="h-5 w-24" />
         </template>
       </ClientOnly>
-      <UBadge
-        color="neutral"
-        variant="outline"
-        class="!bg-white !text-gray-700 ring-1 ring-gray-200 dark:!bg-gray-950 dark:!text-gray-200 dark:ring-gray-800"
-      >
+      <UBadge color="neutral" variant="outline">
         tourney v{{ appVersion }}
       </UBadge>
     </div>

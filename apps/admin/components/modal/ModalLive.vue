@@ -17,7 +17,7 @@ const liveIcon = computed(() => {
     <template #content>
       <UCard
         :ui="{
-          root: 'divide-y divide-gray-100 dark:divide-gray-800',
+          root: 'divide-y divide-neutral-100 dark:divide-neutral-800',
           body: 'px-4 py-5 sm:p-6',
           header: 'px-4 py-3 sm:px-6',
           footer: 'px-4 py-3 sm:px-6',
@@ -30,7 +30,7 @@ const liveIcon = computed(() => {
 
         <div
           v-if="!is_live"
-          class="space-y-3 text-sm text-gray-500 dark:text-gray-400"
+          class="space-y-3 text-sm text-neutral-500 dark:text-neutral-400"
         >
           <p>
             Möchtest du das Turnier live gehen lassen? Es wird für alle sichtbar

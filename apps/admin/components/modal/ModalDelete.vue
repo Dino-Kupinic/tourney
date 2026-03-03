@@ -10,7 +10,7 @@ defineEmits<{
     <template #content>
       <UCard
         :ui="{
-          root: 'divide-y divide-gray-100 dark:divide-gray-800',
+          root: 'divide-y divide-neutral-100 dark:divide-neutral-800',
           body: 'px-4 py-5 sm:p-6',
           header: 'px-4 py-3 sm:px-6',
           footer: 'px-4 py-3 sm:px-6',

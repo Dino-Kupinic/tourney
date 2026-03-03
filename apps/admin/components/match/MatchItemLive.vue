@@ -137,9 +137,11 @@ const completeMatch = async () => {
     </p>
     <p v-if="winner === null">Somit ein Unentschieden.</p>
   </ModalMatch>
-  <div class="rounded-md border border-gray-200 shadow-sm dark:border-gray-700">
+  <div
+    class="rounded-md border border-neutral-200 shadow-sm dark:border-neutral-700"
+  >
     <div
-      class="flex justify-between gap-0.5 rounded-t-md border-b border-gray-200 bg-gray-100 p-0.5 dark:border-gray-700 dark:bg-gray-800"
+      class="flex justify-between gap-0.5 rounded-t-md border-b border-neutral-200 bg-neutral-100 p-0.5 dark:border-neutral-700 dark:bg-neutral-800"
     >
       <div class="flex gap-0.5">
         <UBadge
@@ -179,7 +181,9 @@ const completeMatch = async () => {
           />
           <div class="flex flex-col items-center justify-center">
             <p class="text-xs">{{ match.team1?.name }}</p>
-            <p class="text-xs text-gray-500">{{ match.team1?.group?.name }}</p>
+            <p class="text-xs text-neutral-500">
+              {{ match.team1?.group?.name }}
+            </p>
           </div>
           <div class="space-x-0.5">
             <UButton
@@ -218,7 +222,9 @@ const completeMatch = async () => {
           />
           <div class="flex flex-col items-center justify-center">
             <p class="text-xs">{{ match.team2?.name }}</p>
-            <p class="text-xs text-gray-500">{{ match.team2?.group?.name }}</p>
+            <p class="text-xs text-neutral-500">
+              {{ match.team2?.group?.name }}
+            </p>
           </div>
           <div class="space-x-0.5">
             <UButton

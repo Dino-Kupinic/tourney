@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full w-full flex-col">
     <main
-      class="relative h-full w-full grow overflow-hidden rounded-md border border-gray-200 bg-gray-50 text-gray-950 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-100"
+      class="relative h-full w-full grow overflow-hidden rounded-md border border-neutral-200 bg-neutral-50 text-neutral-950 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100"
     >
       <slot />
     </main>

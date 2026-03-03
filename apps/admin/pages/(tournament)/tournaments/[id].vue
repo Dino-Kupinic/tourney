@@ -387,14 +387,14 @@ const canGoLive = computed(() => {
   <BasePageContent>
     <div class="flex h-full w-full">
       <div
-        class="flex w-1/2 flex-col overflow-auto border-r border-gray-200 dark:border-gray-700"
+        class="flex w-1/2 flex-col overflow-auto border-r border-neutral-200 dark:border-neutral-700"
       >
         <div
-          class="flex h-auto w-full gap-3 border-b border-gray-200 bg-gray-100 p-3 px-6 dark:border-gray-800 dark:bg-gray-900"
+          class="flex h-auto w-full gap-3 border-b border-neutral-200 bg-neutral-100 p-3 px-6 dark:border-neutral-800 dark:bg-neutral-900"
         >
           <div
             v-if="tournament"
-            class="flex w-auto grow items-center gap-1 rounded-md bg-gray-50 p-3 pr-3 dark:bg-gray-800"
+            class="flex w-auto grow items-center gap-1 rounded-md bg-neutral-50 p-3 pr-3 dark:bg-neutral-800"
           >
             <div class="flex flex-col">
               <TournamentItemInfoStart
@@ -408,7 +408,7 @@ const canGoLive = computed(() => {
             </div>
           </div>
           <div
-            class="flex w-64 flex-col gap-2 rounded-md bg-gray-50 p-2 px-3 dark:bg-gray-800"
+            class="flex w-64 flex-col gap-2 rounded-md bg-neutral-50 p-2 px-3 dark:bg-neutral-800"
             v-if="data"
           >
             <div class="flex justify-between">
@@ -423,12 +423,14 @@ const canGoLive = computed(() => {
             </div>
             <USeparator
               :ui="{
-                border: 'flex border-gray-200 dark:border-gray-700',
+                border: 'flex border-neutral-200 dark:border-neutral-700',
               }"
             />
             <TournamentTeamStatus :data="data" class="grow" />
           </div>
-          <div class="rounded-md bg-gray-50 p-3 pr-3 text-sm dark:bg-gray-800">
+          <div
+            class="rounded-md bg-neutral-50 p-3 pr-3 text-sm dark:bg-neutral-800"
+          >
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-ticket" />
               <p>{{ tournament?.sport }}</p>
@@ -457,7 +459,7 @@ const canGoLive = computed(() => {
               <UBadge
                 color="neutral"
                 variant="outline"
-                class="truncate rounded-full !bg-white !text-gray-700 dark:!bg-gray-950 dark:!text-gray-200"
+                class="truncate rounded-full !bg-white !text-neutral-700 dark:!bg-neutral-950 dark:!text-neutral-200"
               >
                 {{ item.label }}
               </UBadge>
@@ -465,12 +467,12 @@ const canGoLive = computed(() => {
           </UBreadcrumb>
           <strong>Gruppen</strong>
           <div
-            class="shrink-0 overflow-hidden rounded-md border border-gray-300 dark:border-gray-700"
+            class="shrink-0 overflow-hidden rounded-md border border-neutral-300 dark:border-neutral-700"
           >
             <table class="w-full table-auto border-separate border-spacing-0">
               <thead>
                 <tr
-                  class="bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                  class="bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
                 >
                   <th class="px-4 py-2 first:rounded-tl-sm last:rounded-tr-sm">
                     Gruppe
@@ -491,12 +493,12 @@ const canGoLive = computed(() => {
                   ]"
                 >
                   <td
-                    class="border-t border-r border-gray-300 px-4 py-2 text-center font-medium dark:border-gray-700"
+                    class="border-t border-r border-neutral-300 px-4 py-2 text-center font-medium dark:border-neutral-700"
                   >
                     {{ group.name }}
                   </td>
                   <td
-                    class="border-t border-gray-300 px-4 py-2 dark:border-gray-700"
+                    class="border-t border-neutral-300 px-4 py-2 dark:border-neutral-700"
                   >
                     <div class="flex flex-wrap gap-2">
                       <UBadge
@@ -535,13 +537,13 @@ const canGoLive = computed(() => {
             <template v-if="filteredTeams?.length">
               <div
                 v-for="team in filteredTeams"
-                class="flex flex-col gap-1 rounded-md border border-gray-300 p-3 dark:border-gray-700"
+                class="flex flex-col gap-1 rounded-md border border-neutral-300 p-3 dark:border-neutral-700"
               >
                 <strong>{{ team.name }}</strong>
                 <template v-if="team.player.length > 0">
                   <div
                     v-for="player in team.player"
-                    class="flex gap-1 rounded-md bg-gray-100 p-3 pr-3 dark:bg-gray-800"
+                    class="flex gap-1 rounded-md bg-neutral-100 p-3 pr-3 dark:bg-neutral-800"
                   >
                     <UFormField label="Vorname">
                       <UInput v-model="player.first_name" disabled />
@@ -607,7 +609,7 @@ const canGoLive = computed(() => {
           <LiveFlow :tournament-id="tournament?.id as string" />
           <template #fallback>
             <div
-              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
+              class="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-neutral-800"
             >
               <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
             </div>

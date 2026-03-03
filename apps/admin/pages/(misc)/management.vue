@@ -399,12 +399,12 @@ const refresh = async () => {
 
           <UFormField label="Klassen">
             <div
-              class="max-h-60 overflow-y-auto rounded border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+              class="max-h-60 overflow-y-auto rounded border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900"
             >
               <div
                 v-for="className in creationStateMultiple.classes"
                 :key="className"
-                class="group flex items-center justify-between border-b px-2 py-1 dark:border-gray-700"
+                class="group flex items-center justify-between border-b px-2 py-1 dark:border-neutral-700"
               >
                 <span>{{ className }}</span>
                 <UButton
@@ -443,9 +443,10 @@ const refresh = async () => {
 
       <ModalInfo v-model="isOpenInfo">
         <div class="space-y-4">
-          <pre class="overflow-auto rounded bg-gray-100 p-4 dark:bg-gray-800">{{
-            selectedClass
-          }}</pre>
+          <pre
+            class="overflow-auto rounded bg-neutral-100 p-4 dark:bg-neutral-800"
+            >{{ selectedClass }}</pre
+          >
         </div>
       </ModalInfo>
 
@@ -475,7 +476,7 @@ const refresh = async () => {
           :columns="columns"
           :sorting="[{ id: 'name', desc: false }]"
           :loading="status === 'pending'"
-          class="h-full w-full bg-white dark:bg-gray-900"
+          class="h-full w-full bg-white dark:bg-neutral-900"
           :ui="{
             root: 'relative overflow-auto',
             th: 'px-4 py-3',

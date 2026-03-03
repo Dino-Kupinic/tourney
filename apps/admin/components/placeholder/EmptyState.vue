@@ -12,10 +12,10 @@ defineProps<{
       <UIcon
         name="i-heroicons-face-frown"
         size="24"
-        class="text-gray-500 dark:text-gray-400"
+        class="text-neutral-500 dark:text-neutral-400"
       />
       <p class="text-base font-semibold tracking-tight">{{ title }}</p>
-      <p class="text-sm text-gray-700 dark:text-gray-500">
+      <p class="text-sm text-neutral-700 dark:text-neutral-500">
         {{ description }}
       </p>
       <UAlert

@@ -258,7 +258,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
           <LiveFlow :tournament-id="tournament?.id as string" />
           <template #fallback>
             <div
-              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
+              class="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-neutral-800"
             >
               <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
             </div>
@@ -266,7 +266,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
         </ClientOnly>
       </div>
       <div
-        class="flex h-2/3 justify-between gap-6 border-t border-gray-200 p-6 pt-3 dark:border-gray-700"
+        class="flex h-2/3 justify-between gap-6 border-t border-neutral-200 p-6 pt-3 dark:border-neutral-700"
       >
         <div class="flex w-1/3 flex-col gap-0.5">
           <UTabs :items="tabTable" :ui="{ list: 'h-9', trigger: 'h-7' }" />
@@ -283,7 +283,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
             <template #matches>
               <!-- TODO: fix height constraint, adjust padding -->
               <div
-                class="flex h-[500px] flex-col gap-1 overflow-auto border-t border-gray-200 pt-2 pb-48 dark:border-gray-700"
+                class="flex h-[500px] flex-col gap-1 overflow-auto border-t border-neutral-200 pt-2 pb-48 dark:border-neutral-700"
               >
                 <MatchItemRow
                   v-for="(match, index) in matches"
@@ -297,7 +297,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
             <template #history>
               <!-- TODO: fix height constraint, adjust padding -->
               <div
-                class="flex h-[500px] flex-col gap-1 overflow-auto border-t border-gray-200 pt-2 pb-48 dark:border-gray-700"
+                class="flex h-[500px] flex-col gap-1 overflow-auto border-t border-neutral-200 pt-2 pb-48 dark:border-neutral-700"
               >
                 <!-- @vue-ignore -->
                 <ResultItem
@@ -316,7 +316,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
         <div class="flex w-1/3 flex-col gap-0.5">
           <UTabs :items="tabLive" :ui="{ list: 'h-9', trigger: 'h-7' }" />
           <div
-            class="flex h-full flex-col gap-1 overflow-auto border-t border-gray-200 pt-2 pb-12 dark:border-gray-700"
+            class="flex h-full flex-col gap-1 overflow-auto border-t border-neutral-200 pt-2 pb-12 dark:border-neutral-700"
           >
             <MatchItemLive
               v-for="match in liveMatches"

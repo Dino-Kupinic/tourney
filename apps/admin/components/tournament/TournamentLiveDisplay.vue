@@ -21,7 +21,7 @@ defineProps<{
     label="Inaktiv"
     color="neutral"
     variant="outline"
-    class="!bg-white !text-gray-700 ring-1 ring-gray-200 dark:!bg-gray-950 dark:!text-gray-200 dark:ring-gray-800"
+    class="!bg-white !text-neutral-700 ring-1 ring-neutral-200 dark:!bg-neutral-950 dark:!text-neutral-200 dark:ring-neutral-800"
     v-else
   />
 </template>

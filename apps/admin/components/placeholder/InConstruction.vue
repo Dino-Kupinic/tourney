@@ -9,14 +9,14 @@ const route = useRoute()
         <UIcon
           name="i-heroicons-wrench"
           size="32"
-          class="text-gray-500 dark:text-gray-400"
+          class="text-neutral-500 dark:text-neutral-400"
         />
         <p class="text-base font-semibold tracking-tight">In Arbeit</p>
-        <p class="text-sm text-gray-700 dark:text-gray-500">
+        <p class="text-sm text-neutral-700 dark:text-neutral-500">
           Diese Seite befindet sich derzeit in Arbeit und wird in Kürze
           verfügbar sein. Wir bitten um etwas Geduld.
         </p>
-        <p class="text-sm text-gray-700 dark:text-gray-500">
+        <p class="text-sm text-neutral-700 dark:text-neutral-500">
           In der Zwischenzeit können Sie die anderen Funktionen von tourney
           benutzen.
         </p>

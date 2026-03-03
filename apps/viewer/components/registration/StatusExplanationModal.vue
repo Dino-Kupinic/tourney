@@ -8,7 +8,7 @@ const isOpen = defineModel<boolean>()
       <div class="p-4">
         <PageHeading class="text-center"> Status der Anmeldung </PageHeading>
         <div
-          class="my-4 flex flex-col gap-3 text-base text-gray-700 sm:text-sm dark:text-gray-300"
+          class="my-4 flex flex-col gap-3 text-base text-neutral-700 sm:text-sm dark:text-neutral-300"
         >
           <div class="space-y-2">
             <UBadge label="Ausstehend" color="warning" variant="subtle" />

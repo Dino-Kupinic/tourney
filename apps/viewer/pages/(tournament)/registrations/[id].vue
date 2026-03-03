@@ -198,7 +198,7 @@ const submit = async () => {
       <template #header>
         <div class="flex flex-col gap-3 text-base">
           <div
-            class="flex justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-800"
+            class="flex justify-between rounded-md bg-neutral-50 p-3 dark:bg-neutral-800"
           >
             <div class="flex grow-0 flex-col gap-1">
               <strong>Status</strong>
@@ -228,7 +228,7 @@ const submit = async () => {
               </p>
             </RegistrationItem>
           </div>
-          <div class="rounded-md bg-gray-50 p-3 dark:bg-gray-800">
+          <div class="rounded-md bg-neutral-50 p-3 dark:bg-neutral-800">
             <USelectMenu
               v-model="tournament"
               :disabled="isFormLocked"
@@ -272,11 +272,11 @@ const submit = async () => {
                 {
                   'border-primary-500 shadow-[0_0px_60px_3px_rgba(29,78,216,0.4)]':
                     selectedLogo?.id === logo.id,
-                  'border-gray-200 dark:border-gray-700':
+                  'border-neutral-200 dark:border-neutral-700':
                     selectedLogo?.id !== logo.id,
                 },
               ]"
-              class="bg-white dark:bg-gray-900"
+              class="bg-white dark:bg-neutral-900"
             >
               <NuxtImg
                 width="48"
@@ -285,7 +285,7 @@ const submit = async () => {
                 class="dark:invert dark:filter"
               />
             </div>
-            <p class="mt-1 text-center text-xs text-wrap text-gray-500">
+            <p class="mt-1 text-center text-xs text-wrap text-neutral-500">
               {{ logo.name }}
             </p>
           </div>
@@ -308,11 +308,11 @@ const submit = async () => {
                   {
                     'border-primary-500 shadow-[0_0px_60px_3px_rgba(29,78,216,0.4)]':
                       selectedLogoVariant?.id === variant.id,
-                    'border-gray-200 dark:border-gray-700':
+                    'border-neutral-200 dark:border-neutral-700':
                       selectedLogoVariant?.id !== variant.id,
                   },
                 ]"
-                class="bg-white dark:bg-gray-900"
+                class="bg-white dark:bg-neutral-900"
               >
                 <NuxtImg
                   width="48"
@@ -320,7 +320,7 @@ const submit = async () => {
                   :src="getImageUrl(variant.image_path)"
                 />
               </div>
-              <p class="mt-1 text-center text-xs text-wrap text-gray-500">
+              <p class="mt-1 text-center text-xs text-wrap text-neutral-500">
                 {{ variant.color }}
               </p>
             </div>

@@ -85,7 +85,7 @@ function isActive(to: string) {
       <div
         v-for="(section, sectionIndex) in navigationLinks"
         :key="sectionIndex"
-        class="space-y-0.5 border-b border-gray-200 pb-3 dark:border-gray-800"
+        class="space-y-0.5 border-b border-neutral-200 pb-3 dark:border-neutral-800"
         :class="
           sectionIndex === navigationLinks.length - 1 && 'border-b-0 pb-0'
         "
@@ -97,8 +97,8 @@ function isActive(to: string) {
           class="flex items-center justify-between rounded-lg px-3 py-1 text-sm font-medium transition-colors"
           :class="
             isActive(item.to)
-              ? 'bg-gray-100 text-gray-950 dark:bg-gray-800/70 dark:text-white'
-              : 'text-gray-500 hover:bg-gray-100/70 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/60 dark:hover:text-white'
+              ? 'bg-neutral-100 text-neutral-950 dark:bg-neutral-800/70 dark:text-white'
+              : 'text-neutral-500 hover:bg-neutral-100/70 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/60 dark:hover:text-white'
           "
         >
           <span class="flex items-center gap-2">
@@ -109,7 +109,7 @@ function isActive(to: string) {
             v-if="item.badge"
             color="error"
             variant="outline"
-            class="!text-error ring-error/20 h-5 min-w-5 rounded-md !bg-white px-1.5 !text-[10px] !font-medium ring-1 dark:!bg-gray-950"
+            class="!text-error ring-error/20 h-5 min-w-5 rounded-md !bg-white px-1.5 !text-[10px] !font-medium ring-1 dark:!bg-neutral-950"
           >
             {{ item.badge }}
           </UBadge>
@@ -122,11 +122,11 @@ function isActive(to: string) {
         <img
           :src="svg"
           :alt="name"
-          class="h-5 w-5 rounded-full bg-gray-100 object-cover dark:bg-gray-800"
+          class="h-5 w-5 rounded-full bg-neutral-100 object-cover dark:bg-neutral-800"
         />
         <div class="flex min-w-0 items-center gap-2">
           <p
-            class="truncate text-sm font-semibold text-gray-500 dark:text-gray-300"
+            class="truncate text-sm font-semibold text-neutral-500 dark:text-neutral-300"
           >
             {{ name }}
           </p>
@@ -138,11 +138,11 @@ function isActive(to: string) {
 
       <NuxtLink
         to="/settings"
-        class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+        class="flex items-center gap-2 rounded-lg px-3 py-1 text-sm font-medium transition-colors"
         :class="
           isActive('/settings')
-            ? 'bg-gray-100 text-gray-950 dark:bg-gray-800/70 dark:text-white'
-            : 'text-gray-500 hover:bg-gray-100/70 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/60 dark:hover:text-white'
+            ? 'bg-neutral-100 text-neutral-950 dark:bg-neutral-800/70 dark:text-white'
+            : 'text-neutral-500 hover:bg-neutral-100/70 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/60 dark:hover:text-white'
         "
       >
         <UIcon name="i-heroicons-cog-8-tooth" class="h-4 w-4 shrink-0" />

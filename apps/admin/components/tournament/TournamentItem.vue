@@ -67,7 +67,7 @@ const onDelete = async () => {
 
 <template>
   <div
-    class="h-auto rounded-md border border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600"
+    class="h-auto rounded-md border border-neutral-200 bg-white hover:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:border-neutral-600"
   >
     <ModalInfo v-model="isOpenInfo">
       <pre class="overflow-auto">{{ tournament }}</pre>
@@ -84,7 +84,7 @@ const onDelete = async () => {
       />
     </ModalDelete>
     <div
-      class="flex h-32 flex-col justify-between rounded-t-md bg-gray-100 p-2 dark:bg-gray-800"
+      class="flex h-32 flex-col justify-between rounded-t-md bg-neutral-100 p-2 dark:bg-neutral-800"
     >
       <div class="flex items-center justify-between">
         <TournamentLiveDisplay :is-live="tournament.is_live" />
@@ -99,7 +99,7 @@ const onDelete = async () => {
             />
           </UDropdownMenu>
           <template #fallback>
-            <USkeleton class="m-1 h-6 w-6 bg-gray-200 dark:bg-gray-700" />
+            <USkeleton class="m-1 h-6 w-6 bg-neutral-200 dark:bg-neutral-700" />
           </template>
         </ClientOnly>
       </div>
@@ -111,18 +111,18 @@ const onDelete = async () => {
       <div class="p-3">
         <div class="flex items-center gap-4 sm:gap-3">
           <div
-            class="flex grow items-center gap-1 rounded-md bg-gray-50 p-1 px-3 dark:bg-gray-800"
+            class="flex grow items-center gap-1 rounded-md bg-neutral-50 p-1 px-3 dark:bg-neutral-800"
           >
             <TournamentItemInfoStart :tournament :truncate="true" />
           </div>
           <div
-            class="flex items-center gap-1 rounded-md bg-gray-50 p-1 pr-3 dark:bg-gray-800"
+            class="flex items-center gap-1 rounded-md bg-neutral-50 p-1 pr-3 dark:bg-neutral-800"
           >
             <TournamentItemInfoTime :tournament />
           </div>
         </div>
         <div
-          class="mt-3 flex flex-col gap-2 rounded-md bg-gray-50 p-2 px-3 dark:bg-gray-800"
+          class="mt-3 flex flex-col gap-2 rounded-md bg-neutral-50 p-2 px-3 dark:bg-neutral-800"
           v-if="data"
         >
           <div class="flex justify-between">
@@ -137,12 +137,12 @@ const onDelete = async () => {
           </div>
           <USeparator
             :ui="{
-              border: 'flex border-gray-200 dark:border-gray-700',
+              border: 'flex border-neutral-200 dark:border-neutral-700',
             }"
           />
           <TournamentTeamStatus :data="data" />
         </div>
-        <div class="mt-3 text-right text-xs text-gray-500">
+        <div class="mt-3 text-right text-xs text-neutral-500">
           <p class="truncate">
             Zuletzt geändert von
             {{ formatUsername(user?.email) }}

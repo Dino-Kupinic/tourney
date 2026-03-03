@@ -24,7 +24,7 @@ const lNameInput = `players.${index}.lastName`
   <RegistrationItem>
     <div class="flex grow flex-col gap-3">
       <div
-        class="w-full rounded-md border bg-white p-1 text-center dark:border-gray-700 dark:bg-gray-700"
+        class="w-full rounded-md border bg-white p-1 text-center dark:border-neutral-700 dark:bg-neutral-700"
       >
         <strong class="text-base"> {{ name }} </strong>
       </div>

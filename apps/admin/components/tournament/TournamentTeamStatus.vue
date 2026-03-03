@@ -32,7 +32,7 @@ const summaryItems = computed<SummaryItem[]>(() => [
     <div
       v-for="(item, index) in summaryItems"
       :key="index"
-      class="flex grow items-center justify-center space-x-1 rounded-md bg-white px-2 py-1 dark:bg-gray-900"
+      class="flex grow items-center justify-center space-x-1 rounded-md bg-white px-2 py-1 dark:bg-neutral-900"
     >
       <UIcon :name="item.icon" :class="item.color" size="16" />
       <p class="font-mono">{{ item.value }}</p>

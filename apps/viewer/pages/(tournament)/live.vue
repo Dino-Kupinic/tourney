@@ -108,13 +108,13 @@ const { isDesktop } = useDevice()
   <div
     :class="[
       'h-full w-full',
-      isDesktop && 'rounded-md border dark:border-gray-800',
+      isDesktop && 'rounded-md border dark:border-neutral-800',
     ]"
   >
     <template v-if="tournaments.length">
       <div
         :class="[
-          'w-full border-b bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900',
+          'w-full border-b bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-900',
           isDesktop ? 'rounded-t-md' : '',
         ]"
       >
@@ -127,13 +127,13 @@ const { isDesktop } = useDevice()
         />
       </div>
       <div
-        class="flex h-56 items-center justify-center border-b bg-gray-50 sm:h-96 dark:border-gray-700 dark:bg-gray-900"
+        class="flex h-56 items-center justify-center border-b bg-neutral-50 sm:h-96 dark:border-neutral-700 dark:bg-neutral-900"
       >
         <ClientOnly>
           <LiveFlow :tournament-id="tournament?.id as string" />
           <template #fallback>
             <div
-              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
+              class="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-neutral-800"
             >
               <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
             </div>
@@ -179,7 +179,7 @@ const { isDesktop } = useDevice()
               </div>
             </div>
             <div
-              class="flex flex-col gap-1.5 rounded-md bg-gray-50 p-3 dark:bg-gray-900"
+              class="flex flex-col gap-1.5 rounded-md bg-neutral-50 p-3 dark:bg-neutral-900"
             >
               <template v-if="liveMatches?.length">
                 <div
@@ -208,7 +208,7 @@ const { isDesktop } = useDevice()
           <div class="flex flex-col gap-1.5">
             <USeparator>Anstehende Spiele</USeparator>
             <div
-              class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md bg-gray-50 p-3 pb-8 dark:bg-gray-900"
+              class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md bg-neutral-50 p-3 pb-8 dark:bg-neutral-900"
             >
               <MatchItemRow
                 v-for="(match, index) in matches"
@@ -222,7 +222,7 @@ const { isDesktop } = useDevice()
           <div class="flex flex-col gap-1.5">
             <USeparator>Historie</USeparator>
             <div
-              class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md bg-gray-50 p-3 pb-8 dark:bg-gray-900"
+              class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md bg-neutral-50 p-3 pb-8 dark:bg-neutral-900"
             >
               <!-- @vue-ignore -->
               <ResultItem

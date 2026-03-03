@@ -86,13 +86,13 @@ async function saveContent() {
       <!--      <MonacoEditor-->
       <!--        v-model="content"-->
       <!--        lang="markdown"-->
-      <!--        class="h-full w-3/5 border-r border-gray-200 dark:border-gray-700"-->
+      <!--        class="h-full w-3/5 border-r border-neutral-200 dark:border-neutral-700"-->
       <!--        :options="{ theme: theme }"-->
       <!--      />-->
       <div class="h-full w-2/5">
         <MDC
           v-if="content"
-          class="h-full w-full overflow-auto bg-gray-100 p-3 pb-16 dark:bg-gray-800"
+          class="h-full w-full overflow-auto bg-neutral-100 p-3 pb-16 dark:bg-neutral-800"
           :value="content"
         />
         <div v-else>
@@ -102,7 +102,7 @@ async function saveContent() {
     </div>
     <template #fallback>
       <div
-        class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-900"
+        class="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-neutral-900"
       >
         <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
       </div>

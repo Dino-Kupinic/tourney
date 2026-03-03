@@ -8,7 +8,7 @@ const bgColor = computed(() => {
     case 1:
       return "bg-amber-200 dark:bg-amber-500"
     case 2:
-      return "bg-gray-200 dark:bg-gray-500"
+      return "bg-neutral-200 dark:bg-neutral-500"
     case 3:
       return "bg-yellow-600 dark:bg-yellow-700"
   }
@@ -17,7 +17,7 @@ const bgColor = computed(() => {
 
 <template>
   <div
-    class="flex items-center gap-3 rounded-md bg-gray-50 p-2 text-base sm:text-sm dark:bg-gray-800"
+    class="flex items-center gap-3 rounded-md bg-neutral-50 p-2 text-base sm:text-sm dark:bg-neutral-800"
   >
     <div
       :class="[

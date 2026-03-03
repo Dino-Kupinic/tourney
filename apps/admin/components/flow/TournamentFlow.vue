@@ -41,7 +41,7 @@ nodes.value = generateNodes(groups)
 <template>
   <VueFlow
     :nodes="nodes"
-    class="bg-gray-100 dark:bg-gray-800"
+    class="bg-neutral-100 dark:bg-neutral-800"
     :default-viewport="{ zoom: 1.5 }"
     :min-zoom="0.2"
     :max-zoom="4"

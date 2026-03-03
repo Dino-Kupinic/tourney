@@ -31,7 +31,7 @@ const bonus = computed(() => {
     </template>
     <div class="flex items-center gap-4 sm:gap-3">
       <div
-        class="flex grow items-center gap-1 rounded-md bg-gray-50 p-1 px-3 dark:bg-gray-800"
+        class="flex grow items-center gap-1 rounded-md bg-neutral-50 p-1 px-3 dark:bg-neutral-800"
       >
         <div class="flex flex-col text-base sm:text-sm">
           <div class="flex items-center space-x-1">
@@ -49,7 +49,7 @@ const bonus = computed(() => {
         </div>
       </div>
       <div
-        class="flex items-center gap-1 rounded-md bg-gray-50 p-1 pr-3 dark:bg-gray-800"
+        class="flex items-center gap-1 rounded-md bg-neutral-50 p-1 pr-3 dark:bg-neutral-800"
       >
         <UIcon name="i-heroicons-arrow-long-down" size="20" />
         <div class="flex flex-col text-base sm:text-sm">
@@ -70,7 +70,7 @@ const bonus = computed(() => {
     </div>
     <PageHeading>Regeln</PageHeading>
     <div
-      class="h-28 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
+      class="h-28 overflow-auto rounded-md border-neutral-200 bg-neutral-50 p-2 dark:border-neutral-800 dark:bg-neutral-800"
     >
       <pre class="text text-sm text-wrap">{{ tournament.rules }}</pre>
     </div>
@@ -86,7 +86,7 @@ const bonus = computed(() => {
         {{ tournament.prizes?.third ?? "Nichts" }}
       </TournamentPrizeRow>
       <div
-        class="h-20 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
+        class="h-20 overflow-auto rounded-md border-neutral-200 bg-neutral-50 p-2 dark:border-neutral-800 dark:bg-neutral-800"
       >
         <!-- Keep this as one line or else there will be an unnecessary line -->
         <pre class="text text-sm text-wrap">{{ bonus }}</pre>

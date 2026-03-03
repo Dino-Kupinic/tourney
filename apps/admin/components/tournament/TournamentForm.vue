@@ -54,7 +54,7 @@ const thumbnails = computed(() => {
           class="grid flex-1 gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]"
         >
           <div
-            class="flex h-full flex-col gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
+            class="flex h-full flex-col gap-3 rounded-md border border-neutral-200 p-3 dark:border-neutral-700"
           >
             <UFormField
               label="Startdatum"
@@ -87,7 +87,7 @@ const thumbnails = computed(() => {
           </div>
 
           <div
-            class="flex h-full flex-col gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
+            class="flex h-full flex-col gap-3 rounded-md border border-neutral-200 p-3 dark:border-neutral-700"
           >
             <UFormField
               label="Knockout Interval"
@@ -123,7 +123,7 @@ const thumbnails = computed(() => {
             </template>
           </USelectMenu>
         </UFormField>
-        <p class="text-xs text-gray-500">
+        <p class="text-xs text-neutral-500">
           Keine Bilder? Lade eins hoch in
           <NuxtLink to="/gallery">
             <span class="text-primary-500">Galerie</span>
@@ -136,7 +136,7 @@ const thumbnails = computed(() => {
         </p>
         <UFormField label="Preise" class="flex-1">
           <div
-            class="flex h-full flex-col gap-3 rounded-md bg-gray-50 p-3 dark:bg-gray-800"
+            class="flex h-full flex-col gap-3 rounded-md bg-neutral-50 p-3 dark:bg-neutral-800"
           >
             <UFormField label="Erster Platz" name="prizes.first">
               <UInput

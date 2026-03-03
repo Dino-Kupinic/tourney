@@ -453,7 +453,7 @@ const onSubmitCreate = async () => {
         <template #content>
           <UCard
             :ui="{
-              root: 'flex max-h-[90vh] flex-col divide-y divide-gray-100 overflow-hidden dark:divide-gray-800',
+              root: 'flex max-h-[90vh] flex-col divide-y divide-neutral-100 overflow-hidden dark:divide-neutral-800',
               body: 'flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-5 sm:p-6',
               header: 'px-4 py-3 sm:px-6',
               footer: 'px-4 py-3 sm:px-6',
@@ -478,13 +478,13 @@ const onSubmitCreate = async () => {
               <div class="flex min-h-0 flex-col gap-1 overflow-hidden">
                 <strong>Klassenlinks</strong>
                 <div
-                  class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
+                  class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-neutral-200 shadow-sm dark:border-neutral-800"
                 >
                   <ul class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
                     <li
                       v-for="[className, classLinks] in Object.entries(links)"
                       :key="className"
-                      class="border-b border-gray-200 p-4 last:border-b-0 dark:border-gray-800"
+                      class="border-b border-neutral-200 p-4 last:border-b-0 dark:border-neutral-800"
                     >
                       <div class="flex w-full flex-col gap-3">
                         <div class="flex items-center gap-2">
@@ -497,7 +497,7 @@ const onSubmitCreate = async () => {
                           />
                         </div>
                         <ul
-                          class="space-y-1 rounded-md bg-gray-100 p-3 shadow-sm dark:bg-gray-800"
+                          class="space-y-1 rounded-md bg-neutral-100 p-3 shadow-sm dark:bg-neutral-800"
                         >
                           <li
                             v-for="link in classLinks.links"
@@ -536,7 +536,7 @@ const onSubmitCreate = async () => {
               <div class="flex min-h-0 flex-col gap-1">
                 <strong>Einstellungen</strong>
                 <div
-                  class="flex h-full min-h-0 flex-col overflow-y-auto rounded-md border border-gray-200 p-3 shadow-sm dark:border-gray-800"
+                  class="flex h-full min-h-0 flex-col overflow-y-auto rounded-md border border-neutral-200 p-3 shadow-sm dark:border-neutral-800"
                 >
                   <UForm
                     :state="linksState"
@@ -544,15 +544,17 @@ const onSubmitCreate = async () => {
                     class="flex h-full min-h-0 flex-col space-y-3"
                   >
                     <div
-                      class="flex items-start justify-between gap-3 rounded-md bg-gray-50 p-3 dark:bg-gray-800"
+                      class="flex items-start justify-between gap-3 rounded-md bg-neutral-50 p-3 dark:bg-neutral-800"
                     >
                       <div class="min-w-0">
                         <p
-                          class="text-sm font-medium text-gray-900 dark:text-white"
+                          class="text-sm font-medium text-neutral-900 dark:text-white"
                         >
                           Aktivieren
                         </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                        <p
+                          class="text-xs text-neutral-500 dark:text-neutral-400"
+                        >
                           Fügt Einleitung und Abschlusstext zur Nachricht hinzu.
                         </p>
                       </div>
@@ -636,13 +638,13 @@ const onSubmitCreate = async () => {
                 description="Für diese Klassen wird ein Link generiert."
               >
                 <ul
-                  class="h-40 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
+                  class="h-40 w-full overflow-y-scroll rounded-md border border-neutral-200 shadow-sm dark:border-neutral-800"
                 >
                   <template v-if="classes?.length">
                     <li
                       v-for="schoolClass in classes"
                       :key="schoolClass.name"
-                      class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
+                      class="flex justify-between border-b border-neutral-200 p-2 px-4 dark:border-neutral-800"
                     >
                       <p>{{ schoolClass.name }}</p>
                       <p>{{ schoolClass.year }}</p>
@@ -650,7 +652,7 @@ const onSubmitCreate = async () => {
                   </template>
                   <template v-else>
                     <div class="flex h-full w-full items-center justify-center">
-                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                      <p class="text-sm text-neutral-500 dark:text-neutral-400">
                         Keine Klassen für {{ classYear }} gefunden.
                       </p>
                     </div>
@@ -726,15 +728,15 @@ const onSubmitCreate = async () => {
 
               <UFormField name="allow_class_mixing">
                 <div
-                  class="flex items-start justify-between gap-3 rounded-md bg-gray-50 p-3 dark:bg-gray-800"
+                  class="flex items-start justify-between gap-3 rounded-md bg-neutral-50 p-3 dark:bg-neutral-800"
                 >
                   <div class="min-w-0">
                     <p
-                      class="text-sm font-medium text-gray-900 dark:text-white"
+                      class="text-sm font-medium text-neutral-900 dark:text-white"
                     >
                       Klassenmischung erlauben
                     </p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">
                       Schüler können sich in anderen Klassen anmelden.
                     </p>
                   </div>
@@ -774,13 +776,13 @@ const onSubmitCreate = async () => {
 
           <UFormField name="allow_class_mixing">
             <div
-              class="flex items-start justify-between gap-3 rounded-md bg-gray-50 p-3 dark:bg-gray-800"
+              class="flex items-start justify-between gap-3 rounded-md bg-neutral-50 p-3 dark:bg-neutral-800"
             >
               <div class="min-w-0">
-                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                <p class="text-sm font-medium text-neutral-900 dark:text-white">
                   Klassenmischung erlauben
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
+                <p class="text-xs text-neutral-500 dark:text-neutral-400">
                   Schüler können sich in anderen Klassen anmelden.
                 </p>
               </div>
@@ -808,12 +810,12 @@ const onSubmitCreate = async () => {
       :get-row-id="(row) => row.id"
       :enable-row-selection="true"
       :loading="status === 'pending'"
-      class="h-full w-full bg-white dark:bg-gray-900"
+      class="h-full w-full bg-white dark:bg-neutral-900"
       :meta="{
         class: {
           tr: (row) =>
             row.getIsSelected()
-              ? 'cursor-pointer bg-gray-50 dark:bg-gray-800/40'
+              ? 'cursor-pointer bg-neutral-50 dark:bg-neutral-800/40'
               : 'cursor-pointer',
         },
       }"

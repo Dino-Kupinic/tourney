@@ -56,7 +56,7 @@ const items = computed(() => [
       color="neutral"
       variant="outline"
       size="sm"
-      class="w-32 flex-1 justify-between bg-white dark:bg-gray-950"
+      class="w-32 flex-1 justify-between"
     >
       <div class="flex items-center gap-1">
         <UIcon name="i-heroicons-view-columns" class="h-4 w-4" />
@@ -64,7 +64,7 @@ const items = computed(() => [
       </div>
       <UIcon
         name="i-heroicons-chevron-down-20-solid"
-        class="h-4 w-4 text-gray-400 transition-transform dark:text-gray-500"
+        class="h-4 w-4 text-neutral-400 transition-transform dark:text-neutral-500"
         :class="[open && 'rotate-180 transform']"
       />
     </UButton>
