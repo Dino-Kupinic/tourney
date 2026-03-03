@@ -23,7 +23,8 @@ const isOpenInfo = defineModel<boolean>()
           <div class="flex items-center gap-2">
             <UButton
               color="neutral"
-              size="xs"
+              variant="outline"
+              size="sm"
               @click="isOpenInfo = false"
               label="Fertig"
             />

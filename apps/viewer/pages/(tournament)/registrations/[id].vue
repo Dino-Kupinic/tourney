@@ -210,6 +210,7 @@ const submit = async () => {
                 size="md"
                 square
                 color="neutral"
+                variant="outline"
                 @click="isOpen = true"
               />
               <StatusExplanationModal v-model="isOpen" />

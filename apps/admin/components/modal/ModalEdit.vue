@@ -35,13 +35,14 @@ const modalUI = computed(() => ({
           <div class="flex items-center gap-2">
             <UButton
               variant="soft"
-              size="xs"
+              size="sm"
               @click="$emit('edit')"
               label="Speichern"
             />
             <UButton
               color="neutral"
-              size="xs"
+              variant="outline"
+              size="sm"
               @click="isOpenEdit = false"
               label="Abbrechen"
             />

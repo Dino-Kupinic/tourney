@@ -77,7 +77,7 @@ const liveIcon = computed(() => {
           <div class="flex items-center gap-2">
             <UButton
               variant="soft"
-              size="xs"
+              size="sm"
               color="error"
               :icon="liveIcon"
               @click="$emit('live')"
@@ -85,7 +85,8 @@ const liveIcon = computed(() => {
             />
             <UButton
               color="neutral"
-              size="xs"
+              variant="outline"
+              size="sm"
               @click="isOpenLive = false"
               label="Abbrechen"
             />

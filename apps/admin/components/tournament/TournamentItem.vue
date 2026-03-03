@@ -92,8 +92,9 @@ const onDelete = async () => {
           <UDropdownMenu :items="items" class="m-1">
             <UButton
               color="neutral"
+              variant="outline"
               icon="i-heroicons-ellipsis-horizontal-20-solid"
-              size="xs"
+              size="sm"
               square
             />
           </UDropdownMenu>

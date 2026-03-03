@@ -59,7 +59,7 @@ const startTime = computed(() => {
           icon="i-heroicons-play"
           label="Starten..."
           color="primary"
-          size="xs"
+          size="sm"
           variant="link"
           @click="addToLive"
         />

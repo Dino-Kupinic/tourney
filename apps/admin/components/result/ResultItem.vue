@@ -127,7 +127,8 @@ const onSubmitEdit = async () => {
         <UButton
           icon="i-heroicons-pencil"
           color="neutral"
-          size="xs"
+          variant="outline"
+          size="sm"
           square
           @click="isOpenEdit = true"
         />

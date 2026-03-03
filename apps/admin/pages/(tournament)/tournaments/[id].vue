@@ -304,7 +304,8 @@ const canGoLive = computed(() => {
         <UButton
           icon="i-heroicons-arrow-path"
           color="neutral"
-          size="xs"
+          variant="outline"
+          size="sm"
           square
           @click="refreshTournament"
         />
@@ -313,7 +314,8 @@ const canGoLive = computed(() => {
           icon="i-heroicons-pencil-square"
           label="Bearbeiten"
           color="neutral"
-          size="xs"
+          variant="outline"
+          size="sm"
           square
           @click="isOpenEdit = true"
         />
@@ -335,7 +337,7 @@ const canGoLive = computed(() => {
               icon="i-heroicons-table-cells"
               variant="soft"
               color="warning"
-              size="xs"
+              size="sm"
               :disabled="hasMatches as boolean"
               @click="isOpenConfirm = true"
             />
@@ -348,7 +350,7 @@ const canGoLive = computed(() => {
             icon="i-heroicons-table-cells"
             variant="soft"
             color="warning"
-            size="xs"
+            size="sm"
             @click="isOpenConfirm = true"
           />
         </template>
@@ -359,7 +361,7 @@ const canGoLive = computed(() => {
               icon="i-heroicons-signal"
               color="error"
               variant="soft"
-              size="xs"
+              size="sm"
               :disabled="!canGoLive"
               @click="isOpenLive = true"
             />
@@ -371,7 +373,7 @@ const canGoLive = computed(() => {
             icon="i-heroicons-signal"
             color="error"
             variant="soft"
-            size="xs"
+            size="sm"
             @click="isOpenLive = true"
           />
         </template>
@@ -554,6 +556,7 @@ const canGoLive = computed(() => {
                         <UButton
                           icon="i-heroicons-check"
                           color="neutral"
+                          variant="outline"
                           size="sm"
                           square
                           @click="editPlayerNote(player.id, player.note)"

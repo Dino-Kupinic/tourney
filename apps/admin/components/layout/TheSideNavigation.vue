@@ -80,77 +80,74 @@ function isActive(to: string) {
 </script>
 
 <template>
-  <aside class="flex h-full min-w-64 flex-col gap-4 pb-2">
-    <nav class="flex grow flex-col pr-2">
-      <template
+  <aside class="flex h-full max-w-44 min-w-44 flex-col pb-2">
+    <nav class="flex grow flex-col gap-2 pr-2">
+      <div
         v-for="(section, sectionIndex) in navigationLinks"
         :key="sectionIndex"
+        class="space-y-0.5 border-b border-gray-200 pb-3 dark:border-gray-800"
+        :class="
+          sectionIndex === navigationLinks.length - 1 && 'border-b-0 pb-0'
+        "
       >
-        <div class="space-y-0.5">
-          <NuxtLink
-            v-for="item in section"
-            :key="item.to"
-            :to="item.to"
-            class="flex items-center justify-between rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
-            :class="
-              isActive(item.to)
-                ? 'bg-gray-200 text-gray-950 dark:bg-gray-800 dark:text-white'
-                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/80'
-            "
+        <NuxtLink
+          v-for="item in section"
+          :key="item.to"
+          :to="item.to"
+          class="flex items-center justify-between rounded-lg px-3 py-1 text-sm font-medium transition-colors"
+          :class="
+            isActive(item.to)
+              ? 'bg-gray-100 text-gray-950 dark:bg-gray-800/70 dark:text-white'
+              : 'text-gray-500 hover:bg-gray-100/70 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/60 dark:hover:text-white'
+          "
+        >
+          <span class="flex items-center gap-2">
+            <UIcon :name="item.icon" class="h-4 w-4 shrink-0" />
+            <span>{{ item.label }}</span>
+          </span>
+          <UBadge
+            v-if="item.badge"
+            color="error"
+            variant="outline"
+            class="!text-error ring-error/20 h-5 min-w-5 rounded-md !bg-white px-1.5 !text-[10px] !font-medium ring-1 dark:!bg-gray-950"
           >
-            <span class="flex items-center gap-2">
-              <UIcon :name="item.icon" class="h-4 w-4 shrink-0" />
-              <span>{{ item.label }}</span>
-            </span>
-            <UBadge
-              v-if="item.badge"
-              color="neutral"
-              variant="outline"
-              class="!bg-white !text-gray-700 ring-1 ring-gray-200 dark:!bg-gray-950 dark:!text-gray-200 dark:ring-gray-800"
-            >
-              {{ item.badge }}
-            </UBadge>
-          </NuxtLink>
-        </div>
-        <USeparator
-          v-if="sectionIndex < navigationLinks.length - 1"
-          class="my-3 mr-2"
-        />
-      </template>
+            {{ item.badge }}
+          </UBadge>
+        </NuxtLink>
+      </div>
     </nav>
 
-    <div
-      class="mr-2 flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-900"
-    >
-      <img
-        :src="svg"
-        :alt="name"
-        class="h-9 w-9 rounded-md border border-gray-200 bg-gray-100 object-cover dark:border-gray-700 dark:bg-gray-800"
-      />
-      <div class="flex min-w-0 items-center gap-2">
-        <p class="truncate text-sm font-semibold text-gray-950 dark:text-white">
-          {{ name }}
-        </p>
-        <UBadge
-          color="neutral"
-          variant="outline"
-          class="!bg-white !text-gray-700 ring-1 ring-gray-200 dark:!bg-gray-950 dark:!text-gray-200 dark:ring-gray-800"
-        >
-          {{ role }}
-        </UBadge>
+    <div class="mt-2 mr-2">
+      <div class="flex items-center gap-2 rounded-lg px-3 py-2">
+        <img
+          :src="svg"
+          :alt="name"
+          class="h-5 w-5 rounded-full bg-gray-100 object-cover dark:bg-gray-800"
+        />
+        <div class="flex min-w-0 items-center gap-2">
+          <p
+            class="truncate text-sm font-semibold text-gray-500 dark:text-gray-300"
+          >
+            {{ name }}
+          </p>
+          <UBadge color="primary" variant="subtle" size="sm">
+            {{ role }}
+          </UBadge>
+        </div>
       </div>
-    </div>
 
-    <NuxtLink
-      to="/settings"
-      class="mr-2 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/80"
-      :class="
-        isActive('/settings') &&
-        'bg-gray-200 text-gray-950 dark:bg-gray-800 dark:text-white'
-      "
-    >
-      <UIcon name="i-heroicons-cog-8-tooth" class="h-4 w-4 shrink-0" />
-      <span>Einstellungen</span>
-    </NuxtLink>
+      <NuxtLink
+        to="/settings"
+        class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+        :class="
+          isActive('/settings')
+            ? 'bg-gray-100 text-gray-950 dark:bg-gray-800/70 dark:text-white'
+            : 'text-gray-500 hover:bg-gray-100/70 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800/60 dark:hover:text-white'
+        "
+      >
+        <UIcon name="i-heroicons-cog-8-tooth" class="h-4 w-4 shrink-0" />
+        <span>Einstellungen</span>
+      </NuxtLink>
+    </div>
   </aside>
 </template>

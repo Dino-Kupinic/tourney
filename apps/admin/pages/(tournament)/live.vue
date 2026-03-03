@@ -164,7 +164,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
   <BasePageHeader :title="title">
     <ToolbarContainer>
       <UButton
-        size="xs"
+        size="sm"
         variant="soft"
         color="warning"
         label="Gewinner anzeigen"
@@ -182,7 +182,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
         />
       </ModalInfo>
       <UButton
-        size="xs"
+        size="sm"
         variant="soft"
         color="primary"
         label="Gruppenphase starten..."
@@ -218,7 +218,8 @@ const { data: history, refresh: refreshHistory } = await useFetch(
       <UButton
         icon="i-heroicons-arrow-path"
         color="neutral"
-        size="xs"
+        variant="outline"
+        size="sm"
         square
         @click="refresh"
       />
@@ -233,8 +234,9 @@ const { data: history, refresh: refreshHistory } = await useFetch(
         @click="isOpenInfo = true"
         square
         color="neutral"
+        variant="outline"
         icon="i-ic-round-question-mark"
-        size="xs"
+        size="sm"
       />
       <ModalInfo v-model="isOpenInfo">
         <p>Punktetabelle Abkürzungen</p>

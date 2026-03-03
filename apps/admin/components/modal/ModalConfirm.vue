@@ -26,14 +26,15 @@ defineEmits<{
           <div class="flex items-center gap-2">
             <UButton
               variant="soft"
-              size="xs"
+              size="sm"
               color="warning"
               @click="$emit('confirm')"
               label="Bestätigen"
             />
             <UButton
               color="neutral"
-              size="xs"
+              variant="outline"
+              size="sm"
               @click="isOpenConfirm = false"
               label="Abbrechen"
             />

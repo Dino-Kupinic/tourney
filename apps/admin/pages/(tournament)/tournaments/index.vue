@@ -158,12 +158,13 @@ const onSubmitCreate = async () => {
       <UButton
         icon="i-heroicons-arrow-path"
         color="neutral"
-        size="xs"
+        variant="outline"
+        size="sm"
         square
         @click="refreshTournaments"
       />
       <UButton
-        size="xs"
+        size="sm"
         variant="soft"
         @click="isOpenCreate = true"
         label="Neues Turnier..."

@@ -55,7 +55,8 @@ async function saveContent() {
       <UButton
         label="Markdown Syntax"
         color="neutral"
-        size="xs"
+        variant="outline"
+        size="sm"
         to="https://www.markdownguide.org/cheat-sheet/"
         target="_blank"
         rel="noopener noreferrer"
@@ -64,14 +65,15 @@ async function saveContent() {
       <UButton
         icon="i-heroicons-arrow-path"
         color="neutral"
-        size="xs"
+        variant="outline"
+        size="sm"
         square
         @click="refresh"
       />
       <UButton
         label="Änderungen speichern"
         variant="soft"
-        size="xs"
+        size="sm"
         icon="i-heroicons-check"
         @click="saveContent"
       />

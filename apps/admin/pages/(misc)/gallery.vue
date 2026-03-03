@@ -111,7 +111,7 @@ await fetchImages()
         label="Löschen"
         color="error"
         variant="soft"
-        size="xs"
+        size="sm"
         icon="i-heroicons-trash"
         :loading="isDeleting"
         @click="deleteSelectedImages"
@@ -120,7 +120,7 @@ await fetchImages()
       <UButton
         label="Bilder hochladen"
         variant="soft"
-        size="xs"
+        size="sm"
         icon="i-heroicons-arrow-up-tray"
         :loading="isUploading"
         @click="() => $refs.fileInput.click()"

@@ -410,6 +410,7 @@ const onSubmitCreate = async () => {
           icon="i-heroicons-arrow-up-on-square"
           @click="generateLinks"
           color="neutral"
+          variant="outline"
           size="sm"
         />
       </template>
@@ -419,6 +420,7 @@ const onSubmitCreate = async () => {
           icon="i-heroicons-chevron-down"
           trailing
           color="neutral"
+          variant="outline"
           size="sm"
           label="Markieren als"
         />
@@ -445,14 +447,14 @@ const onSubmitCreate = async () => {
       <!-- Link Modal -->
       <UModal
         v-model:open="isOpenLinks"
-        :ui="{ content: 'w-full sm:max-w-5xl' }"
+        :ui="{ content: 'w-full overflow-hidden sm:max-w-5xl sm:max-h-[90vh]' }"
         prevent-close
       >
         <template #content>
           <UCard
             :ui="{
-              root: 'divide-y divide-gray-100 dark:divide-gray-800',
-              body: 'px-4 py-5 sm:p-6',
+              root: 'flex max-h-[90vh] flex-col divide-y divide-gray-100 overflow-hidden dark:divide-gray-800',
+              body: 'flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-5 sm:p-6',
               header: 'px-4 py-3 sm:px-6',
               footer: 'px-4 py-3 sm:px-6',
             }"
@@ -471,14 +473,14 @@ const onSubmitCreate = async () => {
               </p>
             </div>
             <div
-              class="mt-3 grid min-h-[28rem] gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]"
+              class="mt-3 grid min-h-0 flex-1 gap-3 overflow-hidden lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]"
             >
-              <div class="flex min-h-0 flex-col gap-1">
+              <div class="flex min-h-0 flex-col gap-1 overflow-hidden">
                 <strong>Klassenlinks</strong>
                 <div
-                  class="flex min-h-0 flex-1 flex-col rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
+                  class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
                 >
-                  <ul class="min-h-0 flex-1 overflow-y-auto">
+                  <ul class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
                     <li
                       v-for="[className, classLinks] in Object.entries(links)"
                       :key="className"
@@ -510,8 +512,9 @@ const onSubmitCreate = async () => {
                         </ul>
                         <div class="flex items-center justify-between gap-3">
                           <UButton
-                            variant="soft"
-                            size="xs"
+                            color="neutral"
+                            variant="outline"
+                            size="sm"
                             icon="i-heroicons-clipboard-document-check"
                             label="Kopieren"
                             @click="onCopyEmail(classLinks)"
@@ -519,7 +522,7 @@ const onSubmitCreate = async () => {
                           <UButton
                             variant="soft"
                             color="success"
-                            size="xs"
+                            size="sm"
                             icon="i-heroicons-check"
                             label="Abgesendet"
                             @click="classLinks.sent = !classLinks.sent"
@@ -533,7 +536,7 @@ const onSubmitCreate = async () => {
               <div class="flex min-h-0 flex-col gap-1">
                 <strong>Einstellungen</strong>
                 <div
-                  class="flex h-full min-h-0 flex-col rounded-md border border-gray-200 p-3 shadow-sm dark:border-gray-800"
+                  class="flex h-full min-h-0 flex-col overflow-y-auto rounded-md border border-gray-200 p-3 shadow-sm dark:border-gray-800"
                 >
                   <UForm
                     :state="linksState"
@@ -583,7 +586,8 @@ const onSubmitCreate = async () => {
             <template #footer>
               <UButton
                 color="neutral"
-                size="xs"
+                variant="outline"
+                size="sm"
                 @click="isOpenLinks = false"
                 label="Fertig"
               />
@@ -822,7 +826,7 @@ const onSubmitCreate = async () => {
     >
       <template #select-header="{ table }">
         <UCheckbox
-          size="xs"
+          class="ml-2"
           :model-value="
             table.getIsSomePageRowsSelected()
               ? 'indeterminate'
@@ -834,7 +838,7 @@ const onSubmitCreate = async () => {
 
       <template #select-cell="{ row }">
         <UCheckbox
-          size="xs"
+          class="ml-2"
           :model-value="row.getIsSelected()"
           @click.stop
           @update:model-value="row.toggleSelected(!!$event)"
@@ -846,8 +850,7 @@ const onSubmitCreate = async () => {
           v-if="row.original.status === 'Ausstehend'"
           label="Ausstehend"
           color="neutral"
-          variant="outline"
-          class="!bg-white !text-gray-700 ring-1 ring-gray-200 dark:!bg-gray-950 dark:!text-gray-200 dark:ring-gray-800"
+          variant="subtle"
         />
         <UBadge
           v-else-if="row.original.status === 'Abgesendet'"
@@ -890,7 +893,7 @@ const onSubmitCreate = async () => {
             color="neutral"
             variant="ghost"
             icon="i-heroicons-ellipsis-horizontal-20-solid"
-            size="xs"
+            size="sm"
             square
             @click.stop
           />

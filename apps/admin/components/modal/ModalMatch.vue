@@ -28,7 +28,7 @@ const loading = defineModel<boolean>("loading")
           <div class="flex items-center gap-2">
             <UButton
               variant="soft"
-              size="xs"
+              size="sm"
               color="secondary"
               @click="$emit('confirm')"
               label="Beenden"
@@ -36,7 +36,8 @@ const loading = defineModel<boolean>("loading")
             />
             <UButton
               color="neutral"
-              size="xs"
+              variant="outline"
+              size="sm"
               @click="isOpenConfirm = false"
               label="Abbrechen"
             />

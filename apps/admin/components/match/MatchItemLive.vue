@@ -184,16 +184,18 @@ const completeMatch = async () => {
           <div class="space-x-0.5">
             <UButton
               class="rounded-full"
-              size="xs"
+              size="sm"
               color="neutral"
+              variant="outline"
               square
               icon="i-heroicons-minus"
               @click="score1 > 0 ? score1-- : 0"
             />
             <UButton
               class="rounded-full"
-              size="xs"
+              size="sm"
               color="neutral"
+              variant="outline"
               square
               icon="i-heroicons-plus"
               @click="score1++"
@@ -221,16 +223,18 @@ const completeMatch = async () => {
           <div class="space-x-0.5">
             <UButton
               class="rounded-full"
-              size="xs"
+              size="sm"
               color="neutral"
+              variant="outline"
               square
               icon="i-heroicons-minus"
               @click="score2 > 0 ? score2-- : 0"
             />
             <UButton
               class="rounded-full"
-              size="xs"
+              size="sm"
               color="neutral"
+              variant="outline"
               square
               icon="i-heroicons-plus"
               @click="score2++"
@@ -243,7 +247,7 @@ const completeMatch = async () => {
         variant="soft"
         color="secondary"
         label="Spiel beenden..."
-        size="xs"
+        size="sm"
         @click="isOpenConfirm = true"
       />
     </div>

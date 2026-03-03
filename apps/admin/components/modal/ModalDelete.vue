@@ -26,14 +26,15 @@ defineEmits<{
           <div class="flex items-center gap-2">
             <UButton
               variant="soft"
-              size="xs"
+              size="sm"
               color="error"
               @click="$emit('delete')"
               label="Löschen"
             />
             <UButton
               color="neutral"
-              size="xs"
+              variant="outline"
+              size="sm"
               @click="isOpenDelete = false"
               label="Abbrechen"
             />

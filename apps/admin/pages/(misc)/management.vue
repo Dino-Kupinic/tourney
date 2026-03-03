@@ -308,25 +308,26 @@ const refresh = async () => {
       <UButton
         icon="i-heroicons-arrow-path"
         color="neutral"
-        size="xs"
+        variant="outline"
+        size="sm"
         square
         @click="refresh"
       />
       <UButton
-        size="xs"
+        size="sm"
         variant="soft"
         @click="isOpenCreate = true"
         label="Neue Klasse..."
       />
       <UButton
-        size="xs"
+        size="sm"
         variant="soft"
         @click="isOpenMultipleCreate = true"
         label="Mehrere Klassen..."
       />
       <UButton
         v-if="selectedRows.length > 1"
-        size="xs"
+        size="sm"
         color="error"
         variant="soft"
         @click="isOpenDelete = true"
@@ -398,7 +399,7 @@ const refresh = async () => {
                   icon="i-heroicons-x-mark"
                   color="error"
                   variant="ghost"
-                  size="xs"
+                  size="sm"
                   @click="removeClass(className)"
                 />
               </div>
@@ -475,7 +476,7 @@ const refresh = async () => {
                   color="neutral"
                   variant="ghost"
                   icon="i-heroicons-ellipsis-horizontal-20-solid"
-                  size="xs"
+                  size="sm"
                   square
                 />
               </UDropdownMenu>
