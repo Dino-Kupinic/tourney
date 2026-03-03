@@ -21,7 +21,7 @@ useHead({
               rel="noopener"
               target="_blank"
               to="https://htl-steyr.github.io/tourney/"
-              class="hover:border-primary-500 dark:hover:border-primary-500 flex h-full w-2/3 flex-col justify-between rounded-lg border bg-gray-50 p-8 font-serif text-xl tracking-tight dark:border-gray-700 dark:bg-gray-900"
+              class="hover:border-primary-500 dark:hover:border-primary-500 flex h-full w-2/3 flex-col justify-between rounded-lg border border-gray-300 bg-gray-50 p-8 font-serif text-xl tracking-tight dark:border-gray-700 dark:bg-gray-900"
             >
               <p>Dokumentation</p>
               <UIcon
@@ -34,7 +34,7 @@ useHead({
               rel="noopener"
               target="_blank"
               to="https://github.com/HTL-Steyr/tourney"
-              class="hover:border-primary-500 dark:hover:border-primary-500 flex h-full w-1/3 flex-col justify-between rounded-lg border bg-gray-50 p-8 font-serif text-xl tracking-tight dark:border-gray-700 dark:bg-gray-900"
+              class="hover:border-primary-500 dark:hover:border-primary-500 flex h-full w-1/3 flex-col justify-between rounded-lg border border-gray-300 bg-gray-50 p-8 font-serif text-xl tracking-tight dark:border-gray-700 dark:bg-gray-900"
             >
               <p>GitHub</p>
               <UIcon
@@ -49,7 +49,7 @@ useHead({
             rel="noopener"
             target="_blank"
             to="https://tourney.htl-steyr.at"
-            class="hover:border-primary-500 dark:hover:border-primary-500 flex h-1/3 w-full flex-col justify-between rounded-lg border bg-gray-50 p-8 font-serif text-xl tracking-tight dark:border-gray-700 dark:bg-gray-900"
+            class="hover:border-primary-500 dark:hover:border-primary-500 flex h-1/3 w-full flex-col justify-between rounded-lg border border-gray-300 bg-gray-50 p-8 font-serif text-xl tracking-tight dark:border-gray-700 dark:bg-gray-900"
           >
             <p>Schüler-App</p>
             <UIcon

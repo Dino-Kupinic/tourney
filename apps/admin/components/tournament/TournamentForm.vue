@@ -16,41 +16,45 @@ const thumbnails = computed(() => {
 </script>
 
 <template>
-  <UForm :schema="schema" :state="state" class="pt-2" :validate-on="[]">
-    <div class="flex h-full w-full justify-between gap-6">
-      <div class="flex w-[28rem] flex-col gap-3">
-        <div class="flex space-x-3">
-          <UFormField label="Name" name="name" class="grow" required>
+  <UForm :schema="schema" :state="state" class="h-full pt-2" :validate-on="[]">
+    <div class="grid h-full gap-6 lg:grid-cols-2">
+      <div class="flex h-full flex-col gap-4">
+        <div class="grid gap-3 sm:grid-cols-2">
+          <UFormField label="Name" name="name" class="w-full" required>
             <UInput
               v-model="state.name"
               placeholder="Fußball Turnier 2024/25"
+              class="w-full"
             />
           </UFormField>
-          <UFormField label="Sportart" name="sport" required>
+          <UFormField label="Sportart" name="sport" class="w-full" required>
             <USelect
               v-model="state.sport"
               placeholder="Sport auswählen"
               :items="sports"
-              class="w-40"
+              class="w-full"
             />
           </UFormField>
         </div>
 
-        <UFormField class="grow" label="Ort" name="location" required>
-          <UInput v-model="state.location" />
+        <UFormField class="w-full" label="Ort" name="location" required>
+          <UInput v-model="state.location" class="w-full" />
         </UFormField>
 
-        <UFormField label="Regeln" name="rules">
+        <UFormField class="w-full" label="Regeln" name="rules">
           <UTextarea
             v-model="state.rules"
             :rows="4"
             placeholder="Lorem Ipsum..."
+            class="w-full"
           />
         </UFormField>
 
-        <div class="flex gap-3">
+        <div
+          class="grid flex-1 gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]"
+        >
           <div
-            class="flex flex-col gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
+            class="flex h-full flex-col gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
           >
             <UFormField
               label="Startdatum"
@@ -58,45 +62,61 @@ const thumbnails = computed(() => {
               description="An diesem Datum findet es statt."
               required
             >
-              <UInput v-model="state.start_date" type="date" />
+              <UInput v-model="state.start_date" type="date" class="w-full" />
             </UFormField>
 
-            <div class="flex space-x-3">
+            <div class="flex space-x-1">
               <UFormField label="Von" name="from" required class="grow">
-                <UInput v-model="state.from" type="time" :step="60" />
+                <UInput
+                  v-model="state.from"
+                  type="time"
+                  :step="60"
+                  class="w-full"
+                />
               </UFormField>
 
               <UFormField label="Bis" name="to" required class="grow">
-                <UInput v-model="state.to" type="time" :step="60" />
+                <UInput
+                  v-model="state.to"
+                  type="time"
+                  :step="60"
+                  class="w-full"
+                />
               </UFormField>
             </div>
           </div>
 
           <div
-            class="flex flex-col justify-between gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
+            class="flex h-full flex-col gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
           >
             <UFormField
               label="Knockout Interval"
               name="knockout_interval"
-              description="Matchlänge für Matches nach der Gruppenphase."
+              description="Matchlänge für Matches nach Gruppenphase."
               required
             >
+              <UInput
+                v-model="state.knockout_interval"
+                type="number"
+                class="w-full"
+              />
             </UFormField>
-            <UInput v-model="state.knockout_interval" type="number" />
           </div>
         </div>
       </div>
-      <div class="flex flex-col gap-3">
+      <div class="flex h-full flex-col gap-4">
         <UFormField
           label="Vorschaubild"
           name="thumbnail_path"
           description="Ein Bild für das Turnier."
+          class="w-full"
           required
         >
           <USelectMenu
             v-model="state.thumbnail_path"
             :items="thumbnails"
             placeholder="Bild auswählen"
+            class="w-full"
           >
             <template #item-label="{ item }">
               <span class="font-mono text-xs">{{ item }}</span>
@@ -114,32 +134,47 @@ const thumbnails = computed(() => {
             />
           </NuxtLink>
         </p>
-        <UFormField label="Preise">
+        <UFormField label="Preise" class="flex-1">
           <div
-            class="flex flex-col gap-3 rounded-md bg-gray-50 p-3 dark:bg-gray-800"
+            class="flex h-full flex-col gap-3 rounded-md bg-gray-50 p-3 dark:bg-gray-800"
           >
             <UFormField label="Erster Platz" name="prizes.first">
-              <UInput v-model="state.prizes.first" placeholder="Pokal" />
+              <UInput
+                v-model="state.prizes.first"
+                placeholder="Pokal"
+                class="w-full"
+              />
             </UFormField>
-            <div class="flex space-x-3">
-              <UFormField label="Zweiter Platz" name="prizes.second">
+            <div class="grid gap-3 sm:grid-cols-2">
+              <UFormField
+                label="Zweiter Platz"
+                name="prizes.second"
+                class="w-full"
+              >
                 <UInput
                   v-model="state.prizes.second"
                   placeholder="Silver Medaille"
+                  class="w-full"
                 />
               </UFormField>
-              <UFormField label="Dritter Platz" name="prizes.third">
+              <UFormField
+                label="Dritter Platz"
+                name="prizes.third"
+                class="w-full"
+              >
                 <UInput
                   v-model="state.prizes.third"
                   placeholder="Bronze Medaille"
+                  class="w-full"
                 />
               </UFormField>
             </div>
-            <UFormField label="Sonstiges" name="prizes.bonus">
+            <UFormField label="Sonstiges" name="prizes.bonus" class="flex-1">
               <UTextarea
                 v-model="state.prizes.bonus"
                 :rows="5"
                 placeholder="Eis, Frankfurter, etc."
+                class="w-full"
               />
             </UFormField>
           </div>

@@ -9,7 +9,7 @@ export type ClassColumn = {
 export const useClassTable = (
   onEdit: (row: ClassColumn) => void,
   onInfo: (row: ClassColumn) => void,
-  onDelete: () => void,
+  onDelete: (row: ClassColumn) => void,
 ) => {
   const columns: TableColumn<ClassColumn>[] = [
     {
@@ -45,7 +45,7 @@ export const useClassTable = (
         {
           label: "Löschen",
           icon: "i-heroicons-trash",
-          onSelect: () => onDelete(),
+          onSelect: () => onDelete(row),
         },
       ],
     ])

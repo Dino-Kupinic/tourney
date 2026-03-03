@@ -10,6 +10,16 @@ const isUploading = ref(false)
 const selectedImages = ref<string[]>([])
 const isDeleting = ref(false)
 
+function sanitizeStorageSegment(value: string) {
+  return value
+    .replaceAll("ß", "ss")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+}
+
 async function fetchImages() {
   const { data, error } = await supabase.storage
     .from("images")
@@ -32,8 +42,14 @@ async function uploadImages(event: Event) {
     const files = Array.from(fileInput.files)
 
     for (const file of files) {
-      const fileExt = file.name.split(".").pop()
-      const fileName = `${file.name.slice(0, file.name.indexOf("."))}_${Date.now()}.${fileExt}`
+      const extensionIndex = file.name.lastIndexOf(".")
+      const rawBaseName =
+        extensionIndex > 0 ? file.name.slice(0, extensionIndex) : file.name
+      const rawExtension =
+        extensionIndex > 0 ? file.name.slice(extensionIndex + 1) : ""
+      const fileBaseName = sanitizeStorageSegment(rawBaseName) || "bild"
+      const fileExt = rawExtension.toLowerCase().replace(/[^a-z0-9]/g, "")
+      const fileName = `${fileBaseName}_${Date.now()}${fileExt ? `.${fileExt}` : ""}`
 
       const { error } = await supabase.storage
         .from("images")
@@ -53,7 +69,7 @@ async function uploadImages(event: Event) {
     displayFailureNotification("Fehler beim Hochladen", error.message)
   } finally {
     isUploading.value = false
-    fileInput = null
+    fileInput.value = ""
   }
 }
 
@@ -171,7 +187,7 @@ await fetchImages()
           class="h-full w-full object-cover"
         />
         <div
-          class="bg-opacity-0 group-hover:bg-opacity-30 absolute inset-0 flex items-center justify-center bg-black transition-all"
+          class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30"
         >
           <UCheckbox
             :model-value="selectedImages.includes(image.name)"
@@ -180,7 +196,7 @@ await fetchImages()
           />
         </div>
         <div
-          class="bg-opacity-50 absolute right-0 bottom-0 left-0 bg-black p-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
+          class="absolute right-0 bottom-0 left-0 bg-black/50 p-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
         >
           {{ image.name }}
         </div>

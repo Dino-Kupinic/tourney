@@ -261,6 +261,13 @@ const onSubmitEdit = async () => {
 }
 
 const classIds = computed(() => selectedRows.value.map((row) => row.id))
+const onDeleteClick = (row?: ClassColumn) => {
+  if (row) {
+    selectedRows.value = [row]
+  }
+  isOpenDelete.value = true
+}
+
 const onDelete = async () => {
   try {
     await $fetch("/api/classes/delete", {
@@ -284,7 +291,7 @@ const onDelete = async () => {
   }
 }
 
-const { columns, items } = useClassTable(onEdit, onInfo, onDelete)
+const { columns, items } = useClassTable(onEdit, onInfo, onDeleteClick)
 const refresh = async () => {
   await refreshClasses()
   await refreshYearClasses()
@@ -303,7 +310,8 @@ const refresh = async () => {
         v-model="selectedYear"
         :items="years"
         placeholder="Schuljahr auswählen"
-        size="xs"
+        size="sm"
+        class="min-w-36"
       />
       <UButton
         icon="i-heroicons-arrow-path"
@@ -344,6 +352,8 @@ const refresh = async () => {
               v-model="creationStateSingle.year"
               :items="years"
               placeholder="Schuljahr auswählen"
+              size="sm"
+              class="w-full"
             />
           </UFormField>
           <UFormField label="Klassenname">
@@ -367,6 +377,8 @@ const refresh = async () => {
                 v-model="creationStateMultiple.year"
                 :items="years"
                 placeholder="Schuljahr auswählen"
+                size="sm"
+                class="w-full"
               />
             </UFormField>
             <UFormField label="Neue Klasse hinzufügen">
@@ -419,6 +431,8 @@ const refresh = async () => {
               v-model="editState.year"
               :items="years"
               placeholder="Schuljahr auswählen"
+              size="sm"
+              class="w-full"
             />
           </UFormField>
           <UFormField label="Klassenname">
@@ -469,7 +483,7 @@ const refresh = async () => {
           }"
           @select="(_, row) => select(row.original)"
         >
-          <template #actions-data="{ row }">
+          <template #actions-cell="{ row }">
             <div class="flex items-center gap-2">
               <UDropdownMenu :items="items(row.original).value">
                 <UButton
@@ -478,6 +492,7 @@ const refresh = async () => {
                   icon="i-heroicons-ellipsis-horizontal-20-solid"
                   size="sm"
                   square
+                  @click.stop
                 />
               </UDropdownMenu>
             </div>

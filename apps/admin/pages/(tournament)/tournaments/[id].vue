@@ -454,7 +454,11 @@ const canGoLive = computed(() => {
             separator-icon="i-heroicons-arrow-long-right"
           >
             <template #item="{ item }">
-              <UBadge color="neutral" class="truncate rounded-full">
+              <UBadge
+                color="neutral"
+                variant="outline"
+                class="truncate rounded-full !bg-white !text-gray-700 dark:!bg-gray-950 dark:!text-gray-200"
+              >
                 {{ item.label }}
               </UBadge>
             </template>
