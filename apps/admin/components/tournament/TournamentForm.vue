@@ -20,74 +20,74 @@ const thumbnails = computed(() => {
     <div class="flex h-full w-full justify-between gap-6">
       <div class="flex w-[28rem] flex-col gap-3">
         <div class="flex space-x-3">
-          <UFormGroup label="Name" name="name" class="grow" required>
+          <UFormField label="Name" name="name" class="grow" required>
             <UInput
               v-model="state.name"
               placeholder="Fußball Turnier 2024/25"
             />
-          </UFormGroup>
-          <UFormGroup label="Sportart" name="sport" required>
+          </UFormField>
+          <UFormField label="Sportart" name="sport" required>
             <USelect
               v-model="state.sport"
               placeholder="Sport auswählen"
-              :options="sports"
+              :items="sports"
               class="w-40"
             />
-          </UFormGroup>
+          </UFormField>
         </div>
 
-        <UFormGroup class="grow" label="Ort" name="location" required>
+        <UFormField class="grow" label="Ort" name="location" required>
           <UInput v-model="state.location" />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Regeln" name="rules">
+        <UFormField label="Regeln" name="rules">
           <UTextarea
             v-model="state.rules"
             :rows="4"
             placeholder="Lorem Ipsum..."
           />
-        </UFormGroup>
+        </UFormField>
 
         <div class="flex gap-3">
           <div
             class="flex flex-col gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
           >
-            <UFormGroup
+            <UFormField
               label="Startdatum"
               name="start_date"
               description="An diesem Datum findet es statt."
               required
             >
               <UInput v-model="state.start_date" type="date" />
-            </UFormGroup>
+            </UFormField>
 
             <div class="flex space-x-3">
-              <UFormGroup label="Von" name="from" required class="grow">
+              <UFormField label="Von" name="from" required class="grow">
                 <UInput v-model="state.from" type="time" :step="60" />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Bis" name="to" required class="grow">
+              <UFormField label="Bis" name="to" required class="grow">
                 <UInput v-model="state.to" type="time" :step="60" />
-              </UFormGroup>
+              </UFormField>
             </div>
           </div>
 
           <div
             class="flex flex-col justify-between gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
           >
-            <UFormGroup
+            <UFormField
               label="Knockout Interval"
               name="knockout_interval"
               description="Matchlänge für Matches nach der Gruppenphase."
               required
             >
-            </UFormGroup>
+            </UFormField>
             <UInput v-model="state.knockout_interval" type="number" />
           </div>
         </div>
       </div>
       <div class="flex flex-col gap-3">
-        <UFormGroup
+        <UFormField
           label="Vorschaubild"
           name="thumbnail_path"
           description="Ein Bild für das Turnier."
@@ -95,14 +95,14 @@ const thumbnails = computed(() => {
         >
           <USelectMenu
             v-model="state.thumbnail_path"
-            :options="thumbnails"
+            :items="thumbnails"
             placeholder="Bild auswählen"
           >
-            <template #option="{ option }">
-              <span class="font-mono text-xs">{{ option }}</span>
+            <template #item-label="{ item }">
+              <span class="font-mono text-xs">{{ item }}</span>
             </template>
           </USelectMenu>
-        </UFormGroup>
+        </UFormField>
         <p class="text-xs text-gray-500">
           Keine Bilder? Lade eins hoch in
           <NuxtLink to="/gallery">
@@ -114,36 +114,36 @@ const thumbnails = computed(() => {
             />
           </NuxtLink>
         </p>
-        <UFormGroup label="Preise">
+        <UFormField label="Preise">
           <div
             class="flex flex-col gap-3 rounded-md bg-gray-50 p-3 dark:bg-gray-800"
           >
-            <UFormGroup label="Erster Platz" name="prizes.first">
+            <UFormField label="Erster Platz" name="prizes.first">
               <UInput v-model="state.prizes.first" placeholder="Pokal" />
-            </UFormGroup>
+            </UFormField>
             <div class="flex space-x-3">
-              <UFormGroup label="Zweiter Platz" name="prizes.second">
+              <UFormField label="Zweiter Platz" name="prizes.second">
                 <UInput
                   v-model="state.prizes.second"
                   placeholder="Silver Medaille"
                 />
-              </UFormGroup>
-              <UFormGroup label="Dritter Platz" name="prizes.third">
+              </UFormField>
+              <UFormField label="Dritter Platz" name="prizes.third">
                 <UInput
                   v-model="state.prizes.third"
                   placeholder="Bronze Medaille"
                 />
-              </UFormGroup>
+              </UFormField>
             </div>
-            <UFormGroup label="Sonstiges" name="prizes.bonus">
+            <UFormField label="Sonstiges" name="prizes.bonus">
               <UTextarea
                 v-model="state.prizes.bonus"
                 :rows="5"
                 placeholder="Eis, Frankfurter, etc."
               />
-            </UFormGroup>
+            </UFormField>
           </div>
-        </UFormGroup>
+        </UFormField>
       </div>
     </div>
   </UForm>

@@ -1,3 +1,5 @@
+import { useToast } from "#imports"
+
 /**
  * Display a success notification
  * @param title title of the notification

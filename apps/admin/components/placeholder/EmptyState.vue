@@ -21,7 +21,7 @@ defineProps<{
       <UAlert
         v-if="search"
         icon="i-heroicons-adjustments-horizontal"
-        color="purple"
+        color="secondary"
         variant="subtle"
         title="Gefiltere Ergebnisse"
         description="Es ist ein Filter aktiv. Leere die Suche, um ungefilterte Ergebnisse zu sehen."

@@ -16,8 +16,9 @@ useHead({
 const { tournaments, fetchTournaments } = useLiveTournaments()
 const selected = useState<string>("selectedTournament", () => "")
 await fetchTournaments()
-if (!selected.value && tournaments.value.length > 0) {
-  selected.value = tournaments.value[0].id
+const firstTournament = tournaments.value[0]
+if (!selected.value && firstTournament) {
+  selected.value = firstTournament.id
 }
 
 const { data: tournament, refresh: tournamentRefresh } =
@@ -165,7 +166,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
       <UButton
         size="xs"
         variant="soft"
-        color="amber"
+        color="warning"
         label="Gewinner anzeigen"
         icon="i-heroicons-trophy"
         v-if="results?.length"
@@ -195,34 +196,34 @@ const { data: history, refresh: refreshHistory } = await useFetch(
         modal-width="sm:max-w-sm"
       >
         <UForm :schema="schema" :state="state" class="space-y-4 pt-2">
-          <UFormGroup
+          <UFormField
             label="Matchlänge"
             name="interval"
             description="Matchlänge in Minuten, nach dieser Zeit folgt das nächste Match."
             required
           >
             <UInput v-model="state.interval" type="number" />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup
+          <UFormField
             label="Startzeit"
             name="start_time"
             description="Startzeit der Gruppenphase. Standardmäßig die Turnierzeit."
             required
           >
             <UInput v-model="state.start_time" type="time" :step="60" />
-          </UFormGroup>
+          </UFormField>
         </UForm>
       </ModalCreate>
       <UButton
         icon="i-heroicons-arrow-path"
-        color="gray"
+        color="neutral"
         size="xs"
         square
         @click="refresh"
       />
       <USelect
-        :options="tournaments"
+        :items="tournaments"
         v-model="selected"
         size="xs"
         value-attribute="id"
@@ -231,7 +232,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
       <UButton
         @click="isOpenInfo = true"
         square
-        color="white"
+        color="neutral"
         icon="i-ic-round-question-mark"
         size="xs"
       />
@@ -266,35 +267,21 @@ const { data: history, refresh: refreshHistory } = await useFetch(
         class="flex h-2/3 justify-between gap-6 border-t border-gray-200 p-6 pt-3 dark:border-gray-700"
       >
         <div class="flex w-1/3 flex-col gap-0.5">
-          <UTabs
-            :items="tabTable"
-            :ui="{ list: { tab: { height: 'h-7' }, height: 'h-9' } }"
-          />
+          <UTabs :items="tabTable" :ui="{ list: 'h-9', trigger: 'h-7' }" />
           <StandingsTable v-if="standings" :standings="standings" />
         </div>
         <div class="flex w-1/3 flex-col gap-0.5">
           <UTabs
             :items="tabsMatches"
             :ui="{
-              list: {
-                base: 'relative mb-0.5',
-                tab: { height: 'h-7' },
-                height: 'h-9',
-              },
+              list: 'relative mb-0.5 h-9',
+              trigger: 'h-7',
             }"
           >
-            <template #icon="{ item, selected }">
-              <UIcon
-                :name="item.icon"
-                class="me-2 h-4 w-4 flex-shrink-0"
-                :class="[selected && 'text-primary-500 dark:text-primary-400']"
-              />
-            </template>
-
             <template #matches>
               <!-- TODO: fix height constraint, adjust padding -->
               <div
-                class="flex h-[500px] flex-col gap-1 overflow-auto border-t border-gray-200 pb-48 pt-2 dark:border-gray-700"
+                class="flex h-[500px] flex-col gap-1 overflow-auto border-t border-gray-200 pt-2 pb-48 dark:border-gray-700"
               >
                 <MatchItemRow
                   v-for="(match, index) in matches"
@@ -308,7 +295,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
             <template #history>
               <!-- TODO: fix height constraint, adjust padding -->
               <div
-                class="flex h-[500px] flex-col gap-1 overflow-auto border-t border-gray-200 pb-48 pt-2 dark:border-gray-700"
+                class="flex h-[500px] flex-col gap-1 overflow-auto border-t border-gray-200 pt-2 pb-48 dark:border-gray-700"
               >
                 <!-- @vue-ignore -->
                 <ResultItem
@@ -325,12 +312,9 @@ const { data: history, refresh: refreshHistory } = await useFetch(
           </UTabs>
         </div>
         <div class="flex w-1/3 flex-col gap-0.5">
-          <UTabs
-            :items="tabLive"
-            :ui="{ list: { tab: { height: 'h-7' }, height: 'h-9' } }"
-          />
+          <UTabs :items="tabLive" :ui="{ list: 'h-9', trigger: 'h-7' }" />
           <div
-            class="flex h-full flex-col gap-1 overflow-auto border-t border-gray-200 pb-12 pt-2 dark:border-gray-700"
+            class="flex h-full flex-col gap-1 overflow-auto border-t border-gray-200 pt-2 pb-12 dark:border-gray-700"
           >
             <MatchItemLive
               v-for="match in liveMatches"

@@ -92,13 +92,20 @@ export default defineEventHandler(async (event) => {
       statusMessage: error.message,
     })
   }
+  const teamId = data?.[0]?.id
+  if (!teamId) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Team could not be created",
+    })
+  }
 
   const players: PlayerDTO[] = formPlayers.map((formPlayer) => ({
     first_name: formPlayer.firstName,
     last_name: formPlayer.lastName,
     class: formPlayer.schoolClass.name,
     note: "",
-    team_id: data[0].id,
+    team_id: teamId,
   }))
 
   await $fetch("/api/players/create", {

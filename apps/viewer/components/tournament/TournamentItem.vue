@@ -13,26 +13,14 @@ const bonus = computed(() => {
 </script>
 
 <template>
-  <UCard
-    :ui="{
-      header: {
-        padding: '',
-      },
-      body: {
-        padding: 'p-4 sm:p-3',
-      },
-      footer: {
-        padding: 'py-3',
-      },
-    }"
-  >
+  <UCard>
     <template #header>
       <div
         class="relative flex h-[200px] flex-col justify-end overflow-hidden rounded-t-lg p-4 py-2"
       >
         <NuxtImg
           :src="getImageUrl(tournament.thumbnail_path)"
-          class="absolute left-0 top-0 h-full w-full overflow-clip object-cover object-top"
+          class="absolute top-0 left-0 h-full w-full overflow-clip object-cover object-top"
         />
         <h2
           class="z-10 text-3xl font-bold tracking-tight text-white drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
@@ -84,7 +72,7 @@ const bonus = computed(() => {
     <div
       class="h-28 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
     >
-      <pre class="text text-wrap text-sm">{{ tournament.rules }}</pre>
+      <pre class="text text-sm text-wrap">{{ tournament.rules }}</pre>
     </div>
     <PageHeading>Preise</PageHeading>
     <div class="flex flex-col gap-1">
@@ -101,7 +89,7 @@ const bonus = computed(() => {
         class="h-20 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
       >
         <!-- Keep this as one line or else there will be an unnecessary line -->
-        <pre class="text text-wrap text-sm">{{ bonus }}</pre>
+        <pre class="text text-sm text-wrap">{{ bonus }}</pre>
       </div>
     </div>
     <template #footer>

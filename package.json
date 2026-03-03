@@ -1,7 +1,7 @@
 {
   "name": "tourney",
   "description": "The next level of tournament management.",
-  "packageManager": "bun@1.3.4",
+  "packageManager": "bun@1.3.9",
   "workspaces": [
     "packages/*",
     "apps/*"
@@ -10,9 +10,10 @@
     "clean": "git clean -xdf node_modules",
     "create:users": "turbo run create --filter=@tourney/user-creator",
     "install:browsers": "bunx puppeteer browsers install",
-    "app:start": "pm2 start ecosystem.config.cjs",
-    "app:kill": "pm2 kill",
-    "app:monitor": "pm2 monit",
+    "docker:build": "docker compose -f docker-compose.prod.yml build",
+    "docker:up": "docker compose -f docker-compose.prod.yml up -d",
+    "docker:down": "docker compose -f docker-compose.prod.yml down",
+    "docker:logs": "docker compose -f docker-compose.prod.yml logs -f",
     "start:docs": "vitepress preview docs",
     "start:admin": "cd ./apps/admin && bun .output/server/index.mjs",
     "start:viewer": "cd ./apps/viewer && bun .output/server/index.mjs",
@@ -31,10 +32,10 @@
     "dev:admin:host": "turbo run dev --filter=@tourney/admin -- --host",
     "dev:viewer:host": "turbo run dev --filter=@tourney/viewer -- --host",
     "generate-pwa-assets": "pnpm --filter=@tourney/viewer run generate-pwa-assets",
-    "start:supabase": "cd ./apps/api/supabase && npx supabase start",
-    "stop:supabase": "cd ./apps/api/supabase && npx supabase stop",
-    "types:supabase": "cd ./apps/api/supabase && npx supabase gen types --lang=typescript --local > ../../../packages/db/database.types.ts",
-    "schema:supabase": "cd ./apps/api/supabase && supabase db diff -f --local",
+    "start:supabase": "cd ./apps/api/supabase && bunx supabase start",
+    "stop:supabase": "cd ./apps/api/supabase && bunx supabase stop",
+    "types:supabase": "cd ./apps/api/supabase && bunx supabase gen types --lang=typescript --local > ../../../packages/types/src/database.types.ts",
+    "schema:supabase": "cd ./apps/api/supabase && bunx supabase db diff -f --local",
     "format": "turbo run format",
     "format:write": "turbo run format:write",
     "release": "semantic-release",
@@ -49,23 +50,20 @@
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^11.0.1",
-    "@semantic-release/release-notes-generator": "^14.0.3",
+    "@semantic-release/github": "^12.0.6",
+    "@semantic-release/release-notes-generator": "^14.1.0",
     "husky": "^9.1.7",
-    "lint-staged": "^16.1.2",
-    "semantic-release": "^24.2.3",
-    "prettier": "^3.6.2",
-    "prettier-plugin-tailwindcss": "^0.6.14",
-    "turbo": "^2.5.5",
-    "vitepress": "^1.6.3"
+    "lint-staged": "^16.3.1",
+    "semantic-release": "^25.0.3",
+    "prettier": "^3.8.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "turbo": "^2.8.12",
+    "vitepress": "^1.6.4"
   },
   "lint-staged": {
     "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
       "prettier . --write"
     ]
-  },
-  "resolutions": {
-    "cookie": "0.7.2"
   },
   "author": "Dino Kupinic",
   "license": "MIT"

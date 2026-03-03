@@ -9,6 +9,6 @@ export default function (title: string, description: string) {
     title: title,
     description: description,
     icon: "i-heroicons-check-circle",
-    timeout: 1500,
+    duration: 1500,
   })
 }

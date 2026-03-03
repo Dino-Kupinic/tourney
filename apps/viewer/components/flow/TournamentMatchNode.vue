@@ -32,7 +32,7 @@ defineProps<NodeProps>()
           {{ team }}
         </div>
       </div>
-      <div v-else class="text-center italic text-gray-500">Pending</div>
+      <div v-else class="text-center text-gray-500 italic">Pending</div>
     </div>
     <Handle type="source" :position="Position.Right" />
   </div>

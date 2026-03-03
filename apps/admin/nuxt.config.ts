@@ -2,13 +2,10 @@
 export default defineNuxtConfig({
   extends: ["../../packages/core"],
   compatibilityDate: "2025-07-28",
-  modules: ["@vueuse/nuxt", "@nuxtjs/supabase", "@nuxt/content"],
+  modules: ["@vueuse/nuxt"],
   devtools: { enabled: true },
   devServer: {
     port: 3000,
-  },
-  nitro: {
-    preset: "bun",
   },
   components: [
     {
@@ -19,11 +16,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       clientUrl: "",
-    },
-  },
-  content: {
-    markdown: {
-      anchorLinks: false,
     },
   },
 })

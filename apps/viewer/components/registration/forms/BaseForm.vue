@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { z } from "zod"
-import type { Form } from "#ui/types"
 import type { FormPlayer, Tables } from "@tourney/types"
 
 const { playerCount, defaultClass } = defineProps<{
@@ -79,7 +78,16 @@ const state = reactive({
   })),
 })
 
-const form = useTemplateRef<Form<Schema>>("form")
+type FormError = {
+  path: string
+  message: string
+}
+
+type FormRef = {
+  setErrors: (errors: FormError[]) => void
+}
+
+const form = useTemplateRef<FormRef>("form")
 
 async function submitForm() {
   try {

@@ -28,32 +28,32 @@ defineProps<{
         <tbody>
           <tr v-for="standing in standings" :key="standing.team_id!">
             <td
-              class="border-r border-t border-gray-300 py-2 text-center font-medium dark:border-gray-700"
+              class="border-t border-r border-gray-300 py-2 text-center font-medium dark:border-gray-700"
             >
               {{ standing.team_name }}
             </td>
             <td
-              class="border-r border-t border-gray-300 py-2 text-center dark:border-gray-700"
+              class="border-t border-r border-gray-300 py-2 text-center dark:border-gray-700"
             >
               {{ standing.points }}
             </td>
             <td
-              class="border-r border-t border-gray-300 px-1 py-2 text-center dark:border-gray-700"
+              class="border-t border-r border-gray-300 px-1 py-2 text-center dark:border-gray-700"
             >
               {{ standing.wins }}
             </td>
             <td
-              class="border-r border-t border-gray-300 px-1 py-2 text-center dark:border-gray-700"
+              class="border-t border-r border-gray-300 px-1 py-2 text-center dark:border-gray-700"
             >
               {{ standing.draws }}
             </td>
             <td
-              class="border-r border-t border-gray-300 px-1 py-2 text-center dark:border-gray-700"
+              class="border-t border-r border-gray-300 px-1 py-2 text-center dark:border-gray-700"
             >
               {{ standing.losses }}
             </td>
             <td
-              class="border-r border-t border-gray-300 px-1 py-2 text-center dark:border-gray-700"
+              class="border-t border-r border-gray-300 px-1 py-2 text-center dark:border-gray-700"
             >
               {{ standing.goals_scored }}:{{ standing.goals_conceded }}
             </td>

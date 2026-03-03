@@ -1,4 +1,15 @@
+import { serverSupabaseUser } from "#supabase/server"
 import type { Enums, TournamentDTO } from "@tourney/types"
+
+function isUuid(value: string | null | undefined): value is string {
+  if (!value) {
+    return false
+  }
+
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value,
+  )
+}
 
 type Body = {
   name: string
@@ -16,7 +27,7 @@ type Body = {
   }
   thumbnail_path: string
   location: string
-  last_edited_by_id: string
+  last_edited_by_id?: string
   groups: number
   group_teams: number
   knockout_interval: number
@@ -24,6 +35,7 @@ type Body = {
 
 export default defineEventHandler(async (event) => {
   const supabase = await useDatabase(event)
+  const user = await serverSupabaseUser(event)
   const {
     name,
     rules,
@@ -41,6 +53,16 @@ export default defineEventHandler(async (event) => {
     knockout_interval,
   } = await readBody<Body>(event)
 
+  const editorId =
+    user?.id ?? (isUuid(last_edited_by_id) ? last_edited_by_id : null)
+
+  if (!editorId) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    })
+  }
+
   if (
     !name ||
     !start_date ||
@@ -51,7 +73,6 @@ export default defineEventHandler(async (event) => {
     !prizes ||
     !thumbnail_path ||
     !location ||
-    !last_edited_by_id ||
     !groups ||
     !group_teams ||
     !knockout_interval
@@ -74,7 +95,7 @@ export default defineEventHandler(async (event) => {
     prizes,
     thumbnail_path,
     location,
-    last_edited_by_id,
+    last_edited_by_id: editorId,
     groups,
     group_teams,
     knockout_interval,
@@ -96,8 +117,15 @@ export default defineEventHandler(async (event) => {
   tournament.sport === "Fußball"
     ? (groupNames = ["Gruppe A", "Gruppe B", "Gruppe C", "Gruppe D"])
     : (groupNames = ["Gruppe A", "Gruppe B"])
+  const tournamentId = data?.[0]?.id
+  if (!tournamentId) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Tournament could not be created",
+    })
+  }
   const groupInserts = groupNames.map((name) => ({
-    tournament_id: data?.[0].id,
+    tournament_id: tournamentId,
     name,
   }))
 

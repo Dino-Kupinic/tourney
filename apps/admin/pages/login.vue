@@ -31,20 +31,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
 <template>
   <div class="flex h-dvh w-full items-center justify-center">
-    <UCard
-      class="w-full sm:w-96"
-      :ui="{
-        body: {
-          padding: 'px-4 py-5 sm:p-6',
-        },
-        header: {
-          padding: 'px-4 py-5 sm:px-4',
-        },
-        footer: {
-          padding: 'px-4 py-4 sm:px-6',
-        },
-      }"
-    >
+    <UCard class="w-full sm:w-96">
       <template #header>
         <div class="flex flex-col items-center space-y-3">
           <Logo class="h-12 w-12" />
@@ -57,13 +44,13 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         class="space-y-4"
         @submit="onSubmit"
       >
-        <UFormGroup label="E-mail" name="email">
+        <UFormField label="E-mail" name="email">
           <UInput v-model="state.email" />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Passwort" name="password">
+        <UFormField label="Passwort" name="password">
           <UInput v-model="state.password" type="password" />
-        </UFormGroup>
+        </UFormField>
 
         <UButton type="submit" label="Einloggen" />
       </UForm>

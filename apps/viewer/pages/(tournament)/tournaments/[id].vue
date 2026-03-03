@@ -33,8 +33,9 @@ const { data: groups } = tournament.value
   : { data: ref(null) }
 
 const selectedGroup = useState<string>("selectedGroup", () => "")
-if (groups.value && groups.value.length > 0) {
-  selectedGroup.value = groups.value[0].id
+const firstGroup = groups.value?.[0]
+if (firstGroup) {
+  selectedGroup.value = firstGroup.id
 }
 
 const { data: standings, refresh: refreshStandings = () => Promise.resolve() } =
@@ -69,7 +70,7 @@ const fourth = getTeamName(3)
       to="/tournaments"
       icon="i-heroicons-chevron-left"
       variant="link"
-      class="-ml-3 mb-2"
+      class="mb-2 -ml-3"
       label="Zurück"
     />
     <PageTitle>{{ tournament?.name }}</PageTitle>
@@ -125,7 +126,7 @@ const fourth = getTeamName(3)
         <div
           class="h-28 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
         >
-          <pre class="text text-wrap text-sm">{{ tournament?.rules }}</pre>
+          <pre class="text text-sm text-wrap">{{ tournament?.rules }}</pre>
         </div>
         <PageHeading>Preise</PageHeading>
         <div class="flex flex-col gap-1">
@@ -142,7 +143,7 @@ const fourth = getTeamName(3)
             class="h-20 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
           >
             <!-- Keep this as one line or else there will be an unnecessary line -->
-            <pre class="text text-wrap text-sm">{{ bonus }}</pre>
+            <pre class="text text-sm text-wrap">{{ bonus }}</pre>
           </div>
         </div>
       </div>
@@ -187,7 +188,7 @@ const fourth = getTeamName(3)
       <PageHeading>Platzierungen</PageHeading>
       <USelect
         v-if="groups && groups.length"
-        :options="groups"
+        :items="groups"
         v-model="selectedGroup"
         size="lg"
         value-attribute="id"

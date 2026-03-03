@@ -18,7 +18,9 @@ const now = useTimestamp({ immediate: true })
 
 const calculateElapsedTime = () => {
   if (!match.start_time) return
-  const [hours, minutes, seconds] = match.start_time.split(":").map(Number)
+  const [hours = 0, minutes = 0, seconds = 0] = match.start_time
+    .split(":")
+    .map(Number)
   const startDateTime = new Date()
   startDateTime.setHours(hours, minutes, seconds || 0, 0)
   const startTimeMs = startDateTime.getTime()
@@ -142,14 +144,14 @@ const completeMatch = async () => {
       <div class="flex gap-0.5">
         <UBadge
           :label="match.round ?? 'Unbekannte Runde'"
-          color="fuchsia"
+          color="secondary"
           size="xs"
           variant="subtle"
           block
         />
         <UBadge
           :label="match.start_time!"
-          color="white"
+          color="neutral"
           size="xs"
           icon="i-heroicons-clock"
           block
@@ -159,7 +161,7 @@ const completeMatch = async () => {
         <UBadge
           :label="formattedTime"
           icon="i-heroicons-clock"
-          color="white"
+          color="neutral"
           size="xs"
           :trailing="false"
           class="w-[90px]"
@@ -184,17 +186,17 @@ const completeMatch = async () => {
           </div>
           <div class="space-x-0.5">
             <UButton
-              :ui="{ rounded: 'rounded-full' }"
-              size="2xs"
-              color="gray"
+              class="rounded-full"
+              size="xs"
+              color="neutral"
               square
               icon="i-heroicons-minus"
               @click="score1 > 0 ? score1-- : 0"
             />
             <UButton
-              :ui="{ rounded: 'rounded-full' }"
-              size="2xs"
-              color="gray"
+              class="rounded-full"
+              size="xs"
+              color="neutral"
               square
               icon="i-heroicons-plus"
               @click="score1++"
@@ -221,17 +223,17 @@ const completeMatch = async () => {
           </div>
           <div class="space-x-0.5">
             <UButton
-              :ui="{ rounded: 'rounded-full' }"
-              size="2xs"
-              color="gray"
+              class="rounded-full"
+              size="xs"
+              color="neutral"
               square
               icon="i-heroicons-minus"
               @click="score2 > 0 ? score2-- : 0"
             />
             <UButton
-              :ui="{ rounded: 'rounded-full' }"
-              size="2xs"
-              color="gray"
+              class="rounded-full"
+              size="xs"
+              color="neutral"
               square
               icon="i-heroicons-plus"
               @click="score2++"
@@ -242,9 +244,9 @@ const completeMatch = async () => {
       <UButton
         icon="i-heroicons-hand-raised"
         variant="soft"
-        color="fuchsia"
+        color="secondary"
         label="Spiel beenden..."
-        size="2xs"
+        size="xs"
         @click="isOpenConfirm = true"
       />
     </div>

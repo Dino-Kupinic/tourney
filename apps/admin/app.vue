@@ -1,4 +1,10 @@
 <script setup lang="ts">
+const colorMode = useColorMode()
+
+if (import.meta.client && colorMode.preference === "system") {
+  colorMode.preference = "light"
+}
+
 useHead({
   titleTemplate: (titleChunk) => {
     return titleChunk ? `${titleChunk} - tourney` : "tourney"
@@ -7,12 +13,12 @@ useHead({
 </script>
 
 <template>
-  <div>
+  <UApp>
     <NuxtLoadingIndicator />
     <NuxtRouteAnnouncer />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-    <UNotifications />
-  </div>
+    <UToaster />
+  </UApp>
 </template>

@@ -18,7 +18,9 @@ const now = useTimestamp({ immediate: true })
 
 const calculateElapsedTime = () => {
   if (!match.start_time) return
-  const [hours, minutes, seconds] = match.start_time.split(":").map(Number)
+  const [hours = 0, minutes = 0, seconds = 0] = match.start_time
+    .split(":")
+    .map(Number)
   const startDateTime = new Date()
   startDateTime.setHours(hours, minutes, seconds || 0, 0)
   const startTimeMs = startDateTime.getTime()
@@ -64,14 +66,14 @@ const formattedTime = computed(() => {
       <div class="flex gap-0.5">
         <UBadge
           :label="match.round ?? 'Unbekannte Runde'"
-          color="fuchsia"
+          color="secondary"
           size="xs"
           variant="subtle"
           block
         />
         <UBadge
           :label="match.start_time!"
-          color="white"
+          color="neutral"
           size="xs"
           icon="i-heroicons-clock"
           block
@@ -81,7 +83,7 @@ const formattedTime = computed(() => {
         <UBadge
           :label="formattedTime"
           icon="i-heroicons-clock"
-          color="white"
+          color="neutral"
           size="xs"
           :trailing="false"
           class="w-[90px]"

@@ -18,7 +18,6 @@
   "dependencies": {
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/svg-spinners": "^1.2.4",
-    "@nuxt/content": "2.13.4",
     "@nuxtjs/device": "^4.0.0",
     "@nuxtjs/supabase": "^2.0.4",
     "@supabase/supabase-js": "^2.97.0",

@@ -29,25 +29,25 @@ const lNameInput = `players.${index}.lastName`
         <strong class="text-base"> {{ name }} </strong>
       </div>
       <div class="flex flex-col gap-3 sm:flex-row">
-        <UFormGroup label="Vorname" :name="fNameInput" size="lg">
+        <UFormField label="Vorname" :name="fNameInput" size="lg">
           <UInput v-model="firstName" placeholder="Max" :disabled="isLocked" />
-        </UFormGroup>
-        <UFormGroup label="Nachname" :name="lNameInput" size="lg" class="grow">
+        </UFormField>
+        <UFormField label="Nachname" :name="lNameInput" size="lg" class="grow">
           <UInput
             v-model="lastName"
             placeholder="Mustermann"
             :disabled="isLocked"
           />
-        </UFormGroup>
+        </UFormField>
       </div>
-      <UFormGroup label="Klasse" name="email" size="lg" v-if="allowClassMixing">
+      <UFormField label="Klasse" name="email" size="lg" v-if="allowClassMixing">
         <USelectMenu
           v-model="schoolClass"
-          :options="schoolClasses ?? []"
+          :items="schoolClasses ?? []"
           option-attribute="name"
           :disabled="isLocked"
         />
-      </UFormGroup>
+      </UFormField>
     </div>
   </RegistrationItem>
 </template>

@@ -30,14 +30,14 @@ const items = [
     {
       label: "Info",
       icon: "i-heroicons-information-circle",
-      click: () => (isOpenInfo.value = true),
+      onSelect: () => (isOpenInfo.value = true),
     },
   ],
   [
     {
       label: "Löschen",
       icon: "i-heroicons-trash",
-      click: () => (isOpenDelete.value = true),
+      onSelect: () => (isOpenDelete.value = true),
     },
   ],
 ]
@@ -76,7 +76,7 @@ const onDelete = async () => {
       <p>Möchtest du das Turnier wirklich löschen?</p>
       <UAlert
         icon="i-heroicons-exclamation-triangle"
-        color="red"
+        color="error"
         variant="soft"
         class="mt-3"
         title="Achtung"
@@ -89,19 +89,14 @@ const onDelete = async () => {
       <div class="flex items-center justify-between">
         <TournamentLiveDisplay :is-live="tournament.is_live" />
         <ClientOnly>
-          <UDropdown
-            :items="items"
-            :ui="{ width: 'w-auto' }"
-            class="m-1"
-            :popper="{ placement: 'left' }"
-          >
+          <UDropdownMenu :items="items" class="m-1">
             <UButton
-              color="gray"
+              color="neutral"
               icon="i-heroicons-ellipsis-horizontal-20-solid"
-              size="2xs"
+              size="xs"
               square
             />
-          </UDropdown>
+          </UDropdownMenu>
           <template #fallback>
             <USkeleton class="m-1 h-6 w-6 bg-gray-200 dark:bg-gray-700" />
           </template>
@@ -139,11 +134,9 @@ const onDelete = async () => {
               <p>{{ data?.students }} Schüler</p>
             </div>
           </div>
-          <UDivider
+          <USeparator
             :ui="{
-              border: {
-                base: 'flex border-gray-200 dark:border-gray-700',
-              },
+              border: 'flex border-gray-200 dark:border-gray-700',
             }"
           />
           <TournamentTeamStatus :data="data" />

@@ -9,7 +9,7 @@ defineProps<NodeProps>()
   <div class="w-[150px] rounded bg-white px-2 py-1 shadow-sm">
     <Handle type="target" :position="Position.Left" />
     <div
-      class="overflow-hidden text-ellipsis whitespace-nowrap text-center text-xs"
+      class="overflow-hidden text-center text-xs text-ellipsis whitespace-nowrap"
     >
       {{ data.teams[0] }}
     </div>

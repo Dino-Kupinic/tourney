@@ -16,11 +16,9 @@ function size(v: number) {
     <div
       class="flex w-full items-center justify-end gap-1 p-1 pr-0 font-mono tracking-tight"
     >
-      <UBadge v-if="isOnline" color="green" size="xs" variant="subtle">
-        Online
-      </UBadge>
-      <UBadge v-else color="red" size="xs" variant="subtle"> Offline </UBadge>
-      <UBadge color="purple" size="xs" variant="subtle">
+      <UBadge v-if="isOnline" color="success" variant="subtle"> Online </UBadge>
+      <UBadge v-else color="error" variant="subtle"> Offline </UBadge>
+      <UBadge color="secondary" variant="subtle">
         <NuxtTime
           :datetime="Date.now()"
           year="numeric"
@@ -32,30 +30,22 @@ function size(v: number) {
         />
       </UBadge>
       <ClientOnly>
-        <UBadge
-          v-if="isSupported && memory"
-          color="yellow"
-          size="xs"
-          variant="subtle"
-        >
+        <UBadge v-if="isSupported && memory" color="warning" variant="subtle">
           {{ size(memory.usedJSHeapSize) }}
         </UBadge>
         <UBadge
           v-else-if="!isSupported && !memory"
-          color="yellow"
-          size="xs"
+          color="warning"
           variant="subtle"
         >
           Nicht Unterstützt
         </UBadge>
-        <UBadge v-else color="yellow" size="xs" variant="subtle">
-          Kalkuliere...
-        </UBadge>
+        <UBadge v-else color="warning" variant="subtle"> Kalkuliere... </UBadge>
         <template #fallback>
           <USkeleton class="h-5 w-24" />
         </template>
       </ClientOnly>
-      <UBadge color="white" size="xs"> tourney v{{ appVersion }} </UBadge>
+      <UBadge color="neutral"> tourney v{{ appVersion }} </UBadge>
     </div>
   </nav>
 </template>

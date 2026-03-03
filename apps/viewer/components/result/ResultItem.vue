@@ -27,21 +27,21 @@ const logoTeam2 = computed(
         <div class="flex gap-0.5">
           <UBadge
             :label="match.round ?? 'Unbekannte Runde'"
-            color="fuchsia"
+            color="secondary"
             size="xs"
             variant="subtle"
             block
           />
           <UBadge
             :label="match.start_time!"
-            color="white"
+            color="neutral"
             size="xs"
             icon="i-heroicons-clock"
             block
           />
           <UBadge
             :label="match.end_time!"
-            color="white"
+            color="neutral"
             size="xs"
             icon="i-heroicons-bell"
             block

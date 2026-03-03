@@ -10,6 +10,7 @@ const title = ref<string>("Turniere")
 useHead({
   title: () => title.value,
 })
+const { getCurrentUserId } = useUser()
 const route = useRoute()
 const { data: tournament, refresh: tournamentRefresh } =
   await useFetch<ParsedJsonTournament | null>(
@@ -244,11 +245,15 @@ const editState = reactive({
 const isOpenEdit = ref<boolean>(false)
 const onSubmitEdit = async () => {
   try {
+    const editorId = await getCurrentUserId()
     await $fetch("/api/tournaments/edit", {
       method: "PUT",
       body: {
         id: tournament.value?.id,
-        tournament: editState,
+        tournament: {
+          ...editState,
+          last_edited_by_id: editorId,
+        },
       },
     })
     isOpenEdit.value = false
@@ -292,13 +297,13 @@ const canGoLive = computed(() => {
   <BasePageHeader class="pl-0">
     <ToolbarContainer class="flex w-full items-center justify-between">
       <div class="flex items-center gap-2">
-        <UBreadcrumb :links="links" />
+        <UBreadcrumb :items="links" />
         <TournamentLiveDisplay v-if="tournament" :is-live="isTournamentLive" />
       </div>
       <div class="flex items-center space-x-2">
         <UButton
           icon="i-heroicons-arrow-path"
-          color="gray"
+          color="neutral"
           size="xs"
           square
           @click="refreshTournament"
@@ -307,7 +312,7 @@ const canGoLive = computed(() => {
           v-if="!isTournamentLive"
           icon="i-heroicons-pencil-square"
           label="Bearbeiten"
-          color="gray"
+          color="neutral"
           size="xs"
           square
           @click="isOpenEdit = true"
@@ -329,7 +334,7 @@ const canGoLive = computed(() => {
               label="Gruppen neu mischen..."
               icon="i-heroicons-table-cells"
               variant="soft"
-              color="yellow"
+              color="warning"
               size="xs"
               :disabled="hasMatches as boolean"
               @click="isOpenConfirm = true"
@@ -342,7 +347,7 @@ const canGoLive = computed(() => {
             label="Gruppen neu mischen..."
             icon="i-heroicons-table-cells"
             variant="soft"
-            color="yellow"
+            color="warning"
             size="xs"
             @click="isOpenConfirm = true"
           />
@@ -352,7 +357,7 @@ const canGoLive = computed(() => {
             <UButton
               :label="liveLabel"
               icon="i-heroicons-signal"
-              color="red"
+              color="error"
               variant="soft"
               size="xs"
               :disabled="!canGoLive"
@@ -364,7 +369,7 @@ const canGoLive = computed(() => {
           <UButton
             :label="liveLabel"
             icon="i-heroicons-signal"
-            color="red"
+            color="error"
             variant="soft"
             size="xs"
             @click="isOpenLive = true"
@@ -414,11 +419,9 @@ const canGoLive = computed(() => {
                 <p>{{ data?.students }} Schüler</p>
               </div>
             </div>
-            <UDivider
+            <USeparator
               :ui="{
-                border: {
-                  base: 'flex border-gray-200 dark:border-gray-700',
-                },
+                border: 'flex border-gray-200 dark:border-gray-700',
               }"
             />
             <TournamentTeamStatus :data="data" class="grow" />
@@ -444,10 +447,13 @@ const canGoLive = computed(() => {
         </div>
         <div class="flex h-full w-full flex-col gap-3 p-6">
           <strong>Ablauf</strong>
-          <UBreadcrumb :links="timeline" divider="i-heroicons-arrow-long-right">
-            <template #default="{ link }">
-              <UBadge color="gray" class="truncate rounded-full">
-                {{ link.label }}
+          <UBreadcrumb
+            :items="timeline"
+            separator-icon="i-heroicons-arrow-long-right"
+          >
+            <template #item="{ item }">
+              <UBadge color="neutral" class="truncate rounded-full">
+                {{ item.label }}
               </UBadge>
             </template>
           </UBreadcrumb>
@@ -474,12 +480,12 @@ const canGoLive = computed(() => {
                   :key="groupIndex"
                   :class="[
                     groupIndex === groups?.length - 1
-                      ? 'last:rounded-bl-md last:rounded-br-md'
+                      ? 'last:rounded-br-md last:rounded-bl-md'
                       : '',
                   ]"
                 >
                   <td
-                    class="border-r border-t border-gray-300 px-4 py-2 text-center font-medium dark:border-gray-700"
+                    class="border-t border-r border-gray-300 px-4 py-2 text-center font-medium dark:border-gray-700"
                   >
                     {{ group.name }}
                   </td>
@@ -492,10 +498,10 @@ const canGoLive = computed(() => {
                         :key="teamIndex"
                         :color="
                           team.registration?.status === 'Abgesendet'
-                            ? 'orange'
-                            : 'green'
+                            ? 'warning'
+                            : 'success'
                         "
-                        :ui="{ rounded: 'rounded-full' }"
+                        class="rounded-full"
                         variant="subtle"
                         size="xs"
                         :label="team.name"
@@ -510,7 +516,7 @@ const canGoLive = computed(() => {
             <UAlert
               v-if="maxTeams !== data?.teams"
               icon="i-heroicons-exclamation-triangle"
-              color="red"
+              color="error"
               variant="soft"
               title="Gruppen unvollständig"
               :description="groupAlert"
@@ -532,23 +538,23 @@ const canGoLive = computed(() => {
                     v-for="player in team.player"
                     class="flex gap-1 rounded-md bg-gray-100 p-3 pr-3 dark:bg-gray-800"
                   >
-                    <UFormGroup label="Vorname">
+                    <UFormField label="Vorname">
                       <UInput v-model="player.first_name" disabled />
-                    </UFormGroup>
-                    <UFormGroup label="Nachname">
+                    </UFormField>
+                    <UFormField label="Nachname">
                       <UInput v-model="player.last_name" disabled />
-                    </UFormGroup>
-                    <UFormGroup label="Klasse">
+                    </UFormField>
+                    <UFormField label="Klasse">
                       <UInput v-model="player.class" class="w-20" disabled />
-                    </UFormGroup>
-                    <UFormGroup label="Notiz">
+                    </UFormField>
+                    <UFormField label="Notiz">
                       <UInput v-model="player.note" />
-                    </UFormGroup>
+                    </UFormField>
                     <div class="flex h-full gap-1">
                       <div class="self-end">
                         <UButton
                           icon="i-heroicons-check"
-                          color="gray"
+                          color="neutral"
                           size="sm"
                           square
                           @click="editPlayerNote(player.id, player.note)"
@@ -557,7 +563,7 @@ const canGoLive = computed(() => {
                       <div class="self-end" v-if="!isTournamentLive">
                         <UButton
                           icon="i-heroicons-x-mark"
-                          color="red"
+                          color="error"
                           variant="soft"
                           size="sm"
                           square
@@ -570,7 +576,7 @@ const canGoLive = computed(() => {
                 <template v-else>
                   <UAlert
                     icon="i-heroicons-exclamation-triangle"
-                    color="red"
+                    color="error"
                     variant="soft"
                     title="Keine Spieler"
                     description="Dieses Team hat keine Spieler!"

@@ -40,7 +40,15 @@ export default defineEventHandler(async (event: H3Event) => {
     return `${player.first_name} ${player.last_name}, ${player.class}`
   })
 
-  const t = await useStorage("assets:templates").getItem(`pdf-template.html`)
+  const t =
+    await useStorage("assets:templates").getItem<string>(`pdf-template.html`)
+  if (!t) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "PDF template not found",
+    })
+  }
+
   Handlebars.registerHelper("getPlayer", function (array, index) {
     return array[index] || ""
   })

@@ -12,7 +12,7 @@ const years = Array.from(
   (_, i) =>
     `${new Date().getFullYear() + i - 1}/${(new Date().getFullYear() + i).toString().slice(2)}`,
 )
-const selectedYear = ref<string>(years[0])
+const selectedYear = ref<string>(years[0] ?? "")
 const encodedYear = computed(() => encodeURIComponent(selectedYear.value))
 
 watch(selectedYear, () => {
@@ -301,13 +301,13 @@ const refresh = async () => {
       <SearchInput v-model="search" placeholder="Klasse suchen..." />
       <USelect
         v-model="selectedYear"
-        :options="years"
+        :items="years"
         placeholder="Schuljahr auswählen"
         size="xs"
       />
       <UButton
         icon="i-heroicons-arrow-path"
-        color="gray"
+        color="neutral"
         size="xs"
         square
         @click="refresh"
@@ -327,7 +327,7 @@ const refresh = async () => {
       <UButton
         v-if="selectedRows.length > 1"
         size="xs"
-        color="red"
+        color="error"
         variant="soft"
         @click="isOpenDelete = true"
         label="Löschen..."
@@ -338,19 +338,19 @@ const refresh = async () => {
         @create="onSubmitCreateSingle"
       >
         <div class="space-y-4">
-          <UFormGroup label="Schuljahr">
+          <UFormField label="Schuljahr">
             <USelect
               v-model="creationStateSingle.year"
-              :options="years"
+              :items="years"
               placeholder="Schuljahr auswählen"
             />
-          </UFormGroup>
-          <UFormGroup label="Klassenname">
+          </UFormField>
+          <UFormField label="Klassenname">
             <UInput
               v-model="creationStateSingle.name"
               placeholder="z.B. 1AHITN"
             />
-          </UFormGroup>
+          </UFormField>
         </div>
       </ModalCreate>
 
@@ -361,14 +361,14 @@ const refresh = async () => {
       >
         <div class="space-y-4">
           <div class="flex items-center justify-between gap-3">
-            <UFormGroup label="Schuljahr" class="grow">
+            <UFormField label="Schuljahr" class="grow">
               <USelect
                 v-model="creationStateMultiple.year"
-                :options="years"
+                :items="years"
                 placeholder="Schuljahr auswählen"
               />
-            </UFormGroup>
-            <UFormGroup label="Neue Klasse hinzufügen">
+            </UFormField>
+            <UFormField label="Neue Klasse hinzufügen">
               <div class="flex gap-2">
                 <UInput
                   v-model="customClassName"
@@ -381,10 +381,10 @@ const refresh = async () => {
                   @click="addCustomClass"
                 />
               </div>
-            </UFormGroup>
+            </UFormField>
           </div>
 
-          <UFormGroup label="Klassen">
+          <UFormField label="Klassen">
             <div
               class="max-h-60 overflow-y-auto rounded border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
             >
@@ -396,14 +396,14 @@ const refresh = async () => {
                 <span>{{ className }}</span>
                 <UButton
                   icon="i-heroicons-x-mark"
-                  color="red"
+                  color="error"
                   variant="ghost"
                   size="xs"
                   @click="removeClass(className)"
                 />
               </div>
             </div>
-          </UFormGroup>
+          </UFormField>
         </div>
       </ModalCreate>
 
@@ -413,16 +413,16 @@ const refresh = async () => {
         @edit="onSubmitEdit"
       >
         <div class="space-y-4">
-          <UFormGroup label="Schuljahr">
+          <UFormField label="Schuljahr">
             <USelect
               v-model="editState.year"
-              :options="years"
+              :items="years"
               placeholder="Schuljahr auswählen"
             />
-          </UFormGroup>
-          <UFormGroup label="Klassenname">
+          </UFormField>
+          <UFormField label="Klassenname">
             <UInput v-model="editState.name" placeholder="z.B. 10a" />
-          </UFormGroup>
+          </UFormField>
         </div>
       </ModalEdit>
 
@@ -443,7 +443,7 @@ const refresh = async () => {
           </p>
           <UAlert
             icon="i-heroicons-exclamation-triangle"
-            color="red"
+            color="error"
             variant="soft"
             title="Achtung"
             description="Diese Aktion kann nicht rückgängig gemacht werden. Alle Verknüpfungen zu dieser Klasse werden ebenfalls gelöscht."
@@ -456,36 +456,29 @@ const refresh = async () => {
     <div class="h-full overflow-auto pb-1">
       <template v-if="yearClasses && yearClasses.length > 0">
         <UTable
-          :rows="filteredRows"
+          :data="filteredRows"
           :columns="columns"
-          :sort="{ column: 'name', direction: 'asc' }"
+          :sorting="[{ id: 'name', desc: false }]"
           :loading="status === 'pending'"
-          :loading-state="{
-            icon: 'i-heroicons-arrow-path-20-solid',
-            label: 'Lade...',
-          }"
           class="h-full w-full bg-white dark:bg-gray-900"
           :ui="{
-            wrapper: 'relative overflow-auto',
-            th: {
-              padding: 'px-4 py-3',
-            },
-            td: { base: 'max-w-[0] truncate', padding: 'py-2' },
+            root: 'relative overflow-auto',
+            th: 'px-4 py-3',
+            td: 'max-w-[0] truncate py-2',
           }"
-          v-model="selectedRows"
-          @select="select"
+          @select="(_, row) => select(row.original)"
         >
           <template #actions-data="{ row }">
             <div class="flex items-center gap-2">
-              <UDropdown :items="items(row).value" :ui="{ width: 'w-auto' }">
+              <UDropdownMenu :items="items(row.original).value">
                 <UButton
-                  color="gray"
+                  color="neutral"
                   variant="ghost"
                   icon="i-heroicons-ellipsis-horizontal-20-solid"
-                  size="2xs"
+                  size="xs"
                   square
                 />
-              </UDropdown>
+              </UDropdownMenu>
             </div>
           </template>
           <template #empty-state>

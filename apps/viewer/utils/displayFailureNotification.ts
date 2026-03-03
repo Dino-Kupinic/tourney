@@ -1,3 +1,5 @@
+import { useToast } from "#imports"
+
 /**
  * Display a failure notification
  * @param title title of the notification
@@ -8,7 +10,7 @@ export default function (title: string, description: string) {
   toast.add({
     title: title,
     description: description,
-    color: "red",
+    color: "error",
     icon: "i-heroicons-exclamation-circle-solid",
   })
 }

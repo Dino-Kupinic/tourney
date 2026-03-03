@@ -4,8 +4,9 @@ import type { Match, ParsedJsonTournament, Standing } from "@tourney/types"
 const { tournaments, fetchTournaments } = useLiveTournaments()
 const selected = useState<string>("selectedTournament", () => "")
 await fetchTournaments()
-if (!selected.value && tournaments.value.length > 0) {
-  selected.value = tournaments.value[0].id
+const firstTournament = tournaments.value[0]
+if (!selected.value && firstTournament) {
+  selected.value = firstTournament.id
 }
 
 const { data: tournament, refresh: tournamentRefresh } =
@@ -28,8 +29,9 @@ const { data: groups } = tournament.value
   : { data: ref(null) }
 
 const selectedGroup = useState<string>("selectedGroup", () => "")
-if (groups.value && groups.value.length > 0) {
-  selectedGroup.value = groups.value[0].id
+const firstGroup = groups.value?.[0]
+if (firstGroup) {
+  selectedGroup.value = firstGroup.id
 }
 
 const { data: standings, refresh: standingsRefresh } = selectedGroup.value
@@ -117,7 +119,7 @@ const { isDesktop } = useDevice()
         ]"
       >
         <USelect
-          :options="tournaments"
+          :items="tournaments"
           v-model="selected"
           size="lg"
           value-attribute="id"
@@ -161,7 +163,7 @@ const { isDesktop } = useDevice()
           <div class="flex flex-col gap-1.5 lg:col-span-2">
             <div>
               <div
-                class="flex items-center justify-center space-x-1.5 rounded-md bg-red-50 px-2.5 py-0.5 ring-1 ring-inset ring-red-500 ring-opacity-25 dark:bg-red-500 dark:bg-opacity-10 dark:ring-red-400 dark:ring-opacity-25"
+                class="ring-opacity-25 dark:bg-opacity-10 dark:ring-opacity-25 flex items-center justify-center space-x-1.5 rounded-md bg-red-50 px-2.5 py-0.5 ring-1 ring-red-500 ring-inset dark:bg-red-500 dark:ring-red-400"
               >
                 <span class="relative flex h-2 w-2">
                   <span
@@ -204,7 +206,7 @@ const { isDesktop } = useDevice()
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <UDivider>Anstehende Spiele</UDivider>
+            <USeparator>Anstehende Spiele</USeparator>
             <div
               class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md bg-gray-50 p-3 pb-8 dark:bg-gray-900"
             >
@@ -218,7 +220,7 @@ const { isDesktop } = useDevice()
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <UDivider>Historie</UDivider>
+            <USeparator>Historie</USeparator>
             <div
               class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md bg-gray-50 p-3 pb-8 dark:bg-gray-900"
             >
@@ -235,10 +237,10 @@ const { isDesktop } = useDevice()
           </div>
 
           <div class="flex flex-col gap-1.5 lg:col-span-2">
-            <UDivider>Platzierungen</UDivider>
+            <USeparator>Platzierungen</USeparator>
             <USelect
               v-if="groups"
-              :options="groups"
+              :items="groups"
               v-model="selectedGroup"
               size="lg"
               value-attribute="id"

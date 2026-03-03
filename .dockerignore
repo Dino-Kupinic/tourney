@@ -1,0 +1,13 @@
+.git
+.github
+.idea
+.turbo
+node_modules
+**/node_modules
+**/.nuxt
+**/.output
+**/.data
+**/.cache
+**/dist
+**/.DS_Store
+CHANGELOG.md

@@ -87,7 +87,7 @@ Copy the content into your `.env` and replace the following fields with your own
 | ------------------------ | ------------------------------------------------------ |
 | `SUPABASE_URL`           | URL to Supabase API                                    |
 | `SUPABASE_KEY`           | Anon key                                               |
-| `SUPABASE_SERVICE_KEY`   | Service Role Key                                       |
+| `SUPABASE_SECRET_KEY`    | Secret key (service-level key)                         |
 | `NUXT_PUBLIC_CLIENT_URL` | URL of the viewer app, default `http://localhost:3001` |
 
 2. run dev server
@@ -130,7 +130,7 @@ Create a `.env` file and checkout the `.env.example`. Copy the content into your
 | Field             | Description                   |
 | ----------------- | ----------------------------- |
 | `SUPABASE_URL`    | URL to Supabase API           |
-| `SUPABASE_KEY`    | Anon key                      |
+| `SUPABASE_SECRET_KEY` | Secret key (service-level key) |
 | `USERS_TO_CREATE` | See comment in `.env.example` |
 
 2. run the script
@@ -149,27 +149,25 @@ If it works, great! You can now log in in the admin dashboard with the created u
 bun run build
 ```
 
-> [!CAUTION]
-> The following section will be deprecated in the future!
-
-2. start the app
+2. start both apps with Docker
 
 ```bash
-bun run app:start
+bun run docker:up
 ```
 
-> [!TIP]
-> Didn't work?
-> Try installing pm2 globally with `npm install pm2 -g`.
-> For npm you need to install Node.js.
-
-3. monitor the app
+3. view logs
 
 ```bash
-bun run app:monitor
+bun run docker:logs
 ```
 
-4. enjoy the app!
+4. stop the deployment
+
+```bash
+bun run docker:down
+```
+
+5. enjoy the app!
 
 ## 😄 Authors
 
@@ -183,10 +181,9 @@ bun run app:monitor
 
 ## 🛠️ Tech Stack
 
-- Nuxt 3
+- Nuxt 4
 - Supabase
 - Docker
-- pm2
 
 ## Contributing
 

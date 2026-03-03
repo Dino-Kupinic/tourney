@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { VerticalNavigationLink } from "#ui/types"
 import { createAvatar } from "@dicebear/core"
 import { glass } from "@dicebear/collection"
 
 const { name, role } = useUser()
+const route = useRoute()
 const avatar = createAvatar(glass, {
   seed: name.value,
 })
@@ -12,7 +12,7 @@ const svg = avatar.toDataUri()
 const { liveTournaments, fetchLiveTournaments } = useLiveTournaments()
 await fetchLiveTournaments()
 
-const navigationLinks: VerticalNavigationLink[][] = [
+const navigationLinks = [
   [
     {
       label: "Home",
@@ -69,43 +69,77 @@ const navigationLinks: VerticalNavigationLink[][] = [
   ],
 ]
 
-const profileLinks: VerticalNavigationLink[] = [
-  {
-    label: name.value,
-    avatar: {
-      src: svg,
-    },
-    badge: role.value,
-  },
-  {
-    label: "Einstellungen",
-    icon: "i-heroicons-cog-8-tooth",
-    to: "/settings",
-  },
-]
+function isActive(to: string) {
+  if (to === "/") {
+    return route.path === to
+  }
+
+  return route.path === to || route.path.startsWith(`${to}/`)
+}
 </script>
 
 <template>
-  <div class="flex h-full min-w-44 flex-col pb-2">
-    <UVerticalNavigation
-      :links="navigationLinks"
-      :ui="{
-        wrapper: 'mr-2 grow',
-        badge: {
-          color: 'red',
-          variant: 'subtle',
-        },
-      }"
-    />
-    <UVerticalNavigation
-      :links="profileLinks"
-      :ui="{
-        wrapper: 'mr-2',
-        badge: {
-          color: 'primary',
-          variant: 'subtle',
-        },
-      }"
-    />
-  </div>
+  <aside class="flex h-full min-w-64 flex-col gap-4 pb-2">
+    <nav class="flex grow flex-col gap-4 pr-2">
+      <div
+        v-for="(section, sectionIndex) in navigationLinks"
+        :key="sectionIndex"
+        class="space-y-1"
+      >
+        <NuxtLink
+          v-for="item in section"
+          :key="item.to"
+          :to="item.to"
+          class="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+          :class="
+            isActive(item.to)
+              ? 'bg-gray-200 text-gray-950 dark:bg-gray-800 dark:text-white'
+              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/80'
+          "
+        >
+          <span class="flex items-center gap-2">
+            <UIcon :name="item.icon" class="h-4 w-4 shrink-0" />
+            <span>{{ item.label }}</span>
+          </span>
+          <UBadge v-if="item.badge" color="neutral" variant="subtle" size="xs">
+            {{ item.badge }}
+          </UBadge>
+        </NuxtLink>
+      </div>
+    </nav>
+
+    <div
+      class="mr-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900"
+    >
+      <div class="flex items-center gap-3">
+        <img
+          :src="svg"
+          :alt="name"
+          class="h-12 w-12 rounded-lg border border-gray-200 bg-gray-100 object-cover dark:border-gray-700 dark:bg-gray-800"
+        />
+        <div class="min-w-0">
+          <p
+            class="truncate text-sm font-semibold text-gray-950 dark:text-white"
+          >
+            {{ name }}
+          </p>
+          <UBadge color="secondary" variant="subtle" size="xs">
+            {{ role }}
+          </UBadge>
+        </div>
+      </div>
+    </div>
+
+    <NuxtLink
+      to="/settings"
+      class="mr-2 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/80"
+      :class="
+        isActive('/settings') &&
+        'bg-gray-200 text-gray-950 dark:bg-gray-800 dark:text-white'
+      "
+    >
+      <UIcon name="i-heroicons-cog-8-tooth" class="h-4 w-4 shrink-0" />
+      <span>Einstellungen</span>
+    </NuxtLink>
+  </aside>
 </template>

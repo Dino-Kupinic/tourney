@@ -56,7 +56,7 @@ const startTime = computed(() => {
       <div v-if="next" class="flex gap-0.5">
         <UBadge
           label="Nächstes Spiel"
-          color="green"
+          color="success"
           size="xs"
           variant="subtle"
           block
@@ -65,7 +65,7 @@ const startTime = computed(() => {
           icon="i-heroicons-play"
           label="Starten..."
           color="primary"
-          size="3xs"
+          size="xs"
           variant="link"
           @click="addToLive"
         />
@@ -73,14 +73,14 @@ const startTime = computed(() => {
       <UBadge
         v-else
         label="Anstehendes Spiel"
-        color="yellow"
+        color="warning"
         size="xs"
         variant="subtle"
         block
       />
     </div>
     <div
-      class="flex w-full flex-col items-center justify-between px-6 pb-3 pt-2 hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+      class="flex w-full flex-col items-center justify-between px-6 pt-2 pb-3 hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
       @click="isOpenInfo = true"
     >
       <div class="flex w-full items-center justify-between">

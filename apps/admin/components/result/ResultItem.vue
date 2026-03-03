@@ -28,13 +28,11 @@ const isOpenEdit = ref<boolean>(false)
 const editSchema = z.object({
   score1: z.number(),
   score2: z.number(),
-  winner: z.string().optional(),
 })
 
 const editState = reactive({
   score1: score1,
   score2: score2,
-  winner: stateWinner,
 })
 
 const supabase = useDatabaseClient()
@@ -73,22 +71,22 @@ const onSubmitEdit = async () => {
   >
     <UForm :schema="editSchema" :state="editState" class="space-y-4">
       <div class="flex justify-between">
-        <UFormGroup
+        <UFormField
           :label="match.team1?.name"
           name="score1"
           description="Punkteanzahl"
           required
         >
           <UInput v-model="editState.score1" type="number" />
-        </UFormGroup>
-        <UFormGroup
+        </UFormField>
+        <UFormField
           :label="match.team2?.name"
           name="score2"
           description="Punkteanzahl"
           required
         >
           <UInput v-model="editState.score2" type="number" />
-        </UFormGroup>
+        </UFormField>
       </div>
       <p>
         Anhand von diesen Angaben, ist
@@ -108,21 +106,21 @@ const onSubmitEdit = async () => {
         <div class="flex gap-0.5">
           <UBadge
             :label="match.round ?? 'Unbekannte Runde'"
-            color="fuchsia"
+            color="secondary"
             size="xs"
             variant="subtle"
             block
           />
           <UBadge
             :label="match.start_time!"
-            color="gray"
+            color="neutral"
             size="xs"
             icon="i-heroicons-clock"
             block
           />
           <UBadge
             :label="match.end_time!"
-            color="gray"
+            color="neutral"
             size="xs"
             icon="i-heroicons-bell"
             block
@@ -131,8 +129,8 @@ const onSubmitEdit = async () => {
 
         <UButton
           icon="i-heroicons-pencil"
-          color="gray"
-          size="3xs"
+          color="neutral"
+          size="xs"
           square
           @click="isOpenEdit = true"
         />

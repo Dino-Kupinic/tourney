@@ -1,15 +1,18 @@
 <script setup lang="ts">
+import type { ParsedJsonTournament } from "@tourney/types"
+
 useHead({
   title: "Turniere",
 })
 
-const { data: tournaments } = await useFetch("/api/tournaments")
+const { data: tournaments } =
+  await useFetch<ParsedJsonTournament[]>("/api/tournaments")
 
 const groupedTournaments = computed(() => {
   if (!tournaments.value) return []
 
   const grouped = tournaments.value.reduce<
-    Record<number, typeof tournaments.value>
+    Record<number, ParsedJsonTournament[]>
   >((acc, curr) => {
     const year = curr.year
     if (!acc[year]) {
@@ -33,9 +36,9 @@ const groupedTournaments = computed(() => {
     <PageHeader title="Turniere" description="Alle Turniere im Überblick" />
 
     <div v-for="group in groupedTournaments" :key="group.year">
-      <UDivider>
+      <USeparator>
         <strong>{{ group.year }}</strong>
-      </UDivider>
+      </USeparator>
       <div class="grid grid-cols-1 flex-col gap-4 py-4 sm:grid-cols-3">
         <TournamentItem
           v-for="tournament in group.tournaments"

@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import type { NuxtError } from "#app"
+type ViewerError = {
+  statusCode?: number
+  message?: string
+}
 
 defineProps({
-  error: Object as () => NuxtError,
+  error: Object as () => ViewerError,
 })
 </script>
 
@@ -23,7 +26,7 @@ defineProps({
         <div
           class="h-40 w-80 rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
         >
-          <pre class="w-full overflow-auto text-wrap text-sm">
+          <pre class="w-full overflow-auto text-sm text-wrap">
             {{ error?.message }}
           </pre>
         </div>

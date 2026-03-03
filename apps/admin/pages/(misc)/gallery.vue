@@ -109,7 +109,7 @@ await fetchImages()
       <UButton
         v-if="selectedImages.length > 0"
         label="Löschen"
-        color="red"
+        color="error"
         variant="soft"
         size="xs"
         icon="i-heroicons-trash"
@@ -171,31 +171,33 @@ await fetchImages()
           class="h-full w-full object-cover"
         />
         <div
-          class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 transition-all group-hover:bg-opacity-30"
+          class="bg-opacity-0 group-hover:bg-opacity-30 absolute inset-0 flex items-center justify-center bg-black transition-all"
         >
           <UCheckbox
-            v-model="selectedImages"
-            :value="image.name"
+            :model-value="selectedImages.includes(image.name)"
             class="opacity-0 group-hover:opacity-100"
+            @click.stop="toggleImageSelection(image.name)"
           />
         </div>
         <div
-          class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
+          class="bg-opacity-50 absolute right-0 bottom-0 left-0 bg-black p-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
         >
           {{ image.name }}
         </div>
       </div>
     </div>
 
-    <UModal v-model="isUploading">
-      <div class="p-4 text-center">
-        <UIcon
-          name="i-svg-spinners-180-ring-with-bg"
-          class="text-primary-500 mb-2"
-          size="32"
-        />
-        <p>Bilder werden hochgeladen...</p>
-      </div>
+    <UModal v-model:open="isUploading">
+      <template #content>
+        <div class="p-4 text-center">
+          <UIcon
+            name="i-svg-spinners-180-ring-with-bg"
+            class="text-primary-500 mb-2"
+            size="32"
+          />
+          <p>Bilder werden hochgeladen...</p>
+        </div>
+      </template>
     </UModal>
   </div>
 </template>

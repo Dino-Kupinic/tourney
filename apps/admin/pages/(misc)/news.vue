@@ -54,7 +54,7 @@ async function saveContent() {
     <ToolbarContainer>
       <UButton
         label="Markdown Syntax"
-        color="gray"
+        color="neutral"
         size="xs"
         to="https://www.markdownguide.org/cheat-sheet/"
         target="_blank"
@@ -63,7 +63,7 @@ async function saveContent() {
       />
       <UButton
         icon="i-heroicons-arrow-path"
-        color="gray"
+        color="neutral"
         size="xs"
         square
         @click="refresh"
