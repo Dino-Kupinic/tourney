@@ -1,8 +1,12 @@
+import { readFileSync } from "node:fs"
 import { fileURLToPath } from "url"
 import { dirname, join } from "path"
 
 // needed for layer relative import (https://nuxt.com/docs/guide/going-further/layers#relative-paths-and-aliases)
 const currentDir = dirname(fileURLToPath(import.meta.url))
+const rootPackage = JSON.parse(
+  readFileSync(join(currentDir, "../../package.json"), "utf8"),
+) as { version?: string }
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -14,7 +18,7 @@ export default defineNuxtConfig({
   css: [join(currentDir, "./assets/base.css")],
   runtimeConfig: {
     public: {
-      // clientVersion: pkg.version, TODO: workaround since using semantic-release bot we ditched package.json version
+      clientVersion: rootPackage.version || "dev",
     },
   },
   fonts: {

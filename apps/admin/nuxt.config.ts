@@ -4,6 +4,17 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-28",
   modules: ["@vueuse/nuxt"],
   devtools: { enabled: true },
+  vite: {
+    optimizeDeps: {
+      include: [
+        "@nuxt/ui > prosemirror-state",
+        "@nuxt/ui > prosemirror-transform",
+        "@nuxt/ui > prosemirror-model",
+        "@nuxt/ui > prosemirror-view",
+        "@nuxt/ui > prosemirror-gapcursor",
+      ],
+    },
+  },
   devServer: {
     port: 3000,
   },

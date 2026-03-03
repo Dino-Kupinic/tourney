@@ -1,50 +1,102 @@
 <script setup lang="ts">
+import type { EditorToolbarItem } from "@nuxt/ui"
+
 const title = ref<string>("Aktuelles")
 useHead({
   title: () => title.value,
 })
 
 const content = ref("")
-const mode = useColorMode()
-const theme = computed(() => {
-  return mode.value === "dark" ? "vs-dark" : "vs-light"
-})
-
+const isRefreshing = ref(false)
+const isSaving = ref(false)
 const supabase = useSupabaseClient()
-const { data } = await supabase.storage.from("misc").download("news.md")
-content.value = (await data?.text()) ?? ""
-async function refresh() {
+
+const editorToolbarItems = [
+  [
+    { kind: "heading", level: 1, label: "H1" },
+    { kind: "heading", level: 2, label: "H2" },
+    { kind: "paragraph", label: "Text" },
+  ],
+  [
+    { kind: "mark", mark: "bold", label: "Fett" },
+    { kind: "mark", mark: "italic", label: "Kursiv" },
+    { kind: "link", label: "Link" },
+  ],
+  [
+    { kind: "bulletList", label: "Liste" },
+    { kind: "orderedList", label: "1." },
+    { kind: "blockquote", label: "Zitat" },
+    { kind: "codeBlock", label: "Code" },
+  ],
+  [
+    { kind: "undo", label: "Zurueck" },
+    { kind: "redo", label: "Vor" },
+  ],
+] satisfies EditorToolbarItem[][]
+
+async function loadContent() {
   const { data, error } = await supabase.storage
     .from("misc")
     .download("news.md")
-  content.value = (await data?.text()) ?? ""
+
   if (error) {
-    throw createError({
-      statusCode: 500,
-      message: error.message,
-    })
-  } else {
+    throw error
+  }
+
+  content.value = (await data?.text()) ?? ""
+}
+
+try {
+  await loadContent()
+} catch (error: any) {
+  throw createError({
+    statusCode: 500,
+    statusMessage: error?.message ?? "Aktuelles konnte nicht geladen werden.",
+  })
+}
+
+async function refresh() {
+  isRefreshing.value = true
+
+  try {
+    await loadContent()
     displaySuccessNotification(
       "Inhalt aktualisiert",
       "Der Inhalt wurde erfolgreich aktualisiert.",
     )
+  } catch (error: any) {
+    displayFailureNotification(
+      "Fehler beim Aktualisieren",
+      error?.message ?? "Aktuelles konnte nicht geladen werden.",
+    )
+  } finally {
+    isRefreshing.value = false
   }
 }
 
 async function saveContent() {
-  const { error } = await supabase.storage
-    .from("misc")
-    .upload("news.md", content.value, { upsert: true })
-  if (error) {
-    throw createError({
-      statusCode: 500,
-      message: error.message,
-    })
-  } else {
+  isSaving.value = true
+
+  try {
+    const { error } = await supabase.storage
+      .from("misc")
+      .upload("news.md", content.value, { upsert: true })
+
+    if (error) {
+      throw error
+    }
+
     displaySuccessNotification(
       "Änderungen gespeichert",
       "Die Änderungen wurden erfolgreich gespeichert.",
     )
+  } catch (error: any) {
+    displayFailureNotification(
+      "Fehler beim Speichern",
+      error?.message ?? "Aktuelles konnte nicht gespeichert werden.",
+    )
+  } finally {
+    isSaving.value = false
   }
 }
 </script>
@@ -53,21 +105,12 @@ async function saveContent() {
   <BasePageHeader :title="title">
     <ToolbarContainer>
       <UButton
-        label="Markdown Syntax"
-        color="neutral"
-        variant="outline"
-        size="sm"
-        to="https://www.markdownguide.org/cheat-sheet/"
-        target="_blank"
-        rel="noopener noreferrer"
-        icon="i-heroicons-arrow-top-right-on-square"
-      />
-      <UButton
         icon="i-heroicons-arrow-path"
         color="neutral"
         variant="outline"
         size="sm"
         square
+        :loading="isRefreshing"
         @click="refresh"
       />
       <UButton
@@ -75,30 +118,31 @@ async function saveContent() {
         variant="soft"
         size="sm"
         icon="i-heroicons-check"
+        :loading="isSaving"
         @click="saveContent"
       />
     </ToolbarContainer>
   </BasePageHeader>
   <ClientOnly>
-    <div class="flex h-full w-full">
-      <!-- TODO: Swap to light weight editor, monaco is heavy and overkill -->
-
-      <!--      <MonacoEditor-->
-      <!--        v-model="content"-->
-      <!--        lang="markdown"-->
-      <!--        class="h-full w-3/5 border-r border-neutral-200 dark:border-neutral-700"-->
-      <!--        :options="{ theme: theme }"-->
-      <!--      />-->
-      <div class="h-full w-2/5">
-        <MDC
-          v-if="content"
-          class="h-full w-full overflow-auto bg-neutral-100 p-3 pb-16 dark:bg-neutral-800"
-          :value="content"
+    <div class="h-full w-full px-3 pb-3">
+      <UEditor
+        v-slot="{ editor }"
+        v-model="content"
+        content-type="markdown"
+        placeholder="Aktuelles verfassen..."
+        class="h-full"
+        :ui="{
+          root: 'flex h-full min-h-[32rem] flex-col',
+          content: 'flex-1 overflow-y-auto px-4 py-3',
+        }"
+      >
+        <UEditorToolbar
+          :editor="editor"
+          :items="editorToolbarItems"
+          size="xs"
+          class="px-2 py-2"
         />
-        <div v-else>
-          <p class="p-3">Kein Inhalt</p>
-        </div>
-      </div>
+      </UEditor>
     </div>
     <template #fallback>
       <div
