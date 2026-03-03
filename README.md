@@ -127,11 +127,11 @@ If it works, great!
 
 Create a `.env` file and checkout the `.env.example`. Copy the content into your `.env` and replace the following fields
 
-| Field             | Description                   |
-| ----------------- | ----------------------------- |
-| `SUPABASE_URL`    | URL to Supabase API           |
+| Field                 | Description                    |
+| --------------------- | ------------------------------ |
+| `SUPABASE_URL`        | URL to Supabase API            |
 | `SUPABASE_SECRET_KEY` | Secret key (service-level key) |
-| `USERS_TO_CREATE` | See comment in `.env.example` |
+| `USERS_TO_CREATE`     | See comment in `.env.example`  |
 
 2. run the script
 

@@ -1,6 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
+
 This repository is a Bun + Turbo monorepo.
 
 - `apps/admin`: Nuxt admin dashboard (tournament operations, management UI).
@@ -12,6 +13,7 @@ This repository is a Bun + Turbo monorepo.
 - `docs`: VitePress documentation site.
 
 ## Build, Test, and Development Commands
+
 Run all commands from the repo root.
 
 - `bun install`: install workspace dependencies.
@@ -24,6 +26,7 @@ Run all commands from the repo root.
 - `bun run types:supabase`: regenerate DB types after schema changes.
 
 ## Coding Style & Naming Conventions
+
 - Follow `.editorconfig`: UTF-8, LF, 2-space indentation, trim trailing whitespace, final newline.
 - Formatting is enforced with Prettier (`.prettierrc`): no semicolons and Tailwind class sorting.
 - Vue component files use `PascalCase` (example: `TournamentFlow.vue`).
@@ -31,6 +34,7 @@ Run all commands from the repo root.
 - Keep shared domain types in `packages/types/src` and import them instead of redefining.
 
 ## Testing Guidelines
+
 There is currently no unified `test` script in the workspace. For each change:
 
 - Run `bun run format` and `bunx turbo run check-types`.
@@ -38,6 +42,7 @@ There is currently no unified `test` script in the workspace. For each change:
 - For performance/load checks, use the existing k6 script: `k6 run apps/viewer/test/load.js`.
 
 ## Commit & Pull Request Guidelines
+
 - Use Conventional Commits; this repo uses `semantic-release` (`feat:`, `fix:`, `chore:` etc.).
 - Prefer scoped messages when helpful, e.g. `feat(viewer): add live standings filter`.
 - PRs should include:
@@ -47,6 +52,7 @@ There is currently no unified `test` script in the workspace. For each change:
   - notes for schema/env changes (including migration and `types:supabase` updates).
 
 ## Security & Configuration Tips
+
 - Use each app’s `.env.example` as the source of required variables.
 - Never commit secrets or production keys.
 - Keep SQL migrations in `apps/api/supabase/migrations` as the source of truth for DB changes.
