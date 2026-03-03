@@ -17,5 +17,11 @@ defineProps<{
     </span>
     <p class="text-xs font-medium text-red-500 dark:text-red-400">Live</p>
   </div>
-  <UBadge label="Inaktiv" color="neutral" size="sm" v-else />
+  <UBadge
+    label="Inaktiv"
+    color="neutral"
+    variant="outline"
+    class="!bg-white !text-gray-700 ring-1 ring-gray-200 dark:!bg-gray-950 dark:!text-gray-200 dark:ring-gray-800"
+    v-else
+  />
 </template>

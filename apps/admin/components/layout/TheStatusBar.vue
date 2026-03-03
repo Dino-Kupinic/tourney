@@ -1,9 +1,21 @@
 <script setup lang="ts">
-// const appVersion = useAppVersion() TODO: this is broken because package.json version field no longer exists because of semantic-release bot, we need to parse commits or something (or just display most recent commit hash)
-const appVersion = "UNDEFINED"
-
+const runtimeConfig = useRuntimeConfig()
+const appVersion = computed(() => runtimeConfig.public.clientVersion || "dev")
 const isOnline = useOnline()
 const { isSupported, memory } = useMemory()
+const memoryLabel = computed(() => {
+  if (!isSupported.value) {
+    return "Nicht verfügbar"
+  }
+
+  const usedHeap = memory.value?.usedJSHeapSize
+
+  if (typeof usedHeap !== "number") {
+    return "Nicht verfügbar"
+  }
+
+  return size(usedHeap)
+})
 
 function size(v: number) {
   const kb = v / 1024 / 1024
@@ -30,22 +42,20 @@ function size(v: number) {
         />
       </UBadge>
       <ClientOnly>
-        <UBadge v-if="isSupported && memory" color="warning" variant="subtle">
-          {{ size(memory.usedJSHeapSize) }}
+        <UBadge color="warning" variant="subtle">
+          {{ memoryLabel }}
         </UBadge>
-        <UBadge
-          v-else-if="!isSupported && !memory"
-          color="warning"
-          variant="subtle"
-        >
-          Nicht Unterstützt
-        </UBadge>
-        <UBadge v-else color="warning" variant="subtle"> Kalkuliere... </UBadge>
         <template #fallback>
           <USkeleton class="h-5 w-24" />
         </template>
       </ClientOnly>
-      <UBadge color="neutral"> tourney v{{ appVersion }} </UBadge>
+      <UBadge
+        color="neutral"
+        variant="outline"
+        class="!bg-white !text-gray-700 ring-1 ring-gray-200 dark:!bg-gray-950 dark:!text-gray-200 dark:ring-gray-800"
+      >
+        tourney v{{ appVersion }}
+      </UBadge>
     </div>
   </nav>
 </template>

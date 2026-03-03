@@ -4,10 +4,11 @@ import { glass } from "@dicebear/collection"
 
 const { name, role } = useUser()
 const route = useRoute()
-const avatar = createAvatar(glass, {
-  seed: name.value,
-})
-const svg = avatar.toDataUri()
+const svg = computed(() =>
+  createAvatar(glass, {
+    seed: name.value,
+  }).toDataUri(),
+)
 // TODO: make navbar rerender on live tournament change
 const { liveTournaments, fetchLiveTournaments } = useLiveTournaments()
 await fetchLiveTournaments()
@@ -80,53 +81,63 @@ function isActive(to: string) {
 
 <template>
   <aside class="flex h-full min-w-64 flex-col gap-4 pb-2">
-    <nav class="flex grow flex-col gap-4 pr-2">
-      <div
+    <nav class="flex grow flex-col pr-2">
+      <template
         v-for="(section, sectionIndex) in navigationLinks"
         :key="sectionIndex"
-        class="space-y-1"
       >
-        <NuxtLink
-          v-for="item in section"
-          :key="item.to"
-          :to="item.to"
-          class="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-          :class="
-            isActive(item.to)
-              ? 'bg-gray-200 text-gray-950 dark:bg-gray-800 dark:text-white'
-              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/80'
-          "
-        >
-          <span class="flex items-center gap-2">
-            <UIcon :name="item.icon" class="h-4 w-4 shrink-0" />
-            <span>{{ item.label }}</span>
-          </span>
-          <UBadge v-if="item.badge" color="neutral" variant="subtle" size="xs">
-            {{ item.badge }}
-          </UBadge>
-        </NuxtLink>
-      </div>
+        <div class="space-y-0.5">
+          <NuxtLink
+            v-for="item in section"
+            :key="item.to"
+            :to="item.to"
+            class="flex items-center justify-between rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+            :class="
+              isActive(item.to)
+                ? 'bg-gray-200 text-gray-950 dark:bg-gray-800 dark:text-white'
+                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/80'
+            "
+          >
+            <span class="flex items-center gap-2">
+              <UIcon :name="item.icon" class="h-4 w-4 shrink-0" />
+              <span>{{ item.label }}</span>
+            </span>
+            <UBadge
+              v-if="item.badge"
+              color="neutral"
+              variant="outline"
+              class="!bg-white !text-gray-700 ring-1 ring-gray-200 dark:!bg-gray-950 dark:!text-gray-200 dark:ring-gray-800"
+            >
+              {{ item.badge }}
+            </UBadge>
+          </NuxtLink>
+        </div>
+        <USeparator
+          v-if="sectionIndex < navigationLinks.length - 1"
+          class="my-3 mr-2"
+        />
+      </template>
     </nav>
 
     <div
-      class="mr-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900"
+      class="mr-2 flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-900"
     >
-      <div class="flex items-center gap-3">
-        <img
-          :src="svg"
-          :alt="name"
-          class="h-12 w-12 rounded-lg border border-gray-200 bg-gray-100 object-cover dark:border-gray-700 dark:bg-gray-800"
-        />
-        <div class="min-w-0">
-          <p
-            class="truncate text-sm font-semibold text-gray-950 dark:text-white"
-          >
-            {{ name }}
-          </p>
-          <UBadge color="secondary" variant="subtle" size="xs">
-            {{ role }}
-          </UBadge>
-        </div>
+      <img
+        :src="svg"
+        :alt="name"
+        class="h-9 w-9 rounded-md border border-gray-200 bg-gray-100 object-cover dark:border-gray-700 dark:bg-gray-800"
+      />
+      <div class="flex min-w-0 items-center gap-2">
+        <p class="truncate text-sm font-semibold text-gray-950 dark:text-white">
+          {{ name }}
+        </p>
+        <UBadge
+          color="neutral"
+          variant="outline"
+          class="!bg-white !text-gray-700 ring-1 ring-gray-200 dark:!bg-gray-950 dark:!text-gray-200 dark:ring-gray-800"
+        >
+          {{ role }}
+        </UBadge>
       </div>
     </div>
 

@@ -26,19 +26,12 @@ const startTime = computed(() => {
       class="flex justify-between gap-0.5 rounded-t-md border-b border-gray-200 bg-gray-100 p-0.5 dark:border-gray-700 dark:bg-gray-800"
     >
       <div v-if="next" class="flex gap-0.5">
-        <UBadge
-          label="Nächstes Spiel"
-          color="success"
-          size="xs"
-          variant="subtle"
-          block
-        />
+        <UBadge label="Nächstes Spiel" color="success" variant="subtle" block />
       </div>
       <UBadge
         v-else
         label="Anstehendes Spiel"
         color="warning"
-        size="xs"
         variant="subtle"
         block
       />

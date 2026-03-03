@@ -10,6 +10,18 @@ export const useRegistrationTable = (
 ) => {
   const columns: TableColumn<RegistrationColumn>[] = [
     {
+      id: "select",
+      header: "",
+      enableSorting: false,
+      enableHiding: false,
+      meta: {
+        class: {
+          th: "w-12 px-2",
+          td: "w-12 px-2",
+        },
+      },
+    },
+    {
       accessorKey: "name",
       header: "Name",
       enableSorting: true,
@@ -38,6 +50,14 @@ export const useRegistrationTable = (
     {
       id: "actions",
       header: "Aktionen",
+      enableSorting: false,
+      enableHiding: false,
+      meta: {
+        class: {
+          th: "w-16",
+          td: "w-16",
+        },
+      },
     },
   ]
 

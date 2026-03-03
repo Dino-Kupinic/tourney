@@ -503,7 +503,6 @@ const canGoLive = computed(() => {
                         "
                         class="rounded-full"
                         variant="subtle"
-                        size="xs"
                         :label="team.name"
                       />
                     </div>

@@ -187,7 +187,7 @@ const onSubmitCreate = async () => {
           :key="item.year"
         >
           <div>
-            <UBadge :label="item.year" variant="subtle" size="md" />
+            <UBadge :label="item.year" variant="subtle" />
           </div>
           <TournamentGrid>
             <TournamentItem

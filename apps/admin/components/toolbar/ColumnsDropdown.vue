@@ -1,24 +1,72 @@
 <script setup lang="ts">
-type DataTableColumn = object
+import { computed } from "vue"
+import type { VisibilityState } from "@tanstack/vue-table"
 
-const model = defineModel<DataTableColumn[]>()
-defineProps<{
+type DataTableColumn = {
+  id?: string
+  accessorKey?: string
+  header?: unknown
+  enableHiding?: boolean
+}
+
+const model = defineModel<VisibilityState>({
+  default: () => ({}),
+})
+
+const props = defineProps<{
   columns: DataTableColumn[]
 }>()
+
+const items = computed(() => [
+  props.columns
+    .filter((column) => column.enableHiding !== false)
+    .flatMap((column) => {
+      const key = column.id ?? column.accessorKey
+
+      if (!key) {
+        return []
+      }
+
+      return [
+        {
+          type: "checkbox" as const,
+          label:
+            typeof column.header === "string" ? column.header : String(key),
+          checked: model.value[key] !== false,
+          onUpdateChecked: (checked: boolean) => {
+            const next = { ...model.value }
+
+            if (checked) {
+              delete next[key]
+            } else {
+              next[key] = false
+            }
+
+            model.value = next
+          },
+        },
+      ]
+    }),
+])
 </script>
 
 <template>
-  <USelectMenu v-model="model" :items="columns" multiple v-slot="{ open }">
-    <UButton color="neutral" size="xs" class="w-32 flex-1 justify-between">
+  <UDropdownMenu :items="items" :content="{ align: 'end' }" v-slot="{ open }">
+    <UButton
+      color="neutral"
+      variant="outline"
+      size="sm"
+      class="w-32 flex-1 justify-between bg-white dark:bg-gray-950"
+    >
       <div class="flex items-center gap-1">
         <UIcon name="i-heroicons-view-columns" class="h-4 w-4" />
         Spalten
       </div>
       <UIcon
-        name="i-heroicons-chevron-right-20-solid"
+        name="i-heroicons-chevron-down-20-solid"
         class="h-4 w-4 text-gray-400 transition-transform dark:text-gray-500"
-        :class="[open && 'rotate-90 transform']"
+        :class="[open && 'rotate-180 transform']"
       />
     </UButton>
-  </USelectMenu>
+  </UDropdownMenu>
 </template>
