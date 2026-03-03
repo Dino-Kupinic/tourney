@@ -805,6 +805,7 @@ const onSubmitCreate = async () => {
       v-model:sorting="sort"
       v-model:row-selection="rowSelection"
       v-model:column-visibility="columnVisibility"
+      sticky="header"
       :data="filteredRows"
       :columns="columns"
       :get-row-id="(row) => row.id"

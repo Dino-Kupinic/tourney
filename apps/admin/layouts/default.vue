@@ -1,8 +1,11 @@
 <template>
-  <div class="flex h-dvh p-2 pb-0">
+  <UDashboardGroup
+    storage-key="admin-dashboard"
+    class="gap-2 bg-neutral-100 p-2 dark:bg-neutral-950"
+  >
     <TheSideNavigation />
     <BasePageWrapper>
       <slot />
     </BasePageWrapper>
-  </div>
+  </UDashboardGroup>
 </template>

@@ -31,7 +31,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
 <template>
   <div class="flex h-dvh w-full items-center justify-center">
-    <UCard class="w-full sm:w-96">
+    <UCard class="w-full sm:w-96" variant="outline">
       <template #header>
         <div class="flex flex-col items-center space-y-3">
           <Logo class="h-12 w-12" />
@@ -45,11 +45,11 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         @submit="onSubmit"
       >
         <UFormField label="E-mail" name="email">
-          <UInput v-model="state.email" />
+          <UInput v-model="state.email" class="w-full" />
         </UFormField>
 
         <UFormField label="Passwort" name="password">
-          <UInput v-model="state.password" type="password" />
+          <UInput v-model="state.password" type="password" class="w-full" />
         </UFormField>
 
         <UButton type="submit" label="Einloggen" />

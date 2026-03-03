@@ -7,12 +7,18 @@ const titleUppercase = computed(() => title?.toUpperCase() || "")
 </script>
 
 <template>
-  <header
-    class="flex w-full items-center justify-between rounded-t-md border-b border-neutral-200 bg-white p-2 px-6 text-sm text-neutral-950 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100"
+  <UDashboardNavbar
+    :title="titleUppercase || undefined"
+    :toggle="{ color: 'neutral', variant: 'ghost', size: 'sm' }"
+    :ui="{
+      root: '!h-auto min-h-0 rounded-t-md bg-white px-4 py-2 text-sm text-neutral-950 sm:px-6 dark:bg-neutral-900 dark:text-neutral-100',
+      title: 'font-mono font-medium text-sm leading-none',
+      left: 'gap-2',
+      right: 'min-w-0 flex-1 justify-end gap-2',
+    }"
   >
-    <HeaderTitle v-if="titleUppercase !== ''">
-      {{ titleUppercase }}
-    </HeaderTitle>
-    <slot />
-  </header>
+    <template #right>
+      <slot />
+    </template>
+  </UDashboardNavbar>
 </template>

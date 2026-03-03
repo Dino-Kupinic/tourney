@@ -454,12 +454,16 @@ const canGoLive = computed(() => {
           <UBreadcrumb
             :items="timeline"
             separator-icon="i-heroicons-arrow-long-right"
+            :ui="{
+              root: 'w-full',
+              list: 'flex w-full flex-wrap items-center gap-1.5',
+            }"
           >
             <template #item="{ item }">
               <UBadge
                 color="neutral"
                 variant="outline"
-                class="truncate rounded-full !bg-white !text-neutral-700 dark:!bg-neutral-950 dark:!text-neutral-200"
+                class="truncate rounded-full"
               >
                 {{ item.label }}
               </UBadge>

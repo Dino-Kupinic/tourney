@@ -80,8 +80,35 @@ function isActive(to: string) {
 </script>
 
 <template>
-  <aside class="flex h-full max-w-44 min-w-44 flex-col pb-2">
-    <nav class="flex grow flex-col gap-2 pr-2">
+  <UDashboardSidebar
+    id="navigation"
+    :default-size="14"
+    :min-size="12"
+    :max-size="18"
+    :toggle="{ color: 'neutral', variant: 'ghost', size: 'sm' }"
+    :ui="{
+      root: 'h-full !min-h-0 rounded-md border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900',
+      header: 'px-3 py-3',
+      body: 'gap-2 px-2 py-2',
+      footer: 'border-t border-neutral-200 px-2 py-2 dark:border-neutral-800',
+      content: 'bg-white dark:bg-neutral-900',
+    }"
+  >
+    <template #header>
+      <NuxtLink to="/" class="flex items-center gap-3 px-1">
+        <Logo class="h-8 w-8 shrink-0" />
+        <div class="min-w-0">
+          <p
+            class="truncate text-sm font-semibold text-neutral-950 dark:text-white"
+          >
+            Tourney
+          </p>
+          <p class="text-xs text-neutral-500 dark:text-neutral-400">Admin</p>
+        </div>
+      </NuxtLink>
+    </template>
+
+    <nav class="flex grow flex-col gap-2">
       <div
         v-for="(section, sectionIndex) in navigationLinks"
         :key="sectionIndex"
@@ -101,53 +128,50 @@ function isActive(to: string) {
               : 'text-neutral-500 hover:bg-neutral-100/70 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/60 dark:hover:text-white'
           "
         >
-          <span class="flex items-center gap-2">
+          <span class="flex min-w-0 items-center gap-2">
             <UIcon :name="item.icon" class="h-4 w-4 shrink-0" />
-            <span>{{ item.label }}</span>
+            <span class="truncate">{{ item.label }}</span>
           </span>
-          <UBadge
-            v-if="item.badge"
-            color="error"
-            variant="outline"
-            class="!text-error ring-error/20 h-5 min-w-5 rounded-md !bg-white px-1.5 !text-[10px] !font-medium ring-1 dark:!bg-neutral-950"
-          >
+          <UBadge v-if="item.badge" color="error" variant="outline">
             {{ item.badge }}
           </UBadge>
         </NuxtLink>
       </div>
     </nav>
 
-    <div class="mt-2 mr-2">
-      <div class="flex items-center gap-2 rounded-lg px-3 py-2">
-        <img
-          :src="svg"
-          :alt="name"
-          class="h-5 w-5 rounded-full bg-neutral-100 object-cover dark:bg-neutral-800"
-        />
-        <div class="flex min-w-0 items-center gap-2">
-          <p
-            class="truncate text-sm font-semibold text-neutral-500 dark:text-neutral-300"
-          >
-            {{ name }}
-          </p>
-          <UBadge color="primary" variant="subtle" size="sm">
-            {{ role }}
-          </UBadge>
+    <template #footer>
+      <div class="space-y-2">
+        <div class="flex items-center gap-2 rounded-lg px-3 py-2">
+          <img
+            :src="svg"
+            :alt="name"
+            class="h-5 w-5 rounded-full bg-neutral-100 object-cover dark:bg-neutral-800"
+          />
+          <div class="flex min-w-0 items-center gap-2">
+            <p
+              class="truncate text-sm font-semibold text-neutral-500 dark:text-neutral-300"
+            >
+              {{ name }}
+            </p>
+            <UBadge color="primary" variant="subtle" size="sm">
+              {{ role }}
+            </UBadge>
+          </div>
         </div>
-      </div>
 
-      <NuxtLink
-        to="/settings"
-        class="flex items-center gap-2 rounded-lg px-3 py-1 text-sm font-medium transition-colors"
-        :class="
-          isActive('/settings')
-            ? 'bg-neutral-100 text-neutral-950 dark:bg-neutral-800/70 dark:text-white'
-            : 'text-neutral-500 hover:bg-neutral-100/70 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/60 dark:hover:text-white'
-        "
-      >
-        <UIcon name="i-heroicons-cog-8-tooth" class="h-4 w-4 shrink-0" />
-        <span>Einstellungen</span>
-      </NuxtLink>
-    </div>
-  </aside>
+        <NuxtLink
+          to="/settings"
+          class="flex items-center gap-2 rounded-lg px-3 py-1 text-sm font-medium transition-colors"
+          :class="
+            isActive('/settings')
+              ? 'bg-neutral-100 text-neutral-950 dark:bg-neutral-800/70 dark:text-white'
+              : 'text-neutral-500 hover:bg-neutral-100/70 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/60 dark:hover:text-white'
+          "
+        >
+          <UIcon name="i-heroicons-cog-8-tooth" class="h-4 w-4 shrink-0" />
+          <span>Einstellungen</span>
+        </NuxtLink>
+      </div>
+    </template>
+  </UDashboardSidebar>
 </template>
