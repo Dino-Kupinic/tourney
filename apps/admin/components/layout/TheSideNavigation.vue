@@ -2,7 +2,7 @@
 import { createAvatar } from "@dicebear/core"
 import { glass } from "@dicebear/collection"
 
-const { name, role } = useUser()
+const { name, role, logout } = useUser()
 const route = useRoute()
 const {
   public: { docsUrl },
@@ -23,6 +23,11 @@ function isActive(to: string) {
   }
 
   return route.path === to || route.path.startsWith(`${to}/`)
+}
+
+async function onLogout() {
+  await logout()
+  return navigateTo("/login")
 }
 
 const navigationLinks = computed(() => [
@@ -124,14 +129,24 @@ const secondaryLinks = computed(() => [
   },
 ])
 
-const settingsLinks = computed(() => [
-  {
-    label: "Einstellungen",
-    icon: "i-heroicons-cog-8-tooth",
-    to: "/settings",
-    exact: true,
-    active: isActive("/settings"),
-  },
+const userMenuItems = computed(() => [
+  [
+    {
+      label: "Einstellungen",
+      icon: "i-heroicons-cog-8-tooth",
+      to: "/settings",
+      exact: true,
+      active: isActive("/settings"),
+    },
+  ],
+  [
+    {
+      label: "Logout",
+      icon: "i-heroicons-arrow-right-on-rectangle",
+      color: "error",
+      onSelect: onLogout,
+    },
+  ],
 ])
 </script>
 
@@ -182,9 +197,18 @@ const settingsLinks = computed(() => [
     />
 
     <template #footer>
-      <div class="w-full">
-        <div class="space-y-2">
-          <div class="flex items-center gap-2 rounded-lg px-3 py-2">
+      <UDropdownMenu
+        :items="userMenuItems"
+        :content="{ align: 'end', side: 'top' }"
+        class="w-full"
+        v-slot="{ open }"
+      >
+        <UButton
+          color="neutral"
+          variant="ghost"
+          class="w-full justify-between rounded-lg py-2"
+        >
+          <div class="flex min-w-0 items-center gap-2">
             <img
               :src="svg"
               :alt="name"
@@ -201,15 +225,14 @@ const settingsLinks = computed(() => [
               </UBadge>
             </div>
           </div>
-        </div>
 
-        <UNavigationMenu
-          :items="settingsLinks"
-          orientation="vertical"
-          color="neutral"
-          class="grow"
-        />
-      </div>
+          <UIcon
+            name="i-heroicons-chevron-down-20-solid"
+            class="h-4 w-4 shrink-0 text-neutral-400 transition-transform dark:text-neutral-500"
+            :class="[open && 'rotate-180 transform']"
+          />
+        </UButton>
+      </UDropdownMenu>
     </template>
   </UDashboardSidebar>
 </template>

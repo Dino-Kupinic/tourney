@@ -6,11 +6,23 @@ useHead({
 </script>
 
 <template>
-  <BasePageHeader :title="title" />
+  <BasePageHeader :title="title">
+    <ToolbarContainer>
+      <NuxtLink to="/">
+        <UButton
+          label="Dokumentation"
+          size="sm"
+          variant="outline"
+          color="neutral"
+          trailing-icon="i-heroicons-arrow-up-right"
+        />
+      </NuxtLink>
+    </ToolbarContainer>
+  </BasePageHeader>
   <BasePageContent>
     <div class="flex h-full w-full items-center justify-center">
       <div
-        class="h-[32rem] w-[48rem] rounded-2xl bg-neutral-100 p-12 dark:bg-neutral-800"
+        class="h-128 w-3xl rounded-2xl bg-neutral-100 p-12 dark:bg-neutral-800"
       >
         <h1 class="font-serif text-3xl tracking-tight">
           Willkommen bei tourney.

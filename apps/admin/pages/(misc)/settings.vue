@@ -6,6 +6,13 @@ useHead({
 
 const { name, role, email, last_sign_in, logout } = useUser()
 
+const cardUi = {
+  root: "border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900",
+  header: "px-4 py-2.5 sm:px-5",
+  body: "px-4 py-3 sm:px-5",
+  footer: "px-4 py-2.5 sm:px-5",
+}
+
 const onLogout = async () => {
   await logout()
   return navigateTo("/login")
@@ -13,11 +20,23 @@ const onLogout = async () => {
 </script>
 
 <template>
-  <BasePageHeader :title="title" />
+  <BasePageHeader :title="title">
+    <ToolbarContainer>
+      <NuxtLink to="/">
+        <UButton
+          label="Dokumentation"
+          size="sm"
+          variant="outline"
+          color="neutral"
+          trailing-icon="i-heroicons-arrow-up-right"
+        />
+      </NuxtLink>
+    </ToolbarContainer>
+  </BasePageHeader>
   <main
-    class="m-auto mt-4 flex h-full max-w-[600px] flex-col space-y-3 overflow-y-auto p-2"
+    class="m-auto mt-3 flex h-full max-w-150 flex-col space-y-2 overflow-y-auto px-2 pb-2"
   >
-    <UCard>
+    <UCard variant="soft" :ui="cardUi">
       <template #header> Aussehen </template>
       <BaseSettingsItem>
         <div class="flex items-center justify-between">
@@ -26,7 +45,7 @@ const onLogout = async () => {
         </div>
       </BaseSettingsItem>
     </UCard>
-    <UCard>
+    <UCard variant="soft" :ui="cardUi">
       <template #header> Account </template>
       <BaseSettingsItem>
         <strong>{{ name }}</strong>
@@ -38,10 +57,10 @@ const onLogout = async () => {
         </p>
       </BaseSettingsItem>
       <template #footer>
-        <UButton label="Logout" @click="onLogout()" />
+        <UButton label="Logout" size="sm" @click="onLogout()" />
       </template>
     </UCard>
-    <UCard>
+    <UCard variant="soft" :ui="cardUi">
       <template #header> Kontakt </template>
       <BaseSettingsItem>
         <strong>Dino Kupinic</strong>
