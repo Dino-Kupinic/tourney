@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const { enabled: aiAssistantEnabled } = useAiAssistant()
+</script>
+
 <template>
   <UDashboardGroup
     storage-key="admin-dashboard"
@@ -8,5 +12,6 @@
     <BasePageWrapper>
       <slot />
     </BasePageWrapper>
+    <AssistantSidebar v-if="aiAssistantEnabled" />
   </UDashboardGroup>
 </template>

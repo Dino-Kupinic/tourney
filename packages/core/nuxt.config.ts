@@ -21,6 +21,19 @@ export default defineNuxtConfig({
       clientVersion: rootPackage.version || "dev",
     },
   },
+  ui: {
+    theme: {
+      colors: [
+        "primary",
+        "secondary",
+        "tertiary",
+        "info",
+        "success",
+        "warning",
+        "error",
+      ],
+    },
+  },
   fonts: {
     defaults: {
       weights: [400, 500, 600],
