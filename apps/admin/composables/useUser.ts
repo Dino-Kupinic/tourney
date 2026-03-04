@@ -4,15 +4,6 @@ export const useUser = () => {
   const supabase = useSupabaseClient<Database>()
   const session = useSupabaseUser()
 
-  const id = ref<string>(session.value?.id ?? "")
-  const name = ref<string>(formatUsername(session.value?.email))
-  const email = ref<string>(session.value?.email ?? "Unknown")
-  const role = ref<string>(session.value?.user_metadata.role)
-  const last_sign_in: ComputedRef<string> = useDateFormat(
-    session.value?.last_sign_in_at ?? useNow(),
-    "DD.MM.YYYY HH:mm:ss",
-  )
-
   async function getUserById(user_id: string) {
     const { data, error } = await useFetch(`/api/users/${user_id}`)
     const user = data.value?.data.user
@@ -32,12 +23,51 @@ export const useUser = () => {
     return email.slice(0, email.indexOf("@"))
   }
 
+  const id = computed<string>(() => session.value?.id ?? "")
+  const name = computed<string>(() => formatUsername(session.value?.email))
+  const email = computed<string>(() => session.value?.email ?? "Unknown")
+  const role = computed<string>(() => {
+    return (
+      (session.value?.user_metadata?.role as string | undefined) ?? "Unknown"
+    )
+  })
+  const last_sign_in = computed<string>(() => {
+    const lastSignInAt = session.value?.last_sign_in_at
+
+    if (!lastSignInAt) {
+      return "Unbekannt"
+    }
+
+    return new Date(lastSignInAt).toLocaleString("de-AT")
+  })
+
   async function login(email: string, password: string) {
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     })
     return { data, error }
+  }
+
+  async function getCurrentUserId() {
+    if (id.value) {
+      return id.value
+    }
+
+    const { data, error } = await supabase.auth.getUser()
+
+    if (error) {
+      throw error
+    }
+
+    if (!data.user?.id) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: "Unauthorized",
+      })
+    }
+
+    return data.user.id
   }
 
   async function logout() {
@@ -52,6 +82,7 @@ export const useUser = () => {
     last_sign_in,
     login,
     logout,
+    getCurrentUserId,
     getUserById,
     formatUsername,
   }

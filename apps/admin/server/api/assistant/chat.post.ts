@@ -1,0 +1,46 @@
+import { convertToModelMessages, streamText, type UIMessage } from "ai"
+import { openai } from "@ai-sdk/openai"
+import {
+  AI_ASSISTANT_DEFAULT_MODEL,
+  isAiAssistantModel,
+} from "~/utils/aiAssistant"
+
+export default defineEventHandler(async (event) => {
+  if (!process.env.OPENAI_API_KEY) {
+    throw createError({
+      statusCode: 503,
+      statusMessage:
+        "OPENAI_API_KEY is not configured for the admin AI assistant.",
+    })
+  }
+
+  const body = await readBody<{
+    context?: unknown
+    messages?: unknown
+    model?: unknown
+  }>(event)
+
+  const context =
+    typeof body?.context === "string" && body.context.trim().length > 0
+      ? body.context.trim()
+      : "Admin"
+  const model = isAiAssistantModel(body?.model)
+    ? body.model
+    : AI_ASSISTANT_DEFAULT_MODEL
+  const messages = Array.isArray(body?.messages)
+    ? (body.messages as UIMessage[])
+    : []
+
+  return streamText({
+    model: openai(model),
+    maxOutputTokens: 700,
+    system: [
+      "You are the Tourney admin assistant for a tournament management dashboard.",
+      `The user is currently on the "${context}" page.`,
+      "Respond in concise German unless the user writes in another language.",
+      "Prioritize practical guidance, navigation hints, and clear next steps inside the admin app.",
+      "If the user asks for an action you cannot perform from chat, explain where in the admin UI they should go.",
+    ].join(" "),
+    messages: await convertToModelMessages(messages),
+  }).toUIMessageStreamResponse()
+})

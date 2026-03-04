@@ -10,6 +10,7 @@ const title = ref<string>("Turniere")
 useHead({
   title: () => title.value,
 })
+const { getCurrentUserId } = useUser()
 const route = useRoute()
 const { data: tournament, refresh: tournamentRefresh } =
   await useFetch<ParsedJsonTournament | null>(
@@ -244,11 +245,15 @@ const editState = reactive({
 const isOpenEdit = ref<boolean>(false)
 const onSubmitEdit = async () => {
   try {
+    const editorId = await getCurrentUserId()
     await $fetch("/api/tournaments/edit", {
       method: "PUT",
       body: {
         id: tournament.value?.id,
-        tournament: editState,
+        tournament: {
+          ...editState,
+          last_edited_by_id: editorId,
+        },
       },
     })
     isOpenEdit.value = false
@@ -292,14 +297,15 @@ const canGoLive = computed(() => {
   <BasePageHeader class="pl-0">
     <ToolbarContainer class="flex w-full items-center justify-between">
       <div class="flex items-center gap-2">
-        <UBreadcrumb :links="links" />
+        <UBreadcrumb :items="links" />
         <TournamentLiveDisplay v-if="tournament" :is-live="isTournamentLive" />
       </div>
       <div class="flex items-center space-x-2">
         <UButton
           icon="i-heroicons-arrow-path"
-          color="gray"
-          size="xs"
+          color="neutral"
+          variant="outline"
+          size="sm"
           square
           @click="refreshTournament"
         />
@@ -307,8 +313,9 @@ const canGoLive = computed(() => {
           v-if="!isTournamentLive"
           icon="i-heroicons-pencil-square"
           label="Bearbeiten"
-          color="gray"
-          size="xs"
+          color="neutral"
+          variant="outline"
+          size="sm"
           square
           @click="isOpenEdit = true"
         />
@@ -329,8 +336,8 @@ const canGoLive = computed(() => {
               label="Gruppen neu mischen..."
               icon="i-heroicons-table-cells"
               variant="soft"
-              color="yellow"
-              size="xs"
+              color="warning"
+              size="sm"
               :disabled="hasMatches as boolean"
               @click="isOpenConfirm = true"
             />
@@ -342,8 +349,8 @@ const canGoLive = computed(() => {
             label="Gruppen neu mischen..."
             icon="i-heroicons-table-cells"
             variant="soft"
-            color="yellow"
-            size="xs"
+            color="warning"
+            size="sm"
             @click="isOpenConfirm = true"
           />
         </template>
@@ -352,9 +359,9 @@ const canGoLive = computed(() => {
             <UButton
               :label="liveLabel"
               icon="i-heroicons-signal"
-              color="red"
+              color="error"
               variant="soft"
-              size="xs"
+              size="sm"
               :disabled="!canGoLive"
               @click="isOpenLive = true"
             />
@@ -364,9 +371,9 @@ const canGoLive = computed(() => {
           <UButton
             :label="liveLabel"
             icon="i-heroicons-signal"
-            color="red"
+            color="error"
             variant="soft"
-            size="xs"
+            size="sm"
             @click="isOpenLive = true"
           />
         </template>
@@ -380,14 +387,14 @@ const canGoLive = computed(() => {
   <BasePageContent>
     <div class="flex h-full w-full">
       <div
-        class="flex w-1/2 flex-col overflow-auto border-r border-gray-200 dark:border-gray-700"
+        class="flex w-1/2 flex-col overflow-auto border-r border-neutral-200 2xl:w-2/5 dark:border-neutral-700"
       >
         <div
-          class="flex h-auto w-full gap-3 border-b border-gray-200 bg-gray-100 p-3 px-6 dark:border-gray-800 dark:bg-gray-900"
+          class="flex h-auto w-full gap-3 border-b border-neutral-200 bg-neutral-100 p-3 px-6 dark:border-neutral-800 dark:bg-neutral-900"
         >
           <div
             v-if="tournament"
-            class="flex w-auto grow items-center gap-1 rounded-md bg-gray-50 p-3 pr-3 dark:bg-gray-800"
+            class="flex w-auto grow items-center gap-1 rounded-md bg-neutral-50 p-3 pr-3 dark:bg-neutral-800"
           >
             <div class="flex flex-col">
               <TournamentItemInfoStart
@@ -401,7 +408,7 @@ const canGoLive = computed(() => {
             </div>
           </div>
           <div
-            class="flex w-64 flex-col gap-2 rounded-md bg-gray-50 p-2 px-3 dark:bg-gray-800"
+            class="flex w-64 flex-col gap-2 rounded-md bg-neutral-50 p-2 px-3 dark:bg-neutral-800"
             v-if="data"
           >
             <div class="flex justify-between">
@@ -414,16 +421,16 @@ const canGoLive = computed(() => {
                 <p>{{ data?.students }} Schüler</p>
               </div>
             </div>
-            <UDivider
+            <USeparator
               :ui="{
-                border: {
-                  base: 'flex border-gray-200 dark:border-gray-700',
-                },
+                border: 'flex border-neutral-200 dark:border-neutral-700',
               }"
             />
             <TournamentTeamStatus :data="data" class="grow" />
           </div>
-          <div class="rounded-md bg-gray-50 p-3 pr-3 text-sm dark:bg-gray-800">
+          <div
+            class="rounded-md bg-neutral-50 p-3 pr-3 text-sm 2xl:min-w-0 2xl:flex-1 dark:bg-neutral-800"
+          >
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-ticket" />
               <p>{{ tournament?.sport }}</p>
@@ -444,21 +451,32 @@ const canGoLive = computed(() => {
         </div>
         <div class="flex h-full w-full flex-col gap-3 p-6">
           <strong>Ablauf</strong>
-          <UBreadcrumb :links="timeline" divider="i-heroicons-arrow-long-right">
-            <template #default="{ link }">
-              <UBadge color="gray" class="truncate rounded-full">
-                {{ link.label }}
+          <UBreadcrumb
+            :items="timeline"
+            separator-icon="i-heroicons-arrow-long-right"
+            :ui="{
+              root: 'w-full',
+              list: 'flex w-full flex-wrap items-center gap-1.5',
+            }"
+          >
+            <template #item="{ item }">
+              <UBadge
+                color="neutral"
+                variant="outline"
+                class="truncate rounded-full"
+              >
+                {{ item.label }}
               </UBadge>
             </template>
           </UBreadcrumb>
           <strong>Gruppen</strong>
           <div
-            class="shrink-0 overflow-hidden rounded-md border border-gray-300 dark:border-gray-700"
+            class="shrink-0 overflow-hidden rounded-md border border-neutral-300 dark:border-neutral-700"
           >
             <table class="w-full table-auto border-separate border-spacing-0">
               <thead>
                 <tr
-                  class="bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                  class="bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
                 >
                   <th class="px-4 py-2 first:rounded-tl-sm last:rounded-tr-sm">
                     Gruppe
@@ -474,17 +492,17 @@ const canGoLive = computed(() => {
                   :key="groupIndex"
                   :class="[
                     groupIndex === groups?.length - 1
-                      ? 'last:rounded-bl-md last:rounded-br-md'
+                      ? 'last:rounded-br-md last:rounded-bl-md'
                       : '',
                   ]"
                 >
                   <td
-                    class="border-r border-t border-gray-300 px-4 py-2 text-center font-medium dark:border-gray-700"
+                    class="border-t border-r border-neutral-300 px-4 py-2 text-center font-medium dark:border-neutral-700"
                   >
                     {{ group.name }}
                   </td>
                   <td
-                    class="border-t border-gray-300 px-4 py-2 dark:border-gray-700"
+                    class="border-t border-neutral-300 px-4 py-2 dark:border-neutral-700"
                   >
                     <div class="flex flex-wrap gap-2">
                       <UBadge
@@ -492,12 +510,11 @@ const canGoLive = computed(() => {
                         :key="teamIndex"
                         :color="
                           team.registration?.status === 'Abgesendet'
-                            ? 'orange'
-                            : 'green'
+                            ? 'warning'
+                            : 'success'
                         "
-                        :ui="{ rounded: 'rounded-full' }"
+                        class="rounded-full"
                         variant="subtle"
-                        size="xs"
                         :label="team.name"
                       />
                     </div>
@@ -510,7 +527,7 @@ const canGoLive = computed(() => {
             <UAlert
               v-if="maxTeams !== data?.teams"
               icon="i-heroicons-exclamation-triangle"
-              color="red"
+              color="error"
               variant="soft"
               title="Gruppen unvollständig"
               :description="groupAlert"
@@ -524,31 +541,32 @@ const canGoLive = computed(() => {
             <template v-if="filteredTeams?.length">
               <div
                 v-for="team in filteredTeams"
-                class="flex flex-col gap-1 rounded-md border border-gray-300 p-3 dark:border-gray-700"
+                class="flex flex-col gap-1 rounded-md border border-neutral-300 p-3 dark:border-neutral-700"
               >
                 <strong>{{ team.name }}</strong>
                 <template v-if="team.player.length > 0">
                   <div
                     v-for="player in team.player"
-                    class="flex gap-1 rounded-md bg-gray-100 p-3 pr-3 dark:bg-gray-800"
+                    class="flex gap-1 rounded-md bg-neutral-100 p-3 pr-3 dark:bg-neutral-800"
                   >
-                    <UFormGroup label="Vorname">
+                    <UFormField label="Vorname">
                       <UInput v-model="player.first_name" disabled />
-                    </UFormGroup>
-                    <UFormGroup label="Nachname">
+                    </UFormField>
+                    <UFormField label="Nachname">
                       <UInput v-model="player.last_name" disabled />
-                    </UFormGroup>
-                    <UFormGroup label="Klasse">
+                    </UFormField>
+                    <UFormField label="Klasse">
                       <UInput v-model="player.class" class="w-20" disabled />
-                    </UFormGroup>
-                    <UFormGroup label="Notiz">
+                    </UFormField>
+                    <UFormField label="Notiz">
                       <UInput v-model="player.note" />
-                    </UFormGroup>
+                    </UFormField>
                     <div class="flex h-full gap-1">
                       <div class="self-end">
                         <UButton
                           icon="i-heroicons-check"
-                          color="gray"
+                          color="neutral"
+                          variant="outline"
                           size="sm"
                           square
                           @click="editPlayerNote(player.id, player.note)"
@@ -557,7 +575,7 @@ const canGoLive = computed(() => {
                       <div class="self-end" v-if="!isTournamentLive">
                         <UButton
                           icon="i-heroicons-x-mark"
-                          color="red"
+                          color="error"
                           variant="soft"
                           size="sm"
                           square
@@ -570,7 +588,7 @@ const canGoLive = computed(() => {
                 <template v-else>
                   <UAlert
                     icon="i-heroicons-exclamation-triangle"
-                    color="red"
+                    color="error"
                     variant="soft"
                     title="Keine Spieler"
                     description="Dieses Team hat keine Spieler!"
@@ -590,12 +608,12 @@ const canGoLive = computed(() => {
           </div>
         </div>
       </div>
-      <div class="w-1/2">
+      <div class="w-1/2 2xl:w-3/5">
         <ClientOnly>
           <LiveFlow :tournament-id="tournament?.id as string" />
           <template #fallback>
             <div
-              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
+              class="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-neutral-800"
             >
               <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
             </div>

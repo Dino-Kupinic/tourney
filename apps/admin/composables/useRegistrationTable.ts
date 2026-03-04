@@ -1,4 +1,4 @@
-import type { TableColumn } from "#ui/types"
+import type { TableColumn } from "@nuxt/ui/components/Table.vue"
 import type { Enums, RegistrationColumn } from "@tourney/types"
 
 export const useRegistrationTable = (
@@ -8,35 +8,56 @@ export const useRegistrationTable = (
   onInfo: (row: RegistrationColumn) => void,
   onDelete: () => void,
 ) => {
-  const columns: TableColumn[] = [
+  const columns: TableColumn<RegistrationColumn>[] = [
     {
-      key: "name",
-      label: "Name",
-      sortable: true,
+      id: "select",
+      header: "",
+      enableSorting: false,
+      enableHiding: false,
+      meta: {
+        class: {
+          th: "w-12 px-2",
+          td: "w-12 px-2",
+        },
+      },
     },
     {
-      key: "class",
-      label: "Klasse",
-      sortable: true,
+      accessorKey: "name",
+      header: "Name",
+      enableSorting: true,
     },
     {
-      key: "date",
-      label: "Ablaufdatum",
-      sortable: true,
+      accessorKey: "class",
+      header: "Klasse",
+      enableSorting: true,
     },
     {
-      key: "status",
-      label: "Status",
-      sortable: true,
+      id: "date",
+      accessorFn: (row: RegistrationColumn) => row.expire_date,
+      header: "Ablaufdatum",
+      enableSorting: true,
     },
     {
-      key: "allow_class_mixing",
-      label: "Mischung",
-      sortable: true,
+      accessorKey: "status",
+      header: "Status",
+      enableSorting: true,
     },
     {
-      key: "actions",
-      label: "Aktionen",
+      accessorKey: "allow_class_mixing",
+      header: "Mischung",
+      enableSorting: true,
+    },
+    {
+      id: "actions",
+      header: "Aktionen",
+      enableSorting: false,
+      enableHiding: false,
+      meta: {
+        class: {
+          th: "w-16",
+          td: "w-16",
+        },
+      },
     },
   ]
 
@@ -46,7 +67,7 @@ export const useRegistrationTable = (
         key: "in_progress",
         label: "Ausstehend",
         icon: "i-heroicons-arrow-path",
-        click: () => onUpdate("Ausstehend"),
+        onSelect: () => onUpdate("Ausstehend"),
       },
     ],
     [
@@ -54,7 +75,7 @@ export const useRegistrationTable = (
         key: "submitted",
         label: "Abgesendet",
         icon: "i-heroicons-envelope",
-        click: () => onUpdate("Abgesendet"),
+        onSelect: () => onUpdate("Abgesendet"),
       },
     ],
     [
@@ -62,7 +83,7 @@ export const useRegistrationTable = (
         key: "completed",
         label: "Abgeschlossen",
         icon: "i-heroicons-check",
-        click: () => onUpdate("Abgeschlossen"),
+        onSelect: () => onUpdate("Abgeschlossen"),
       },
     ],
     [
@@ -70,7 +91,7 @@ export const useRegistrationTable = (
         key: "discarded",
         label: "Abgelehnt",
         icon: "i-heroicons-no-symbol",
-        click: () => onUpdate("Abgelehnt"),
+        onSelect: () => onUpdate("Abgelehnt"),
       },
     ],
   ]
@@ -81,24 +102,24 @@ export const useRegistrationTable = (
         {
           label: "Link kopieren",
           icon: "i-heroicons-clipboard-document-check",
-          click: () => onCopyLink(row),
+          onSelect: () => onCopyLink(row),
         },
         {
           label: "Editieren",
           icon: "i-heroicons-pencil-square-20-solid",
-          click: () => onEdit(row),
+          onSelect: () => onEdit(row),
         },
         {
           label: "Info",
           icon: "i-heroicons-information-circle",
-          click: () => onInfo(row),
+          onSelect: () => onInfo(row),
         },
       ],
       [
         {
           label: "Löschen",
           icon: "i-heroicons-trash",
-          click: () => onDelete(),
+          onSelect: () => onDelete(),
         },
       ],
     ])

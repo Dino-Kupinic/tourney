@@ -7,6 +7,8 @@ useHead({
   title: () => title.value,
 })
 
+const { getCurrentUserId } = useUser()
+
 const { data: groupedTournaments, refresh } = await useFetch(
   "/api/tournaments",
   {
@@ -125,12 +127,12 @@ const onSubmitCreate = async () => {
         creationState.group_teams = VOLLEYBALL_BASKETBALL_TEAMS
         break
     }
-    const { id } = useUser()
+    const editorId = await getCurrentUserId()
     await $fetch("/api/tournaments/create", {
       method: "POST",
       body: {
         ...creationState,
-        last_edited_by_id: id.value,
+        last_edited_by_id: editorId,
       },
     })
     isOpenCreate.value = false
@@ -155,13 +157,14 @@ const onSubmitCreate = async () => {
       <SearchInput v-model="search" placeholder="Namen suchen..." />
       <UButton
         icon="i-heroicons-arrow-path"
-        color="gray"
-        size="xs"
+        color="neutral"
+        variant="outline"
+        size="sm"
         square
         @click="refreshTournaments"
       />
       <UButton
-        size="xs"
+        size="sm"
         variant="soft"
         @click="isOpenCreate = true"
         label="Neues Turnier..."
@@ -185,7 +188,7 @@ const onSubmitCreate = async () => {
           :key="item.year"
         >
           <div>
-            <UBadge :label="item.year" variant="subtle" size="md" />
+            <UBadge :label="item.year" variant="subtle" />
           </div>
           <TournamentGrid>
             <TournamentItem
@@ -195,7 +198,7 @@ const onSubmitCreate = async () => {
               @refresh="refresh"
             />
           </TournamentGrid>
-          <UDivider class="my-6" />
+          <USeparator class="my-6" />
         </div>
       </template>
       <template v-else>

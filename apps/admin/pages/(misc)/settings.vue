@@ -5,6 +5,14 @@ useHead({
 })
 
 const { name, role, email, last_sign_in, logout } = useUser()
+const { enabled: aiAssistantEnabled } = useAiAssistant()
+
+const cardUi = {
+  root: "border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900",
+  header: "px-4 py-2.5 sm:px-5",
+  body: "px-4 py-3 sm:px-5",
+  footer: "px-4 py-2.5 sm:px-5",
+}
 
 const onLogout = async () => {
   await logout()
@@ -13,11 +21,23 @@ const onLogout = async () => {
 </script>
 
 <template>
-  <BasePageHeader :title="title" />
+  <BasePageHeader :title="title">
+    <ToolbarContainer>
+      <NuxtLink to="/">
+        <UButton
+          label="Dokumentation"
+          size="sm"
+          variant="outline"
+          color="neutral"
+          trailing-icon="i-heroicons-arrow-up-right"
+        />
+      </NuxtLink>
+    </ToolbarContainer>
+  </BasePageHeader>
   <main
-    class="m-auto mt-4 flex h-full max-w-[600px] flex-col space-y-3 overflow-y-auto p-2"
+    class="m-auto mt-3 flex h-full max-w-150 flex-col space-y-2 overflow-auto px-2 pb-2"
   >
-    <UCard>
+    <UCard variant="soft" :ui="cardUi">
       <template #header> Aussehen </template>
       <BaseSettingsItem>
         <div class="flex items-center justify-between">
@@ -26,22 +46,42 @@ const onLogout = async () => {
         </div>
       </BaseSettingsItem>
     </UCard>
-    <UCard>
+    <UCard variant="soft" :ui="cardUi">
       <template #header> Account </template>
       <BaseSettingsItem>
         <strong>{{ name }}</strong>
         <UBadge variant="subtle" class="float-right">{{ role }}</UBadge>
         <p>{{ email }}</p>
-        <p class="text-right text-sm text-gray-400 dark:text-gray-500">
+        <p class="text-right text-sm text-neutral-400 dark:text-neutral-500">
           Zuletzt eingeloggt:
           {{ last_sign_in }}
         </p>
       </BaseSettingsItem>
       <template #footer>
-        <UButton label="Logout" @click="onLogout()" />
+        <UButton label="Logout" size="sm" @click="onLogout()" />
       </template>
     </UCard>
-    <UCard>
+    <UCard variant="soft" :ui="cardUi">
+      <template #header>
+        <div class="flex items-center justify-between gap-2">
+          <span>AI</span>
+          <UBadge color="warning" variant="subtle" size="sm">BETA</UBadge>
+        </div>
+      </template>
+      <BaseSettingsItem>
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <strong>Assistent</strong>
+            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Aktiviere den AI Assistenten, um automatisch generierte Antworten
+              auf deine Fragen zu erhalten.
+            </p>
+          </div>
+          <USwitch v-model="aiAssistantEnabled" />
+        </div>
+      </BaseSettingsItem>
+    </UCard>
+    <UCard variant="soft" :ui="cardUi">
       <template #header> Kontakt </template>
       <BaseSettingsItem>
         <strong>Dino Kupinic</strong>

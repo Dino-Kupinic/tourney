@@ -33,8 +33,9 @@ const { data: groups } = tournament.value
   : { data: ref(null) }
 
 const selectedGroup = useState<string>("selectedGroup", () => "")
-if (groups.value && groups.value.length > 0) {
-  selectedGroup.value = groups.value[0].id
+const firstGroup = groups.value?.[0]
+if (firstGroup) {
+  selectedGroup.value = firstGroup.id
 }
 
 const { data: standings, refresh: refreshStandings = () => Promise.resolve() } =
@@ -69,18 +70,18 @@ const fourth = getTeamName(3)
       to="/tournaments"
       icon="i-heroicons-chevron-left"
       variant="link"
-      class="-ml-3 mb-2"
+      class="mb-2 -ml-3"
       label="Zurück"
     />
     <PageTitle>{{ tournament?.name }}</PageTitle>
     <div class="grid max-w-2xl grid-cols-1 gap-4 md:grid-cols-2">
       <div
-        class="mt-3 rounded-md border bg-white p-3 dark:border-gray-800 dark:bg-gray-900"
+        class="mt-3 rounded-md border bg-white p-3 dark:border-neutral-800 dark:bg-neutral-900"
       >
         <PageHeading>Infos</PageHeading>
         <div class="flex items-center gap-4 sm:gap-3">
           <div
-            class="flex grow items-center gap-1 rounded-md bg-gray-50 p-1 px-3 dark:bg-gray-800"
+            class="flex grow items-center gap-1 rounded-md bg-neutral-50 p-1 px-3 dark:bg-neutral-800"
           >
             <div class="flex flex-col text-base sm:text-sm">
               <div class="flex items-center space-x-1">
@@ -98,7 +99,7 @@ const fourth = getTeamName(3)
             </div>
           </div>
           <div
-            class="flex items-center gap-1 rounded-md bg-gray-50 p-1 pr-3 dark:bg-gray-800"
+            class="flex items-center gap-1 rounded-md bg-neutral-50 p-1 pr-3 dark:bg-neutral-800"
           >
             <UIcon name="i-heroicons-arrow-long-down" size="20" />
             <div class="flex flex-col text-base sm:text-sm">
@@ -123,9 +124,9 @@ const fourth = getTeamName(3)
         </div>
         <PageHeading>Regeln</PageHeading>
         <div
-          class="h-28 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
+          class="h-28 overflow-auto rounded-md border-neutral-200 bg-neutral-50 p-2 dark:border-neutral-800 dark:bg-neutral-800"
         >
-          <pre class="text text-wrap text-sm">{{ tournament?.rules }}</pre>
+          <pre class="text text-sm text-wrap">{{ tournament?.rules }}</pre>
         </div>
         <PageHeading>Preise</PageHeading>
         <div class="flex flex-col gap-1">
@@ -139,17 +140,17 @@ const fourth = getTeamName(3)
             {{ tournament?.prizes?.third ?? "Nichts" }}
           </TournamentPrizeRow>
           <div
-            class="h-20 overflow-auto rounded-md border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-800"
+            class="h-20 overflow-auto rounded-md border-neutral-200 bg-neutral-50 p-2 dark:border-neutral-800 dark:bg-neutral-800"
           >
             <!-- Keep this as one line or else there will be an unnecessary line -->
-            <pre class="text text-wrap text-sm">{{ bonus }}</pre>
+            <pre class="text text-sm text-wrap">{{ bonus }}</pre>
           </div>
         </div>
       </div>
 
       <div
         v-if="results && results.length"
-        class="mt-3 rounded-md border bg-white p-3 dark:border-gray-800 dark:bg-gray-900"
+        class="mt-3 rounded-md border bg-white p-3 dark:border-neutral-800 dark:bg-neutral-900"
       >
         <PageHeading>Gewinner</PageHeading>
         <TournamentPlaces
@@ -162,17 +163,17 @@ const fourth = getTeamName(3)
     </div>
 
     <div
-      class="mt-4 max-w-2xl rounded-md border bg-white p-3 dark:border-gray-800 dark:bg-gray-900"
+      class="mt-4 max-w-2xl rounded-md border bg-white p-3 dark:border-neutral-800 dark:bg-neutral-900"
     >
       <PageHeading>Visualisierung</PageHeading>
       <div
-        class="flex h-64 items-center justify-center rounded-md border bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
+        class="flex h-64 items-center justify-center rounded-md border bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900"
       >
         <ClientOnly>
           <LiveFlow :tournament-id="tournament?.id as string" />
           <template #fallback>
             <div
-              class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-800"
+              class="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-neutral-800"
             >
               <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
             </div>
@@ -182,12 +183,12 @@ const fourth = getTeamName(3)
     </div>
 
     <div
-      class="mt-4 max-w-2xl rounded-md border bg-white p-3 dark:border-gray-800 dark:bg-gray-900"
+      class="mt-4 max-w-2xl rounded-md border bg-white p-3 dark:border-neutral-800 dark:bg-neutral-900"
     >
       <PageHeading>Platzierungen</PageHeading>
       <USelect
         v-if="groups && groups.length"
-        :options="groups"
+        :items="groups"
         v-model="selectedGroup"
         size="lg"
         value-attribute="id"
@@ -208,11 +209,11 @@ const fourth = getTeamName(3)
     </div>
 
     <div
-      class="mt-4 max-w-2xl rounded-md border bg-white p-3 dark:border-gray-800 dark:bg-gray-900"
+      class="mt-4 max-w-2xl rounded-md border bg-white p-3 dark:border-neutral-800 dark:bg-neutral-900"
     >
       <PageHeading>Spielverlauf</PageHeading>
       <div
-        class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md border bg-gray-50 p-3 pb-8 dark:border-gray-800 dark:bg-gray-900"
+        class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md border bg-neutral-50 p-3 pb-8 dark:border-neutral-800 dark:bg-neutral-900"
       >
         <template v-if="history && history.length">
           <!-- @vue-ignore -->

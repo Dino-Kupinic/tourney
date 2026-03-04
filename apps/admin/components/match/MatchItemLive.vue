@@ -18,7 +18,9 @@ const now = useTimestamp({ immediate: true })
 
 const calculateElapsedTime = () => {
   if (!match.start_time) return
-  const [hours, minutes, seconds] = match.start_time.split(":").map(Number)
+  const [hours = 0, minutes = 0, seconds = 0] = match.start_time
+    .split(":")
+    .map(Number)
   const startDateTime = new Date()
   startDateTime.setHours(hours, minutes, seconds || 0, 0)
   const startTimeMs = startDateTime.getTime()
@@ -135,22 +137,22 @@ const completeMatch = async () => {
     </p>
     <p v-if="winner === null">Somit ein Unentschieden.</p>
   </ModalMatch>
-  <div class="rounded-md border border-gray-200 shadow-sm dark:border-gray-700">
+  <div
+    class="rounded-md border border-neutral-200 shadow-sm dark:border-neutral-700"
+  >
     <div
-      class="flex justify-between gap-0.5 rounded-t-md border-b border-gray-200 bg-gray-100 p-0.5 dark:border-gray-700 dark:bg-gray-800"
+      class="flex justify-between gap-0.5 rounded-t-md border-b border-neutral-200 bg-neutral-100 p-0.5 dark:border-neutral-700 dark:bg-neutral-800"
     >
       <div class="flex gap-0.5">
         <UBadge
           :label="match.round ?? 'Unbekannte Runde'"
-          color="fuchsia"
-          size="xs"
+          color="secondary"
           variant="subtle"
           block
         />
         <UBadge
           :label="match.start_time!"
-          color="white"
-          size="xs"
+          color="neutral"
           icon="i-heroicons-clock"
           block
         />
@@ -159,8 +161,7 @@ const completeMatch = async () => {
         <UBadge
           :label="formattedTime"
           icon="i-heroicons-clock"
-          color="white"
-          size="xs"
+          color="neutral"
           :trailing="false"
           class="w-[90px]"
           block
@@ -180,21 +181,25 @@ const completeMatch = async () => {
           />
           <div class="flex flex-col items-center justify-center">
             <p class="text-xs">{{ match.team1?.name }}</p>
-            <p class="text-xs text-gray-500">{{ match.team1?.group?.name }}</p>
+            <p class="text-xs text-neutral-500">
+              {{ match.team1?.group?.name }}
+            </p>
           </div>
           <div class="space-x-0.5">
             <UButton
-              :ui="{ rounded: 'rounded-full' }"
-              size="2xs"
-              color="gray"
+              class="rounded-full"
+              size="sm"
+              color="neutral"
+              variant="outline"
               square
               icon="i-heroicons-minus"
               @click="score1 > 0 ? score1-- : 0"
             />
             <UButton
-              :ui="{ rounded: 'rounded-full' }"
-              size="2xs"
-              color="gray"
+              class="rounded-full"
+              size="sm"
+              color="neutral"
+              variant="outline"
               square
               icon="i-heroicons-plus"
               @click="score1++"
@@ -217,21 +222,25 @@ const completeMatch = async () => {
           />
           <div class="flex flex-col items-center justify-center">
             <p class="text-xs">{{ match.team2?.name }}</p>
-            <p class="text-xs text-gray-500">{{ match.team2?.group?.name }}</p>
+            <p class="text-xs text-neutral-500">
+              {{ match.team2?.group?.name }}
+            </p>
           </div>
           <div class="space-x-0.5">
             <UButton
-              :ui="{ rounded: 'rounded-full' }"
-              size="2xs"
-              color="gray"
+              class="rounded-full"
+              size="sm"
+              color="neutral"
+              variant="outline"
               square
               icon="i-heroicons-minus"
               @click="score2 > 0 ? score2-- : 0"
             />
             <UButton
-              :ui="{ rounded: 'rounded-full' }"
-              size="2xs"
-              color="gray"
+              class="rounded-full"
+              size="sm"
+              color="neutral"
+              variant="outline"
               square
               icon="i-heroicons-plus"
               @click="score2++"
@@ -242,9 +251,9 @@ const completeMatch = async () => {
       <UButton
         icon="i-heroicons-hand-raised"
         variant="soft"
-        color="fuchsia"
+        color="secondary"
         label="Spiel beenden..."
-        size="2xs"
+        size="sm"
         @click="isOpenConfirm = true"
       />
     </div>

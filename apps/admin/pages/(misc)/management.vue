@@ -12,7 +12,7 @@ const years = Array.from(
   (_, i) =>
     `${new Date().getFullYear() + i - 1}/${(new Date().getFullYear() + i).toString().slice(2)}`,
 )
-const selectedYear = ref<string>(years[0])
+const selectedYear = ref<string>(years[0] ?? "")
 const encodedYear = computed(() => encodeURIComponent(selectedYear.value))
 
 watch(selectedYear, () => {
@@ -261,6 +261,13 @@ const onSubmitEdit = async () => {
 }
 
 const classIds = computed(() => selectedRows.value.map((row) => row.id))
+const onDeleteClick = (row?: ClassColumn) => {
+  if (row) {
+    selectedRows.value = [row]
+  }
+  isOpenDelete.value = true
+}
+
 const onDelete = async () => {
   try {
     await $fetch("/api/classes/delete", {
@@ -284,7 +291,7 @@ const onDelete = async () => {
   }
 }
 
-const { columns, items } = useClassTable(onEdit, onInfo, onDelete)
+const { columns, items } = useClassTable(onEdit, onInfo, onDeleteClick)
 const refresh = async () => {
   await refreshClasses()
   await refreshYearClasses()
@@ -301,33 +308,35 @@ const refresh = async () => {
       <SearchInput v-model="search" placeholder="Klasse suchen..." />
       <USelect
         v-model="selectedYear"
-        :options="years"
+        :items="years"
         placeholder="Schuljahr auswählen"
-        size="xs"
+        size="sm"
+        class="min-w-36"
       />
       <UButton
         icon="i-heroicons-arrow-path"
-        color="gray"
-        size="xs"
+        color="neutral"
+        variant="outline"
+        size="sm"
         square
         @click="refresh"
       />
       <UButton
-        size="xs"
+        size="sm"
         variant="soft"
         @click="isOpenCreate = true"
         label="Neue Klasse..."
       />
       <UButton
-        size="xs"
+        size="sm"
         variant="soft"
         @click="isOpenMultipleCreate = true"
         label="Mehrere Klassen..."
       />
       <UButton
         v-if="selectedRows.length > 1"
-        size="xs"
-        color="red"
+        size="sm"
+        color="error"
         variant="soft"
         @click="isOpenDelete = true"
         label="Löschen..."
@@ -338,19 +347,21 @@ const refresh = async () => {
         @create="onSubmitCreateSingle"
       >
         <div class="space-y-4">
-          <UFormGroup label="Schuljahr">
+          <UFormField label="Schuljahr">
             <USelect
               v-model="creationStateSingle.year"
-              :options="years"
+              :items="years"
               placeholder="Schuljahr auswählen"
+              size="sm"
+              class="w-full"
             />
-          </UFormGroup>
-          <UFormGroup label="Klassenname">
+          </UFormField>
+          <UFormField label="Klassenname">
             <UInput
               v-model="creationStateSingle.name"
               placeholder="z.B. 1AHITN"
             />
-          </UFormGroup>
+          </UFormField>
         </div>
       </ModalCreate>
 
@@ -361,14 +372,16 @@ const refresh = async () => {
       >
         <div class="space-y-4">
           <div class="flex items-center justify-between gap-3">
-            <UFormGroup label="Schuljahr" class="grow">
+            <UFormField label="Schuljahr" class="grow">
               <USelect
                 v-model="creationStateMultiple.year"
-                :options="years"
+                :items="years"
                 placeholder="Schuljahr auswählen"
+                size="sm"
+                class="w-full"
               />
-            </UFormGroup>
-            <UFormGroup label="Neue Klasse hinzufügen">
+            </UFormField>
+            <UFormField label="Neue Klasse hinzufügen">
               <div class="flex gap-2">
                 <UInput
                   v-model="customClassName"
@@ -381,29 +394,29 @@ const refresh = async () => {
                   @click="addCustomClass"
                 />
               </div>
-            </UFormGroup>
+            </UFormField>
           </div>
 
-          <UFormGroup label="Klassen">
+          <UFormField label="Klassen">
             <div
-              class="max-h-60 overflow-y-auto rounded border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+              class="max-h-60 overflow-y-auto rounded border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900"
             >
               <div
                 v-for="className in creationStateMultiple.classes"
                 :key="className"
-                class="group flex items-center justify-between border-b px-2 py-1 dark:border-gray-700"
+                class="group flex items-center justify-between border-b px-2 py-1 dark:border-neutral-700"
               >
                 <span>{{ className }}</span>
                 <UButton
                   icon="i-heroicons-x-mark"
-                  color="red"
+                  color="error"
                   variant="ghost"
-                  size="xs"
+                  size="sm"
                   @click="removeClass(className)"
                 />
               </div>
             </div>
-          </UFormGroup>
+          </UFormField>
         </div>
       </ModalCreate>
 
@@ -413,24 +426,27 @@ const refresh = async () => {
         @edit="onSubmitEdit"
       >
         <div class="space-y-4">
-          <UFormGroup label="Schuljahr">
+          <UFormField label="Schuljahr">
             <USelect
               v-model="editState.year"
-              :options="years"
+              :items="years"
               placeholder="Schuljahr auswählen"
+              size="sm"
+              class="w-full"
             />
-          </UFormGroup>
-          <UFormGroup label="Klassenname">
+          </UFormField>
+          <UFormField label="Klassenname">
             <UInput v-model="editState.name" placeholder="z.B. 10a" />
-          </UFormGroup>
+          </UFormField>
         </div>
       </ModalEdit>
 
       <ModalInfo v-model="isOpenInfo">
         <div class="space-y-4">
-          <pre class="overflow-auto rounded bg-gray-100 p-4 dark:bg-gray-800">{{
-            selectedClass
-          }}</pre>
+          <pre
+            class="overflow-auto rounded bg-neutral-100 p-4 dark:bg-neutral-800"
+            >{{ selectedClass }}</pre
+          >
         </div>
       </ModalInfo>
 
@@ -443,7 +459,7 @@ const refresh = async () => {
           </p>
           <UAlert
             icon="i-heroicons-exclamation-triangle"
-            color="red"
+            color="error"
             variant="soft"
             title="Achtung"
             description="Diese Aktion kann nicht rückgängig gemacht werden. Alle Verknüpfungen zu dieser Klasse werden ebenfalls gelöscht."
@@ -456,36 +472,30 @@ const refresh = async () => {
     <div class="h-full overflow-auto pb-1">
       <template v-if="yearClasses && yearClasses.length > 0">
         <UTable
-          :rows="filteredRows"
+          :data="filteredRows"
           :columns="columns"
-          :sort="{ column: 'name', direction: 'asc' }"
+          :sorting="[{ id: 'name', desc: false }]"
           :loading="status === 'pending'"
-          :loading-state="{
-            icon: 'i-heroicons-arrow-path-20-solid',
-            label: 'Lade...',
-          }"
-          class="h-full w-full bg-white dark:bg-gray-900"
+          class="h-full w-full bg-white dark:bg-neutral-900"
           :ui="{
-            wrapper: 'relative overflow-auto',
-            th: {
-              padding: 'px-4 py-3',
-            },
-            td: { base: 'max-w-[0] truncate', padding: 'py-2' },
+            root: 'relative overflow-auto',
+            th: 'px-4 py-3',
+            td: 'max-w-[0] truncate py-2',
           }"
-          v-model="selectedRows"
-          @select="select"
+          @select="(_, row) => select(row.original)"
         >
-          <template #actions-data="{ row }">
+          <template #actions-cell="{ row }">
             <div class="flex items-center gap-2">
-              <UDropdown :items="items(row).value" :ui="{ width: 'w-auto' }">
+              <UDropdownMenu :items="items(row.original).value">
                 <UButton
-                  color="gray"
+                  color="neutral"
                   variant="ghost"
                   icon="i-heroicons-ellipsis-horizontal-20-solid"
-                  size="2xs"
+                  size="sm"
                   square
+                  @click.stop
                 />
-              </UDropdown>
+              </UDropdownMenu>
             </div>
           </template>
           <template #empty-state>

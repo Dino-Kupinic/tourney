@@ -54,7 +54,7 @@ const fetchTeam = async () => {
   }
   associatedTeam.value = team
   tournament.value = tournaments.value?.find(
-    (t) => t.id === team?.tournament_id,
+    (t: any) => t.id === team?.tournament_id,
   )
 }
 
@@ -70,7 +70,7 @@ if (!logos.value) {
     message: "Logos nicht gefunden",
   })
 }
-const selectedLogo = ref<Tables<"logo"> | null>(logos.value[0])
+const selectedLogo = ref<Tables<"logo"> | null>(logos.value[0] ?? null)
 
 const url = computed(() =>
   selectedLogo.value?.id
@@ -194,24 +194,11 @@ const submit = async () => {
       title="Anmeldeformular"
       description="Trage dich hier ein für ein Turnier"
     />
-    <UCard
-      :ui="{
-        base: 'max-w-xl mb-3',
-        body: {
-          padding: 'p-4 sm:p-6',
-        },
-        header: {
-          padding: 'p-4 sm:p-6',
-        },
-        footer: {
-          padding: 'p-4 sm:p-6',
-        },
-      }"
-    >
+    <UCard class="mb-3 max-w-xl">
       <template #header>
         <div class="flex flex-col gap-3 text-base">
           <div
-            class="flex justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-800"
+            class="flex justify-between rounded-md bg-neutral-50 p-3 dark:bg-neutral-800"
           >
             <div class="flex grow-0 flex-col gap-1">
               <strong>Status</strong>
@@ -222,7 +209,8 @@ const submit = async () => {
                 icon="i-ic-round-question-mark"
                 size="md"
                 square
-                color="white"
+                color="neutral"
+                variant="outline"
                 @click="isOpen = true"
               />
               <StatusExplanationModal v-model="isOpen" />
@@ -240,11 +228,11 @@ const submit = async () => {
               </p>
             </RegistrationItem>
           </div>
-          <div class="rounded-md bg-gray-50 p-3 dark:bg-gray-800">
+          <div class="rounded-md bg-neutral-50 p-3 dark:bg-neutral-800">
             <USelectMenu
               v-model="tournament"
               :disabled="isFormLocked"
-              :options="tournaments ?? []"
+              :items="tournaments ?? []"
               placeholder="Wähle das Turnier"
               option-attribute="name"
               size="lg"
@@ -284,11 +272,11 @@ const submit = async () => {
                 {
                   'border-primary-500 shadow-[0_0px_60px_3px_rgba(29,78,216,0.4)]':
                     selectedLogo?.id === logo.id,
-                  'border-gray-200 dark:border-gray-700':
+                  'border-neutral-200 dark:border-neutral-700':
                     selectedLogo?.id !== logo.id,
                 },
               ]"
-              class="bg-white dark:bg-gray-900"
+              class="bg-white dark:bg-neutral-900"
             >
               <NuxtImg
                 width="48"
@@ -297,7 +285,7 @@ const submit = async () => {
                 class="dark:invert dark:filter"
               />
             </div>
-            <p class="mt-1 text-wrap text-center text-xs text-gray-500">
+            <p class="mt-1 text-center text-xs text-wrap text-neutral-500">
               {{ logo.name }}
             </p>
           </div>
@@ -320,11 +308,11 @@ const submit = async () => {
                   {
                     'border-primary-500 shadow-[0_0px_60px_3px_rgba(29,78,216,0.4)]':
                       selectedLogoVariant?.id === variant.id,
-                    'border-gray-200 dark:border-gray-700':
+                    'border-neutral-200 dark:border-neutral-700':
                       selectedLogoVariant?.id !== variant.id,
                   },
                 ]"
-                class="bg-white dark:bg-gray-900"
+                class="bg-white dark:bg-neutral-900"
               >
                 <NuxtImg
                   width="48"
@@ -332,7 +320,7 @@ const submit = async () => {
                   :src="getImageUrl(variant.image_path)"
                 />
               </div>
-              <p class="mt-1 text-wrap text-center text-xs text-gray-500">
+              <p class="mt-1 text-center text-xs text-wrap text-neutral-500">
                 {{ variant.color }}
               </p>
             </div>
@@ -343,7 +331,7 @@ const submit = async () => {
         </RegistrationItem>
         <UAlert
           icon="i-heroicons-exclamation-triangle"
-          color="yellow"
+          color="warning"
           variant="soft"
           class="my-3"
           title="Warnung"
@@ -362,7 +350,7 @@ const submit = async () => {
         <template v-if="isFormLocked && registration?.status === 'Abgesendet'">
           <UAlert
             icon="i-heroicons-exclamation-triangle"
-            color="yellow"
+            color="warning"
             variant="soft"
             class="my-3"
             title="Warnung"
@@ -375,7 +363,7 @@ const submit = async () => {
         >
           <UAlert
             icon="i-heroicons-check-circle"
-            color="green"
+            color="success"
             variant="soft"
             class="my-3"
             title="Erfolgreich"
@@ -387,7 +375,7 @@ const submit = async () => {
         >
           <UAlert
             icon="i-heroicons-x-circle"
-            color="red"
+            color="error"
             variant="soft"
             class="my-3"
             title="Abgelehnt"
@@ -419,7 +407,7 @@ const submit = async () => {
             </div>
             <UAlert
               icon="i-heroicons-information-circle"
-              color="blue"
+              color="info"
               variant="soft"
               title="Information"
               description="Die Anmeldung ist erst gültig, wenn das Formular abgegeben wurde."
@@ -441,17 +429,12 @@ const submit = async () => {
             label="Download"
             size="lg"
             variant="soft"
-            :ui="{
-              gap: {
-                lg: 'gap-x-2',
-              },
-            }"
             icon="i-heroicons-document-arrow-down"
             @click="generatePDF"
           />
           <UAlert
             icon="i-heroicons-exclamation-circle"
-            color="red"
+            color="error"
             variant="soft"
             title="Probleme beim Runterladen?"
             description="Versuche es mit einem anderen Browser oder Gerät. Ansonsten wende dich

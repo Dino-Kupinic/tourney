@@ -2,13 +2,21 @@
 export default defineNuxtConfig({
   extends: ["../../packages/core"],
   compatibilityDate: "2025-07-28",
-  modules: ["@vueuse/nuxt", "@nuxtjs/supabase", "@nuxt/content"],
+  modules: ["@vueuse/nuxt"],
   devtools: { enabled: true },
+  vite: {
+    optimizeDeps: {
+      include: [
+        "@nuxt/ui > prosemirror-state",
+        "@nuxt/ui > prosemirror-transform",
+        "@nuxt/ui > prosemirror-model",
+        "@nuxt/ui > prosemirror-view",
+        "@nuxt/ui > prosemirror-gapcursor",
+      ],
+    },
+  },
   devServer: {
     port: 3000,
-  },
-  nitro: {
-    preset: "bun",
   },
   components: [
     {
@@ -19,11 +27,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       clientUrl: "",
-    },
-  },
-  content: {
-    markdown: {
-      anchorLinks: false,
+      docsUrl: "https://tourney.htl-steyr.ac.at/docs",
     },
   },
 })

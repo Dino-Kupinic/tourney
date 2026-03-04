@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import type { ButtonSize } from "#ui/types"
-
 const { size = "lg" } = defineProps<{
-  size: ButtonSize
+  size?: "xs" | "sm" | "md" | "lg" | "xl"
 }>()
 </script>
 
 <template>
   <UButton
     variant="solid"
-    color="white"
+    color="neutral"
     to="/settings"
     :size="size"
     square

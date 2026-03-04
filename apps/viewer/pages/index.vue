@@ -6,13 +6,13 @@ useHead({
 
 <template>
   <div
-    class="m-auto flex h-dvh max-w-[768px] flex-col items-center justify-between pb-32 pt-16 dark:bg-gray-900"
+    class="m-auto flex h-dvh max-w-[768px] flex-col items-center justify-between pt-16 pb-32 dark:bg-neutral-900"
   >
     <div>
       <div class="w-[280px]">
         <Logo class="m-auto mb-8 h-16 w-16" />
         <PageTitle class="mb-2">Willkommen bei Tourney</PageTitle>
-        <p class="text text-wrap text-sm tracking-wide text-gray-500">
+        <p class="text text-sm tracking-wide text-wrap text-neutral-500">
           Verfolge das Fußball-, Volleyball- und Basketballturnier der HTL Steyr
           live auf deinem Handy oder Laptop.
         </p>
@@ -40,19 +40,11 @@ useHead({
           size="xl"
           variant="soft"
           to="/tournaments"
-          :ui="{
-            rounded: 'rounded-xl',
-            padding: {
-              xl: 'px-8 py-3',
-            },
-            variant: {
-              soft: 'bg-{color}-100 hover:bg-{color}-200',
-            },
-          }"
+          class="rounded-xl px-8 py-3"
         />
       </div>
     </div>
-    <div class="text text-sm tracking-wide text-gray-500">
+    <div class="text text-sm tracking-wide text-neutral-500">
       <p>Entwickelt von Dino Kupinic</p>
       <p>Projekt betreut von Prof. Mag. Peter Rathgeb</p>
       <br />

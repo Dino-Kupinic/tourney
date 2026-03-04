@@ -6,25 +6,23 @@ defineProps<{
 
 <template>
   <UBadge
-    size="md"
     v-if="status === 'Ausstehend'"
     :label="status"
-    color="yellow"
-    variant="subtle"
+    color="neutral"
+    variant="outline"
+    class="!bg-white !text-neutral-700 ring-1 ring-neutral-200 dark:!bg-neutral-950 dark:!text-neutral-200 dark:ring-neutral-800"
   />
   <UBadge
-    size="md"
     v-else-if="status === 'Abgesendet'"
     :label="status"
-    color="orange"
+    color="warning"
     variant="subtle"
   />
   <UBadge
-    size="md"
     v-else-if="status === 'Abgeschlossen'"
     :label="status"
-    color="green"
+    color="success"
     variant="subtle"
   />
-  <UBadge size="md" v-else :label="status" color="red" variant="subtle" />
+  <UBadge v-else :label="status" color="error" variant="subtle" />
 </template>

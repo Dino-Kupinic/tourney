@@ -3,13 +3,7 @@ export default defineNuxtConfig({
   extends: ["../../packages/core"],
   compatibilityDate: "2025-07-28",
   devtools: { enabled: true },
-  modules: [
-    "@nuxtjs/device",
-    "@vueuse/nuxt",
-    "@nuxtjs/supabase",
-    "@vite-pwa/nuxt",
-    "@nuxt/content",
-  ],
+  modules: ["@nuxtjs/device", "@vueuse/nuxt", "@vite-pwa/nuxt"],
   supabase: {
     redirect: false,
   },
@@ -20,7 +14,6 @@ export default defineNuxtConfig({
         dir: "./templates",
       },
     ],
-    preset: "bun",
   },
   devServer: {
     port: 3001,
@@ -31,11 +24,6 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
-  content: {
-    markdown: {
-      anchorLinks: false,
-    },
-  },
   pwa: {
     manifest: {
       name: "tourney",
@@ -72,4 +60,4 @@ export default defineNuxtConfig({
       ],
     },
   },
-})
+} as any)

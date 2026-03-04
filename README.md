@@ -87,7 +87,7 @@ Copy the content into your `.env` and replace the following fields with your own
 | ------------------------ | ------------------------------------------------------ |
 | `SUPABASE_URL`           | URL to Supabase API                                    |
 | `SUPABASE_KEY`           | Anon key                                               |
-| `SUPABASE_SERVICE_KEY`   | Service Role Key                                       |
+| `SUPABASE_SECRET_KEY`    | Secret key (service-level key)                         |
 | `NUXT_PUBLIC_CLIENT_URL` | URL of the viewer app, default `http://localhost:3001` |
 
 2. run dev server
@@ -127,11 +127,11 @@ If it works, great!
 
 Create a `.env` file and checkout the `.env.example`. Copy the content into your `.env` and replace the following fields
 
-| Field             | Description                   |
-| ----------------- | ----------------------------- |
-| `SUPABASE_URL`    | URL to Supabase API           |
-| `SUPABASE_KEY`    | Anon key                      |
-| `USERS_TO_CREATE` | See comment in `.env.example` |
+| Field                 | Description                    |
+| --------------------- | ------------------------------ |
+| `SUPABASE_URL`        | URL to Supabase API            |
+| `SUPABASE_SECRET_KEY` | Secret key (service-level key) |
+| `USERS_TO_CREATE`     | See comment in `.env.example`  |
 
 2. run the script
 
@@ -140,36 +140,6 @@ bun run create:users
 ```
 
 If it works, great! You can now log in in the admin dashboard with the created users.
-
-## 🚀 Deployment
-
-1. build the app
-
-```bash
-bun run build
-```
-
-> [!CAUTION]
-> The following section will be deprecated in the future!
-
-2. start the app
-
-```bash
-bun run app:start
-```
-
-> [!TIP]
-> Didn't work?
-> Try installing pm2 globally with `npm install pm2 -g`.
-> For npm you need to install Node.js.
-
-3. monitor the app
-
-```bash
-bun run app:monitor
-```
-
-4. enjoy the app!
 
 ## 😄 Authors
 
@@ -183,10 +153,9 @@ bun run app:monitor
 
 ## 🛠️ Tech Stack
 
-- Nuxt 3
+- Nuxt 4
 - Supabase
 - Docker
-- pm2
 
 ## Contributing
 

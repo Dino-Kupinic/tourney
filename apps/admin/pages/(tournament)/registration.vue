@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { z } from "zod"
+import type { RowSelectionState } from "@tanstack/vue-table"
 import type {
   Enums,
   Link,
@@ -28,18 +29,46 @@ const { data, status, refresh } = await useFetch("/api/registrations", {
   },
 })
 
-const selectedRows = ref<RegistrationColumn[]>([])
-function select(row: RegistrationColumn) {
-  const index = selectedRows.value.findIndex((item) => item.id === row.id)
-  if (index === -1) {
-    selectedRows.value.push(row)
-  } else {
-    selectedRows.value.splice(index, 1)
-  }
-}
-
 const search = ref<string>("")
 const tableData = computed(() => data.value || [])
+const rowSelection = ref<RowSelectionState>({})
+const selectedRows = computed(() =>
+  tableData.value.filter((row) => Boolean(rowSelection.value[row.id])),
+)
+
+async function copyTextToClipboard(text: string) {
+  if (!import.meta.client) {
+    return false
+  }
+
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text)
+    return true
+  }
+
+  const textarea = document.createElement("textarea")
+  textarea.value = text
+  textarea.setAttribute("readonly", "")
+  textarea.style.position = "absolute"
+  textarea.style.left = "-9999px"
+  document.body.appendChild(textarea)
+
+  const selection = document.getSelection()
+  const previousRange =
+    selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null
+
+  textarea.select()
+  const copied = document.execCommand("copy")
+  document.body.removeChild(textarea)
+
+  if (selection && previousRange) {
+    selection.removeAllRanges()
+    selection.addRange(previousRange)
+  }
+
+  return copied
+}
+
 const filteredRows = computed(() => {
   if (!search.value) {
     return tableData.value
@@ -51,7 +80,7 @@ const filteredRows = computed(() => {
   })
 })
 
-const sort = ref({ column: "status", direction: "asc" as const })
+const sort = ref([{ id: "status", desc: false }])
 
 const isOpenDelete = ref<boolean>(false)
 const isOpenEdit = ref<boolean>(false)
@@ -64,7 +93,7 @@ const years = Array.from(
   (_, i) =>
     `${new Date().getFullYear() + i - 1}/${(new Date().getFullYear() + i).toString().slice(2)}`,
 )
-const classYear = ref<string>(years[0])
+const classYear = ref<string>(years[0] ?? "")
 const encodedYear = computed(() => encodeURIComponent(classYear.value))
 
 const { data: classes } = await useFetch<
@@ -157,7 +186,7 @@ const onDelete = async () => {
       body: registrationIds.value,
     })
     isOpenDelete.value = false
-    selectedRows.value = []
+    rowSelection.value = {}
     await refresh()
     displaySuccessNotification(
       "Anmeldungen gelöscht",
@@ -187,7 +216,7 @@ const onUpdate = async (status: Enums<"registration_status">) => {
       method: "PUT",
       body: { registrations: registrationIds.value, status: status },
     })
-    selectedRows.value = []
+    rowSelection.value = {}
     await refresh()
     displaySuccessNotification(
       "Anmeldungen aktualisiert",
@@ -206,18 +235,14 @@ const onUpdate = async (status: Enums<"registration_status">) => {
 const config = useRuntimeConfig()
 const onCopyLink = async (row: RegistrationColumn) => {
   const source: string = `${config.public.clientUrl}/registrations/${row.id}`
-  const { text, copy, copied, isSupported } = useClipboard({
-    source,
-    legacy: true,
-  })
-  await copy()
-  let description = text.value
-  if (!isSupported.value) {
-    description = "Ihr Browser unterstützt das Kopieren nicht."
-  }
-  copied.value
-    ? displaySuccessNotification("Link kopiert", description)
-    : displayFailureNotification("Fehler beim Kopieren", description)
+  const copied = await copyTextToClipboard(source)
+
+  copied
+    ? displaySuccessNotification("Link kopiert", source)
+    : displayFailureNotification(
+        "Fehler beim Kopieren",
+        "Ihr Browser unterstützt das Kopieren nicht.",
+      )
 }
 
 const editSchema = z.object({
@@ -308,26 +333,27 @@ const generateLinks = () => {
 
 const onCopyEmail = async (classLinks: { links: Link[]; sent: boolean }) => {
   let source: string
-  const links = classLinks.links
+  const linkText = classLinks.links
     .map((link) => `${link.name}\n${link.url}`)
     .join("\n\n")
   if (linksState.active) {
-    source = `${linksState.beginning}\n\n${links}\n\n${linksState.end}`
+    source =
+      `${linksState.beginning}\n\n${linkText}\n\n${linksState.end}`.trim()
   } else {
-    source = links
+    source = linkText
   }
-  const { text, copy, copied, isSupported } = useClipboard({
-    source,
-    legacy: true,
-  })
-  await copy()
-  let description = text.value.slice(0, 150) + "\n... (Nachricht gekürzt)"
-  if (!isSupported.value) {
-    description = "Ihr Browser unterstützt das Kopieren nicht."
-  }
-  copied.value
+  const copied = await copyTextToClipboard(source)
+  const description =
+    source.length > 150
+      ? `${source.slice(0, 150)}\n... (Nachricht gekürzt)`
+      : source
+
+  copied
     ? displaySuccessNotification("E-Mail kopiert", description)
-    : displayFailureNotification("Fehler beim Kopieren", description)
+    : displayFailureNotification(
+        "Fehler beim Kopieren",
+        "Ihr Browser unterstützt das Kopieren nicht.",
+      )
 }
 
 const refreshTable = () => {
@@ -343,17 +369,10 @@ const { items, actions, columns, tabItems } = useRegistrationTable(
   onDelete,
 )
 
-const selectedColumns = ref(columns)
-const columnsTable = computed(() =>
-  columns.filter((column) => selectedColumns.value.includes(column)),
-)
+const columnVisibility = ref({})
 
 type TabKey = "multiple" | "single"
-const currentTab = ref<TabKey>(tabItems[0].key as TabKey)
-function onChange(index: number) {
-  const item = tabItems[index]
-  currentTab.value = item.key as TabKey
-}
+const currentTab = ref<TabKey>((tabItems[0]?.key as TabKey) ?? "multiple")
 
 const onSubmitCreate = async () => {
   if (currentTab.value === "multiple") {
@@ -382,181 +401,201 @@ const onSubmitCreate = async () => {
           @click="isOpenDelete = true"
           icon="i-heroicons-trash"
           variant="soft"
-          color="red"
-          size="xs"
+          color="error"
+          size="sm"
           label="Löschen..."
         />
         <UButton
           label="Links exportieren"
           icon="i-heroicons-arrow-up-on-square"
           @click="generateLinks"
-          color="gray"
-          size="xs"
+          color="neutral"
+          variant="outline"
+          size="sm"
         />
       </template>
 
-      <UDropdown
-        v-if="selectedRows.length > 0"
-        :items="actions"
-        :ui="{ width: 'w-40', item: { padding: 'p-1' } }"
-      >
+      <UDropdownMenu v-if="selectedRows.length > 0" :items="actions">
         <UButton
           icon="i-heroicons-chevron-down"
           trailing
-          color="gray"
-          size="xs"
+          color="neutral"
+          variant="outline"
+          size="sm"
           label="Markieren als"
         />
-      </UDropdown>
+      </UDropdownMenu>
 
-      <ColumnsDropdown :columns="columns" v-model="selectedColumns" />
+      <ColumnsDropdown :columns="columns" v-model="columnVisibility" />
 
       <UButton
         icon="i-heroicons-arrow-path"
-        color="gray"
-        size="xs"
+        variant="outline"
+        color="neutral"
+        size="sm"
         square
         @click="refreshTable"
       />
 
       <UButton
-        size="xs"
         variant="soft"
+        size="sm"
         @click="isOpenCreate = true"
         label="Neue Anmeldung..."
       />
 
       <!-- Link Modal -->
       <UModal
-        v-model="isOpenLinks"
-        :ui="{ width: 'w-full sm:max-w-5xl' }"
+        v-model:open="isOpenLinks"
+        :ui="{ content: 'w-full overflow-hidden sm:max-w-5xl sm:max-h-[90vh]' }"
         prevent-close
       >
-        <UCard
-          :ui="{
-            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-            body: {
-              padding: 'px-4 py-5 sm:p-6',
-            },
-            header: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-            footer: {
-              padding: 'px-4 py-3 sm:px-6',
-            },
-          }"
-        >
-          <template #header>
-            <strong> Export </strong>
-          </template>
+        <template #content>
+          <UCard
+            :ui="{
+              root: 'flex max-h-[90vh] flex-col divide-y divide-neutral-100 overflow-hidden dark:divide-neutral-800',
+              body: 'flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-5 sm:p-6',
+              header: 'px-4 py-3 sm:px-6',
+              footer: 'px-4 py-3 sm:px-6',
+            }"
+          >
+            <template #header>
+              <strong> Export </strong>
+            </template>
 
-          <strong>Anleitung</strong>
-          <p>
-            Die ausgewählten Anmeldungen wurden nach Klasse gruppiert. Kopieren
-            Sie den Textinhalt pro Klasse und verschicken Sie diesen per Mail an
-            die Klassenmail (z.b. <code>1ahitn@htl-steyr.ac.at</code> ).
-          </p>
-          <div class="mt-3 flex gap-3">
-            <div class="flex grow flex-col gap-1">
-              <strong>Klassenlinks</strong>
-              <ul
-                class="h-96 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
-              >
-                <li
-                  v-for="[className, classLinks] in Object.entries(links)"
-                  :key="className"
-                  class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
-                >
-                  <div class="my-3 flex w-full flex-col gap-3">
-                    <div class="flex items-center gap-2">
-                      <strong class="text-lg">{{ className }}</strong>
-                      <UIcon
-                        v-if="classLinks.sent"
-                        name="i-heroicons-check-circle"
-                        class="text-green-500"
-                        size="24"
-                      />
-                    </div>
-                    <ul
-                      class="space-y-1 rounded-md bg-gray-100 p-3 shadow-sm dark:bg-gray-800"
-                    >
-                      <li v-for="link in classLinks.links" :key="link.url">
-                        <p class="text-xs">{{ link.name }}</p>
-                        <code class="text-xs">{{ link.url }}</code>
-                      </li>
-                    </ul>
-                    <div class="flex justify-between">
-                      <UButton
-                        variant="soft"
-                        size="xs"
-                        icon="i-heroicons-clipboard-document-check"
-                        label="Kopieren"
-                        @click="onCopyEmail(classLinks)"
-                      />
-                      <UButton
-                        variant="soft"
-                        color="green"
-                        size="xs"
-                        icon="i-heroicons-check"
-                        label="Abgesendet"
-                        @click="classLinks.sent = !classLinks.sent"
-                      />
-                    </div>
-                  </div>
-                </li>
-              </ul>
+            <div class="space-y-1">
+              <strong>Anleitung</strong>
+              <p>
+                Die ausgewählten Anmeldungen wurden nach Klasse gruppiert.
+                Kopieren Sie den Textinhalt pro Klasse und verschicken Sie
+                diesen per Mail an die Klassenmail (z.b.
+                <code>1ahitn@htl-steyr.ac.at</code> ).
+              </p>
             </div>
-            <div class="flex flex-col gap-1">
-              <strong>Einstellungen</strong>
-              <div
-                class="h-full w-80 rounded-md border border-gray-200 p-3 shadow-sm dark:border-gray-800"
-              >
-                <UForm
-                  :state="linksState"
-                  :schema="linksSchema"
-                  class="space-y-2"
+            <div
+              class="mt-3 grid min-h-0 flex-1 gap-3 overflow-hidden lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]"
+            >
+              <div class="flex min-h-0 flex-col gap-1 overflow-hidden">
+                <strong>Klassenlinks</strong>
+                <div
+                  class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-neutral-200 shadow-sm dark:border-neutral-800"
                 >
-                  <UFormGroup
-                    label="Aktivieren"
-                    :ui="{
-                      wrapper:
-                        'flex items-center justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-800 gap-3',
-                    }"
+                  <ul class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                    <li
+                      v-for="[className, classLinks] in Object.entries(links)"
+                      :key="className"
+                      class="border-b border-neutral-200 p-4 last:border-b-0 dark:border-neutral-800"
+                    >
+                      <div class="flex w-full flex-col gap-3">
+                        <div class="flex items-center gap-2">
+                          <strong class="text-lg">{{ className }}</strong>
+                          <UIcon
+                            v-if="classLinks.sent"
+                            name="i-heroicons-check-circle"
+                            class="text-green-500"
+                            size="24"
+                          />
+                        </div>
+                        <ul
+                          class="space-y-1 rounded-md bg-neutral-100 p-3 shadow-sm dark:bg-neutral-800"
+                        >
+                          <li
+                            v-for="link in classLinks.links"
+                            :key="link.url"
+                            class="min-w-0"
+                          >
+                            <p class="truncate text-xs">{{ link.name }}</p>
+                            <code class="block overflow-x-auto text-xs">{{
+                              link.url
+                            }}</code>
+                          </li>
+                        </ul>
+                        <div class="flex items-center justify-between gap-3">
+                          <UButton
+                            color="neutral"
+                            variant="outline"
+                            size="sm"
+                            icon="i-heroicons-clipboard-document-check"
+                            label="Kopieren"
+                            @click="onCopyEmail(classLinks)"
+                          />
+                          <UButton
+                            variant="soft"
+                            color="success"
+                            size="sm"
+                            icon="i-heroicons-check"
+                            label="Abgesendet"
+                            @click="classLinks.sent = !classLinks.sent"
+                          />
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="flex min-h-0 flex-col gap-1">
+                <strong>Einstellungen</strong>
+                <div
+                  class="flex h-full min-h-0 flex-col overflow-y-auto rounded-md border border-neutral-200 p-3 shadow-sm dark:border-neutral-800"
+                >
+                  <UForm
+                    :state="linksState"
+                    :schema="linksSchema"
+                    class="flex h-full min-h-0 flex-col space-y-3"
                   >
-                    <UToggle v-model="linksState.active" />
-                  </UFormGroup>
-                  <UFormGroup label="Einleitungstext">
-                    <UTextarea
-                      placeholder="Liebe Schülerinnen und Schüler, ..."
-                      color="gray"
-                      :rows="6"
-                      v-model="linksState.beginning"
-                      :disabled="!linksState.active"
-                    />
-                  </UFormGroup>
-                  <UFormGroup label="Abschlusstext">
-                    <UTextarea
-                      placeholder="Mit freundlichen Grüßen"
-                      color="gray"
-                      :rows="5"
-                      v-model="linksState.end"
-                      :disabled="!linksState.active"
-                    />
-                  </UFormGroup>
-                </UForm>
+                    <div
+                      class="flex items-start justify-between gap-3 rounded-md bg-neutral-50 p-3 dark:bg-neutral-800"
+                    >
+                      <div class="min-w-0">
+                        <p
+                          class="text-sm font-medium text-neutral-900 dark:text-white"
+                        >
+                          Aktivieren
+                        </p>
+                        <p
+                          class="text-xs text-neutral-500 dark:text-neutral-400"
+                        >
+                          Fügt Einleitung und Abschlusstext zur Nachricht hinzu.
+                        </p>
+                      </div>
+                      <USwitch v-model="linksState.active" class="shrink-0" />
+                    </div>
+                    <UFormField label="Einleitungstext">
+                      <UTextarea
+                        placeholder="Liebe Schülerinnen und Schüler, ..."
+                        color="neutral"
+                        :rows="6"
+                        v-model="linksState.beginning"
+                        :disabled="!linksState.active"
+                        class="w-full"
+                      />
+                    </UFormField>
+                    <UFormField label="Abschlusstext">
+                      <UTextarea
+                        placeholder="Mit freundlichen Grüßen"
+                        color="neutral"
+                        :rows="5"
+                        v-model="linksState.end"
+                        :disabled="!linksState.active"
+                        class="w-full"
+                      />
+                    </UFormField>
+                  </UForm>
+                </div>
               </div>
             </div>
-          </div>
 
-          <template #footer>
-            <UButton
-              color="gray"
-              size="xs"
-              @click="isOpenLinks = false"
-              label="Fertig"
-            />
-          </template>
-        </UCard>
+            <template #footer>
+              <UButton
+                color="neutral"
+                variant="outline"
+                size="sm"
+                @click="isOpenLinks = false"
+                label="Fertig"
+              />
+            </template>
+          </UCard>
+        </template>
       </UModal>
 
       <ModalCreate
@@ -566,19 +605,12 @@ const onSubmitCreate = async () => {
         modal-width="sm:max-w-md"
       >
         <UTabs
+          v-model="currentTab"
           :items="tabItems"
+          value-key="key"
           class="w-full"
-          @change="onChange"
-          :ui="{ list: { tab: { height: 'h-7' }, height: 'h-9' } }"
+          :ui="{ list: 'h-9', trigger: 'h-7' }"
         >
-          <template #icon="{ item, selected }">
-            <UIcon
-              :name="item.icon"
-              class="me-2 h-4 w-4 flex-shrink-0"
-              :class="[selected && 'text-primary-500 dark:text-primary-400']"
-            />
-          </template>
-
           <template #multiple="{ item }">
             <UForm
               :schema="creationSchemaMultiple"
@@ -586,29 +618,33 @@ const onSubmitCreate = async () => {
               class="space-y-4 pt-2"
               @submit="onSubmitCreateMultiple"
             >
-              <UFormGroup
+              <UFormField
                 label="Teams"
                 name="teams"
                 description="Anzahl an Anmeldungen für jede Klasse."
                 required
               >
-                <UInput v-model="creationStateMultiple.teams" type="number" />
-              </UFormGroup>
+                <UInput
+                  v-model="creationStateMultiple.teams"
+                  type="number"
+                  class="w-full"
+                />
+              </UFormField>
 
-              <UFormGroup
+              <UFormField
                 label="Klassen"
                 name="classes"
                 class="grow"
                 description="Für diese Klassen wird ein Link generiert."
               >
                 <ul
-                  class="h-40 w-full overflow-y-scroll rounded-md border border-gray-200 shadow-sm dark:border-gray-800"
+                  class="h-40 w-full overflow-y-scroll rounded-md border border-neutral-200 shadow-sm dark:border-neutral-800"
                 >
                   <template v-if="classes?.length">
                     <li
                       v-for="schoolClass in classes"
                       :key="schoolClass.name"
-                      class="flex justify-between border-b border-gray-200 p-2 px-4 dark:border-gray-800"
+                      class="flex justify-between border-b border-neutral-200 p-2 px-4 dark:border-neutral-800"
                     >
                       <p>{{ schoolClass.name }}</p>
                       <p>{{ schoolClass.year }}</p>
@@ -616,19 +652,19 @@ const onSubmitCreate = async () => {
                   </template>
                   <template v-else>
                     <div class="flex h-full w-full items-center justify-center">
-                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                      <p class="text-sm text-neutral-500 dark:text-neutral-400">
                         Keine Klassen für {{ classYear }} gefunden.
                       </p>
                     </div>
                   </template>
                 </ul>
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Datensatz">
-                <USelect v-model="classYear" :options="years" />
-              </UFormGroup>
+              <UFormField label="Datensatz">
+                <USelect v-model="classYear" :items="years" class="w-full" />
+              </UFormField>
 
-              <UFormGroup
+              <UFormField
                 label="Ablaufdatum"
                 name="date"
                 description="An diesem Datum werden die Anmeldungen automatisch geschlossen."
@@ -637,27 +673,28 @@ const onSubmitCreate = async () => {
                 <UInput
                   v-model="creationStateMultiple.expire_date"
                   type="date"
+                  class="w-full"
                 />
-              </UFormGroup>
+              </UFormField>
             </UForm>
           </template>
           <template #single="{ item }">
             <UForm
               :schema="creationSchemaSingle"
-              :state="creationSchemaSingle"
+              :state="creationStateSingle"
               class="space-y-4 pt-2"
               @submit="onSubmitCreateSingle"
             >
-              <UFormGroup
+              <UFormField
                 label="Name"
                 name="name"
                 description="Der Name der Anmeldung."
                 required
               >
-                <UInput v-model="creationStateSingle.name" />
-              </UFormGroup>
+                <UInput v-model="creationStateSingle.name" class="w-full" />
+              </UFormField>
 
-              <UFormGroup
+              <UFormField
                 label="Klasse"
                 name="class"
                 description="Die Klasse der Anmeldung."
@@ -666,35 +703,49 @@ const onSubmitCreate = async () => {
                 <USelectMenu
                   v-model="creationStateSingle.schoolClass"
                   placeholder="Klasse auswählen"
-                  :options="classes ?? []"
+                  :items="classes ?? []"
                   option-attribute="name"
+                  class="w-full"
                 />
-              </UFormGroup>
+              </UFormField>
 
-              <UFormGroup label="Datensatz">
-                <USelect v-model="classYear" :options="years" />
-              </UFormGroup>
+              <UFormField label="Datensatz">
+                <USelect v-model="classYear" :items="years" class="w-full" />
+              </UFormField>
 
-              <UFormGroup
+              <UFormField
                 label="Ablaufdatum"
                 name="date"
                 description="An diesem Datum wird die Anmeldung automatisch geschlossen."
                 required
               >
-                <UInput v-model="creationStateSingle.expire_date" type="date" />
-              </UFormGroup>
+                <UInput
+                  v-model="creationStateSingle.expire_date"
+                  type="date"
+                  class="w-full"
+                />
+              </UFormField>
 
-              <UFormGroup
-                label="Klassenmischung erlauben"
-                name="allow_class_mixing"
-                description="Schüler können sich in anderen Klassen anmelden."
-                :ui="{
-                  wrapper:
-                    'flex items-center justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-800 gap-3',
-                }"
-              >
-                <UToggle v-model="creationStateSingle.allow_class_mixing" />
-              </UFormGroup>
+              <UFormField name="allow_class_mixing">
+                <div
+                  class="flex items-start justify-between gap-3 rounded-md bg-neutral-50 p-3 dark:bg-neutral-800"
+                >
+                  <div class="min-w-0">
+                    <p
+                      class="text-sm font-medium text-neutral-900 dark:text-white"
+                    >
+                      Klassenmischung erlauben
+                    </p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                      Schüler können sich in anderen Klassen anmelden.
+                    </p>
+                  </div>
+                  <USwitch
+                    v-model="creationStateSingle.allow_class_mixing"
+                    class="shrink-0"
+                  />
+                </div>
+              </UFormField>
             </UForm>
           </template>
         </UTabs>
@@ -711,25 +762,36 @@ const onSubmitCreate = async () => {
           class="space-y-4"
           @submit="onSubmitEdit"
         >
-          <UFormGroup
+          <UFormField
             label="Ablaufdatum"
             name="date"
             description="An diesem Datum wird die Anmeldung automatisch geschlossen."
           >
-            <UInput v-model="editState.expire_date" type="date" />
-          </UFormGroup>
+            <UInput
+              v-model="editState.expire_date"
+              type="date"
+              class="w-full"
+            />
+          </UFormField>
 
-          <UFormGroup
-            label="Klassenmischung erlauben"
-            name="allow_class_mixing"
-            description="Schüler können sich in anderen Klassen anmelden."
-            :ui="{
-              wrapper:
-                'flex items-center justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-800 gap-3',
-            }"
-          >
-            <UToggle v-model="editState.allow_class_mixing" />
-          </UFormGroup>
+          <UFormField name="allow_class_mixing">
+            <div
+              class="flex items-start justify-between gap-3 rounded-md bg-neutral-50 p-3 dark:bg-neutral-800"
+            >
+              <div class="min-w-0">
+                <p class="text-sm font-medium text-neutral-900 dark:text-white">
+                  Klassenmischung erlauben
+                </p>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                  Schüler können sich in anderen Klassen anmelden.
+                </p>
+              </div>
+              <USwitch
+                v-model="editState.allow_class_mixing"
+                class="shrink-0"
+              />
+            </div>
+          </UFormField>
         </UForm>
       </ModalEdit>
 
@@ -740,63 +802,84 @@ const onSubmitCreate = async () => {
   </BasePageHeader>
   <BasePageContent>
     <UTable
-      v-model="selectedRows"
-      v-model:sort="sort"
-      :rows="filteredRows"
-      :columns="columnsTable"
+      v-model:sorting="sort"
+      v-model:row-selection="rowSelection"
+      v-model:column-visibility="columnVisibility"
+      sticky="header"
+      :data="filteredRows"
+      :columns="columns"
+      :get-row-id="(row) => row.id"
+      :enable-row-selection="true"
       :loading="status === 'pending'"
-      :loading-state="{
-        icon: 'i-heroicons-arrow-path-20-solid',
-        label: 'Lade...',
-      }"
-      class="h-full w-full bg-white dark:bg-gray-900"
-      :ui="{
-        wrapper: 'relative overflow-auto',
-        th: {
-          padding: 'px-4 py-3',
+      class="h-full w-full bg-white dark:bg-neutral-900"
+      :meta="{
+        class: {
+          tr: (row) =>
+            row.getIsSelected()
+              ? 'cursor-pointer bg-neutral-50 dark:bg-neutral-800/40'
+              : 'cursor-pointer',
         },
-        td: { base: 'max-w-[0] truncate', padding: 'py-2' },
       }"
-      @select="select"
+      :ui="{
+        root: 'relative overflow-auto',
+        th: 'px-4 py-3',
+        td: 'max-w-[0] truncate py-2',
+      }"
+      @select="(_, row) => row.toggleSelected()"
     >
-      <template #status-data="{ row }">
+      <template #select-header="{ table }">
+        <UCheckbox
+          class="ml-2"
+          :model-value="
+            table.getIsSomePageRowsSelected()
+              ? 'indeterminate'
+              : table.getIsAllPageRowsSelected()
+          "
+          @update:model-value="table.toggleAllPageRowsSelected(!!$event)"
+        />
+      </template>
+
+      <template #select-cell="{ row }">
+        <UCheckbox
+          class="ml-2"
+          :model-value="row.getIsSelected()"
+          @click.stop
+          @update:model-value="row.toggleSelected(!!$event)"
+        />
+      </template>
+
+      <template #status-cell="{ row }">
         <UBadge
-          size="xs"
-          v-if="row.status === 'Ausstehend'"
+          v-if="row.original.status === 'Ausstehend'"
           label="Ausstehend"
-          color="yellow"
+          color="neutral"
           variant="subtle"
         />
         <UBadge
-          size="xs"
-          v-else-if="row.status === 'Abgesendet'"
+          v-else-if="row.original.status === 'Abgesendet'"
           label="Abgesendet"
-          color="orange"
+          color="warning"
           variant="subtle"
         />
         <UBadge
-          size="xs"
-          v-else-if="row.status === 'Abgeschlossen'"
+          v-else-if="row.original.status === 'Abgeschlossen'"
           label="Abgeschlossen"
-          color="green"
+          color="success"
           variant="subtle"
         />
-        <UBadge
-          size="xs"
-          v-else
-          label="Abgelehnt"
-          color="red"
-          variant="subtle"
-        />
+        <UBadge v-else label="Abgelehnt" color="error" variant="subtle" />
       </template>
 
-      <template #date-data="{ row }">
-        <span>{{ useDateFormat(row.expire_date, "DD.MM.YYYY") }}</span>
+      <template #date-cell="{ row }">
+        <span>{{ useDateFormat(row.original.expire_date, "DD.MM.YYYY") }}</span>
       </template>
 
-      <template #allow_class_mixing-data="{ row }">
+      <template #allow_class_mixing-cell="{ row }">
         <div>
-          <span v-if="row.allow_class_mixing" class="flex items-center gap-2">
+          <span
+            v-if="row.original.allow_class_mixing"
+            class="flex items-center gap-2"
+          >
             <UIcon class="text-green-500" name="i-heroicons-check" size="20" />
             Ja
           </span>
@@ -807,16 +890,17 @@ const onSubmitCreate = async () => {
         </div>
       </template>
 
-      <template #actions-data="{ row }">
-        <UDropdown :items="items(row).value" :ui="{ width: 'w-auto' }">
+      <template #actions-cell="{ row }">
+        <UDropdownMenu :items="items(row.original).value">
           <UButton
-            color="gray"
+            color="neutral"
             variant="ghost"
             icon="i-heroicons-ellipsis-horizontal-20-solid"
-            size="2xs"
+            size="sm"
             square
+            @click.stop
           />
-        </UDropdown>
+        </UDropdownMenu>
       </template>
 
       <template #empty-state>

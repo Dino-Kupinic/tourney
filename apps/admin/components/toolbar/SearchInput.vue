@@ -10,6 +10,6 @@ const { placeholder = "Suchen..." } = defineProps<{
     v-model="model"
     icon="i-heroicons-magnifying-glass-20-solid"
     :placeholder
-    size="xs"
+    size="sm"
   />
 </template>

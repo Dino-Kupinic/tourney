@@ -13,7 +13,7 @@ content.value = (await data?.text()) ?? ""
       <ClientOnly>
         <MDC
           v-if="content"
-          class="h-full w-full overflow-auto rounded-md bg-gray-100 p-3 sm:p-6 dark:bg-gray-900"
+          class="h-full w-full overflow-auto rounded-md bg-neutral-100 p-3 sm:p-6 dark:bg-neutral-900"
           :value="content"
         />
         <div v-else>

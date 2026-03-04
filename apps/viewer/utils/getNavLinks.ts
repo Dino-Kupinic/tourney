@@ -1,5 +1,3 @@
-import type { HorizontalNavigationLink } from "#ui/types"
-
 export default function (mobileOrder: boolean = false) {
   if (mobileOrder) {
     return [
@@ -18,7 +16,7 @@ export default function (mobileOrder: boolean = false) {
         icon: "i-heroicons-newspaper",
         to: "/media",
       },
-    ] as HorizontalNavigationLink[]
+    ]
   }
 
   return [
@@ -37,5 +35,5 @@ export default function (mobileOrder: boolean = false) {
       icon: "i-heroicons-newspaper",
       to: "/media",
     },
-  ] as HorizontalNavigationLink[]
+  ]
 }

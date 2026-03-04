@@ -18,7 +18,9 @@ const now = useTimestamp({ immediate: true })
 
 const calculateElapsedTime = () => {
   if (!match.start_time) return
-  const [hours, minutes, seconds] = match.start_time.split(":").map(Number)
+  const [hours = 0, minutes = 0, seconds = 0] = match.start_time
+    .split(":")
+    .map(Number)
   const startDateTime = new Date()
   startDateTime.setHours(hours, minutes, seconds || 0, 0)
   const startTimeMs = startDateTime.getTime()
@@ -57,22 +59,22 @@ const formattedTime = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-md border border-gray-200 shadow-sm dark:border-gray-700">
+  <div
+    class="rounded-md border border-neutral-200 shadow-sm dark:border-neutral-700"
+  >
     <div
-      class="flex justify-between gap-0.5 rounded-t-md border-b border-gray-200 bg-gray-100 p-0.5 dark:border-gray-700 dark:bg-gray-800"
+      class="flex justify-between gap-0.5 rounded-t-md border-b border-neutral-200 bg-neutral-100 p-0.5 dark:border-neutral-700 dark:bg-neutral-800"
     >
       <div class="flex gap-0.5">
         <UBadge
           :label="match.round ?? 'Unbekannte Runde'"
-          color="fuchsia"
-          size="xs"
+          color="secondary"
           variant="subtle"
           block
         />
         <UBadge
           :label="match.start_time!"
-          color="white"
-          size="xs"
+          color="neutral"
           icon="i-heroicons-clock"
           block
         />
@@ -81,8 +83,7 @@ const formattedTime = computed(() => {
         <UBadge
           :label="formattedTime"
           icon="i-heroicons-clock"
-          color="white"
-          size="xs"
+          color="neutral"
           :trailing="false"
           class="w-[90px]"
           block
@@ -101,7 +102,7 @@ const formattedTime = computed(() => {
             }"
           />
           <p class="text-xs">{{ match.team1?.name }}</p>
-          <p class="text-xs text-gray-500">{{ match.team1?.group?.name }}</p>
+          <p class="text-xs text-neutral-500">{{ match.team1?.group?.name }}</p>
         </div>
         <div class="flex items-center gap-5">
           <p class="text-lg">vs</p>
@@ -116,7 +117,7 @@ const formattedTime = computed(() => {
             }"
           />
           <p class="text-xs">{{ match.team2?.name }}</p>
-          <p class="text-xs text-gray-500">{{ match.team2?.group?.name }}</p>
+          <p class="text-xs text-neutral-500">{{ match.team2?.group?.name }}</p>
         </div>
       </div>
     </div>

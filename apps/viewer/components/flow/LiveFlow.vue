@@ -52,7 +52,7 @@ watchEffect(() => {
   const nodeList: Node[] = []
   const edgeList: Edge[] = []
 
-  data.groups.forEach((group, groupIndex) => {
+  data.groups.forEach((group: any, groupIndex: number) => {
     const groupHeight = GROUP_PADDING + group.teams.length * TEAM_HEIGHT
 
     const groupNode: Node = {
@@ -60,7 +60,7 @@ watchEffect(() => {
       type: "group",
       data: {
         label: group.name,
-        teams: group.teams.map((team) => team.name),
+        teams: group.teams.map((team: any) => team.name),
         nodeType: "group",
       },
       position: { x: 0, y: groupIndex * GROUP_VERTICAL_SPACING },
@@ -95,12 +95,12 @@ watchEffect(() => {
     }
     nodeList.push(matchNode)
 
-    const team1GroupId = data.groups.find((group) =>
-      group.teams.some((team) => team.id === match.team1_id),
+    const team1GroupId = data.groups.find((group: any) =>
+      group.teams.some((team: any) => team.id === match.team1_id),
     )?.id
 
-    const team2GroupId = data.groups.find((group) =>
-      group.teams.some((team) => team.id === match.team2_id),
+    const team2GroupId = data.groups.find((group: any) =>
+      group.teams.some((team: any) => team.id === match.team2_id),
     )?.id
 
     if (team1GroupId) {
@@ -252,8 +252,8 @@ watchEffect(() => {
 
     if (data.winner && "team_id" in data.winner) {
       let winnerTeamName = ""
-      data.groups.forEach((group) => {
-        group.teams.forEach((team) => {
+      data.groups.forEach((group: any) => {
+        group.teams.forEach((team: any) => {
           if (team.id === data.winner?.team_id) {
             winnerTeamName = team.name
           }
@@ -292,7 +292,7 @@ watchEffect(() => {
   <VueFlow
     :nodes="nodes"
     :edges="edges"
-    class="bg-gray-100 dark:bg-gray-800"
+    class="bg-neutral-100 dark:bg-neutral-800"
     :default-viewport="{ zoom: 0.3 }"
     :min-zoom="0.2"
     :max-zoom="4"

@@ -28,13 +28,11 @@ const isOpenEdit = ref<boolean>(false)
 const editSchema = z.object({
   score1: z.number(),
   score2: z.number(),
-  winner: z.string().optional(),
 })
 
 const editState = reactive({
   score1: score1,
   score2: score2,
-  winner: stateWinner,
 })
 
 const supabase = useDatabaseClient()
@@ -73,22 +71,22 @@ const onSubmitEdit = async () => {
   >
     <UForm :schema="editSchema" :state="editState" class="space-y-4">
       <div class="flex justify-between">
-        <UFormGroup
+        <UFormField
           :label="match.team1?.name"
           name="score1"
           description="Punkteanzahl"
           required
         >
           <UInput v-model="editState.score1" type="number" />
-        </UFormGroup>
-        <UFormGroup
+        </UFormField>
+        <UFormField
           :label="match.team2?.name"
           name="score2"
           description="Punkteanzahl"
           required
         >
           <UInput v-model="editState.score2" type="number" />
-        </UFormGroup>
+        </UFormField>
       </div>
       <p>
         Anhand von diesen Angaben, ist
@@ -100,30 +98,29 @@ const onSubmitEdit = async () => {
       <p v-if="winner === null">Somit ein Unentschieden.</p>
     </UForm>
   </ModalEdit>
-  <div class="rounded-md border border-gray-200 shadow-sm dark:border-gray-700">
+  <div
+    class="rounded-md border border-neutral-200 shadow-sm dark:border-neutral-700"
+  >
     <div
-      class="flex justify-between gap-0.5 rounded-t-md border-b border-gray-200 bg-gray-100 p-0.5 dark:border-gray-700 dark:bg-gray-800"
+      class="flex justify-between gap-0.5 rounded-t-md border-b border-neutral-200 bg-neutral-100 p-0.5 dark:border-neutral-700 dark:bg-neutral-800"
     >
       <div class="flex w-full justify-between">
         <div class="flex gap-0.5">
           <UBadge
             :label="match.round ?? 'Unbekannte Runde'"
-            color="fuchsia"
-            size="xs"
+            color="secondary"
             variant="subtle"
             block
           />
           <UBadge
             :label="match.start_time!"
-            color="gray"
-            size="xs"
+            color="neutral"
             icon="i-heroicons-clock"
             block
           />
           <UBadge
             :label="match.end_time!"
-            color="gray"
-            size="xs"
+            color="neutral"
             icon="i-heroicons-bell"
             block
           />
@@ -131,8 +128,9 @@ const onSubmitEdit = async () => {
 
         <UButton
           icon="i-heroicons-pencil"
-          color="gray"
-          size="3xs"
+          color="neutral"
+          variant="outline"
+          size="sm"
           square
           @click="isOpenEdit = true"
         />
@@ -152,7 +150,7 @@ const onSubmitEdit = async () => {
           <p :class="['text-xs', winner === match.team1?.id && 'font-bold']">
             {{ match.team1?.name }}
           </p>
-          <p class="text-xs text-gray-500">{{ match.team1?.group?.name }}</p>
+          <p class="text-xs text-neutral-500">{{ match.team1?.group?.name }}</p>
         </div>
         <div class="flex items-center gap-5">
           <p class="text-4xl font-bold">{{ score1 }}</p>
@@ -171,7 +169,7 @@ const onSubmitEdit = async () => {
           <p :class="['text-xs', winner === match.team2?.id && 'font-bold']">
             {{ match.team2?.name }}
           </p>
-          <p class="text-xs text-gray-500">{{ match.team2?.group?.name }}</p>
+          <p class="text-xs text-neutral-500">{{ match.team2?.group?.name }}</p>
         </div>
       </div>
     </div>

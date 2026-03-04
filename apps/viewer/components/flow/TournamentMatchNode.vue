@@ -7,7 +7,7 @@ defineProps<NodeProps>()
 
 <template>
   <div
-    class="min-w-[180px] rounded border border-gray-300 p-2.5 shadow-md"
+    class="min-w-[180px] rounded border border-neutral-300 p-2.5 shadow-md"
     :class="{
       'border-blue-500/50 bg-blue-500/10': data.nodeType === 'group',
       'border-purple-500/50 bg-purple-500/10': data.nodeType === 'quarterfinal',
@@ -26,13 +26,13 @@ defineProps<NodeProps>()
         <div
           v-for="(team, index) in data.teams"
           :key="index"
-          class="rounded bg-gray-100 p-1.5 dark:bg-gray-900"
+          class="rounded bg-neutral-100 p-1.5 dark:bg-neutral-900"
           :class="{ 'bg-emerald-500/20 font-bold': data.winner === team }"
         >
           {{ team }}
         </div>
       </div>
-      <div v-else class="text-center italic text-gray-500">Pending</div>
+      <div v-else class="text-center text-neutral-500 italic">Pending</div>
     </div>
     <Handle type="source" :position="Position.Right" />
   </div>

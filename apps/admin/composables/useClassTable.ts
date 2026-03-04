@@ -1,4 +1,4 @@
-import type { TableColumn } from "#ui/types"
+import type { TableColumn } from "@nuxt/ui/components/Table.vue"
 
 export type ClassColumn = {
   id: string
@@ -9,21 +9,21 @@ export type ClassColumn = {
 export const useClassTable = (
   onEdit: (row: ClassColumn) => void,
   onInfo: (row: ClassColumn) => void,
-  onDelete: () => void,
+  onDelete: (row: ClassColumn) => void,
 ) => {
-  const columns: TableColumn[] = [
+  const columns: TableColumn<ClassColumn>[] = [
     {
-      key: "name",
-      label: "Klasse",
-      sortable: true,
+      accessorKey: "name",
+      header: "Klasse",
+      enableSorting: true,
     },
     {
-      key: "year",
-      label: "Schuljahr",
+      accessorKey: "year",
+      header: "Schuljahr",
     },
     {
-      key: "actions",
-      label: "Aktionen",
+      id: "actions",
+      header: "Aktionen",
     },
   ]
 
@@ -33,19 +33,19 @@ export const useClassTable = (
         {
           label: "Info",
           icon: "i-heroicons-information-circle",
-          click: () => onInfo(row),
+          onSelect: () => onInfo(row),
         },
         {
           label: "Editieren",
           icon: "i-heroicons-pencil-square-20-solid",
-          click: () => onEdit(row as ClassColumn),
+          onSelect: () => onEdit(row as ClassColumn),
         },
       ],
       [
         {
           label: "Löschen",
           icon: "i-heroicons-trash",
-          click: () => onDelete(),
+          onSelect: () => onDelete(row),
         },
       ],
     ])
