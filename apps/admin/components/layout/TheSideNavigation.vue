@@ -4,11 +4,15 @@ import { glass } from "@dicebear/collection"
 
 const { name, role } = useUser()
 const route = useRoute()
+const {
+  public: { docsUrl },
+} = useRuntimeConfig()
 const svg = computed(() =>
   createAvatar(glass, {
     seed: name.value,
   }).toDataUri(),
 )
+const docsHelpUrl = `${docsUrl.replace(/\/$/, "")}/users/help`
 // TODO: make navbar rerender on live tournament change
 const { liveTournaments, fetchLiveTournaments } = useLiveTournaments()
 await fetchLiveTournaments()
@@ -103,6 +107,23 @@ const navigationLinks = computed(() => [
   ],
 ])
 
+const secondaryLinks = computed(() => [
+  {
+    label: "Was ist neu",
+    icon: "i-heroicons-sparkles",
+    to: "/new",
+    exact: true,
+    active: isActive("/new"),
+  },
+  {
+    label: "Hilfe",
+    icon: "i-heroicons-question-mark-circle",
+    to: docsHelpUrl,
+    external: true,
+    target: "_blank",
+  },
+])
+
 const settingsLinks = computed(() => [
   {
     label: "Einstellungen",
@@ -151,6 +172,13 @@ const settingsLinks = computed(() => [
       orientation="vertical"
       color="neutral"
       class="grow"
+    />
+
+    <UNavigationMenu
+      :items="secondaryLinks"
+      orientation="vertical"
+      color="neutral"
+      :external-icon="false"
     />
 
     <template #footer>

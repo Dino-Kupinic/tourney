@@ -27,6 +27,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       clientUrl: "",
+      docsUrl: "https://tourney.htl-steyr.ac.at/docs",
     },
   },
 })

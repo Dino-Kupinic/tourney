@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { z } from "zod"
+import type { AuthFormField } from "@nuxt/ui"
 import type { FormSubmitEvent } from "#ui/types"
 
 definePageMeta({
@@ -16,15 +17,26 @@ const schema = z.object({
 })
 
 type Schema = z.output<typeof schema>
-const state = reactive({
-  email: undefined,
-  password: undefined,
-})
+const fields: AuthFormField[] = [
+  {
+    name: "email",
+    type: "email",
+    label: "E-mail",
+  },
+  {
+    name: "password",
+    type: "password",
+    label: "Passwort",
+  },
+]
 
 const { login } = useUser()
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
-  const { data, error } = await login(state.email ?? "", state.password ?? "")
-  if (error) console.log(error)
+  const { data, error } = await login(
+    event.data.email ?? "",
+    event.data.password ?? "",
+  )
+  if (error) console.error(error)
   if (data.user) await navigateTo("/")
 }
 </script>
@@ -32,38 +44,29 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 <template>
   <div class="flex h-dvh w-full items-center justify-center">
     <UCard class="w-full sm:w-96" variant="outline">
-      <template #header>
-        <div class="flex flex-col items-center space-y-3">
-          <Logo class="h-12 w-12" />
-          <HeaderTitle>TOURNEY LOGIN</HeaderTitle>
-        </div>
-      </template>
-      <UForm
+      <UAuthForm
         :schema="schema"
-        :state="state"
-        class="space-y-4"
+        :fields="fields"
+        :submit="{ label: 'Einloggen', block: true }"
         @submit="onSubmit"
       >
-        <UFormField label="E-mail" name="email">
-          <UInput v-model="state.email" class="w-full" />
-        </UFormField>
-
-        <UFormField label="Passwort" name="password">
-          <UInput v-model="state.password" type="password" class="w-full" />
-        </UFormField>
-
-        <UButton type="submit" label="Einloggen" />
-      </UForm>
-      <template #footer>
-        <div class="text-sm">
-          <strong>Wo kriege ich meine Daten?</strong>
-          <br />
-          <span>
-            Die Anmeldedaten werden Ihnen auf die Schul Mail
-            <code>(@htl-steyr.ac.at)</code> geschickt.
-          </span>
-        </div>
-      </template>
+        <template #header>
+          <div class="flex flex-col items-center space-y-3">
+            <Logo class="h-12 w-12" />
+            <HeaderTitle>TOURNEY LOGIN</HeaderTitle>
+          </div>
+        </template>
+        <template #footer>
+          <div class="text-sm">
+            <strong>Wo kriege ich meine Daten?</strong>
+            <br />
+            <span>
+              Die Anmeldedaten werden Ihnen auf die Schul Mail
+              <code>(@htl-steyr.ac.at)</code> geschickt.
+            </span>
+          </div>
+        </template>
+      </UAuthForm>
     </UCard>
   </div>
 </template>
