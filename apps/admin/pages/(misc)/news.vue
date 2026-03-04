@@ -29,8 +29,8 @@ const editorToolbarItems = [
     { kind: "codeBlock", label: "Code" },
   ],
   [
-    { kind: "undo", label: "Zurueck" },
-    { kind: "redo", label: "Vor" },
+    { kind: "undo", label: "Undo" },
+    { kind: "redo", label: "Redo" },
   ],
 ] satisfies EditorToolbarItem[][]
 
@@ -124,7 +124,7 @@ async function saveContent() {
     </ToolbarContainer>
   </BasePageHeader>
   <ClientOnly>
-    <div class="h-full w-full px-3 pb-3">
+    <div class="h-full w-full pb-3">
       <UEditor
         v-slot="{ editor }"
         v-model="content"
@@ -133,13 +133,12 @@ async function saveContent() {
         class="h-full"
         :ui="{
           root: 'flex h-full min-h-[32rem] flex-col',
-          content: 'flex-1 overflow-y-auto px-4 py-3',
+          content: 'flex-1 overflow-y-auto py-6',
         }"
       >
         <UEditorToolbar
           :editor="editor"
           :items="editorToolbarItems"
-          size="xs"
           class="px-2 py-2"
         />
       </UEditor>
