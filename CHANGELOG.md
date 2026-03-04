@@ -1,3 +1,19 @@
+# [0.32.0](https://github.com/HTL-Steyr/tourney/compare/v0.31.0...v0.32.0) (2026-03-04)
+
+
+### Bug Fixes
+
+* set Node.js version to LTS in release workflow ([0513aea](https://github.com/HTL-Steyr/tourney/commit/0513aeae930f5c6f2cfe645a9c14246ee6028437))
+
+
+### Features
+
+* add Node.js setup step in release workflow ([ce446fd](https://github.com/HTL-Steyr/tourney/commit/ce446fd68f29c7729e124d6c9a73304e4d5a80ea))
+* first step of migration to nuxt 4 and ui 4 + docker ([8e9d8ee](https://github.com/HTL-Steyr/tourney/commit/8e9d8eed55a040acb4af0433ae27a5875094a174))
+* refactor sidebar ([a376437](https://github.com/HTL-Steyr/tourney/commit/a376437333aa10e549c9997af56c0c75dc22f511))
+* small adjustments ([9eb8ea0](https://github.com/HTL-Steyr/tourney/commit/9eb8ea0def9e3898f0cc068029c3f6e68ed2cd4a))
+* work on adding AI assistant functionality ([31b7abf](https://github.com/HTL-Steyr/tourney/commit/31b7abf678b8cf9842e08af2fbd2b687aebde728))
+
 # [0.31.0](https://github.com/HTL-Steyr/tourney/compare/v0.30.2...v0.31.0) (2025-08-29)
 
 ### Features
