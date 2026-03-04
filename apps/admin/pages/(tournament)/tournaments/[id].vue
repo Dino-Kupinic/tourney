@@ -387,7 +387,7 @@ const canGoLive = computed(() => {
   <BasePageContent>
     <div class="flex h-full w-full">
       <div
-        class="flex w-1/2 flex-col overflow-auto border-r border-neutral-200 dark:border-neutral-700"
+        class="flex w-1/2 flex-col overflow-auto border-r border-neutral-200 2xl:w-2/5 dark:border-neutral-700"
       >
         <div
           class="flex h-auto w-full gap-3 border-b border-neutral-200 bg-neutral-100 p-3 px-6 dark:border-neutral-800 dark:bg-neutral-900"
@@ -429,7 +429,7 @@ const canGoLive = computed(() => {
             <TournamentTeamStatus :data="data" class="grow" />
           </div>
           <div
-            class="rounded-md bg-neutral-50 p-3 pr-3 text-sm dark:bg-neutral-800"
+            class="rounded-md bg-neutral-50 p-3 pr-3 text-sm 2xl:min-w-0 2xl:flex-1 dark:bg-neutral-800"
           >
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-ticket" />
@@ -608,7 +608,7 @@ const canGoLive = computed(() => {
           </div>
         </div>
       </div>
-      <div class="w-1/2">
+      <div class="w-1/2 2xl:w-3/5">
         <ClientOnly>
           <LiveFlow :tournament-id="tournament?.id as string" />
           <template #fallback>

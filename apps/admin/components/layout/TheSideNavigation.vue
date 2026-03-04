@@ -180,7 +180,11 @@ const userMenuItems = computed(() => [
       </NuxtLink>
     </template>
 
-    <UDashboardSearchButton variant="soft" :kbds="['meta', 'k']" />
+    <UDashboardSearchButton
+      variant="soft"
+      :kbds="['meta', 'k']"
+      label="Suchen..."
+    />
 
     <UNavigationMenu
       :items="navigationLinks"
