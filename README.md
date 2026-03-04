@@ -141,34 +141,6 @@ bun run create:users
 
 If it works, great! You can now log in in the admin dashboard with the created users.
 
-## 🚀 Deployment
-
-1. build the app
-
-```bash
-bun run build
-```
-
-2. start both apps with Docker
-
-```bash
-bun run docker:up
-```
-
-3. view logs
-
-```bash
-bun run docker:logs
-```
-
-4. stop the deployment
-
-```bash
-bun run docker:down
-```
-
-5. enjoy the app!
-
 ## 😄 Authors
 
 ### Creator
