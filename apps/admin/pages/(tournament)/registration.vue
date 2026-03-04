@@ -599,7 +599,7 @@ const onSubmitCreate = async () => {
       </UModal>
 
       <ModalCreate
-        title="Neues Anmeldung"
+        title="Neue Anmeldung"
         v-model="isOpenCreate"
         @create="onSubmitCreate"
         modal-width="sm:max-w-md"
