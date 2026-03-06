@@ -98,9 +98,7 @@ const onSubmitEdit = async () => {
       <p v-if="winner === null">Somit ein Unentschieden.</p>
     </UForm>
   </ModalEdit>
-  <div
-    class="rounded-md border border-neutral-200 shadow-sm dark:border-neutral-700"
-  >
+  <div class="rounded-md border border-neutral-200 dark:border-neutral-700">
     <div
       class="flex justify-between gap-0.5 rounded-t-md border-b border-neutral-200 bg-neutral-100 p-0.5 dark:border-neutral-700 dark:bg-neutral-800"
     >
@@ -115,12 +113,14 @@ const onSubmitEdit = async () => {
           <UBadge
             :label="match.start_time!"
             color="neutral"
+            variant="outline"
             icon="i-heroicons-clock"
             block
           />
           <UBadge
             :label="match.end_time!"
             color="neutral"
+            variant="outline"
             icon="i-heroicons-bell"
             block
           />
@@ -130,7 +130,7 @@ const onSubmitEdit = async () => {
           icon="i-heroicons-pencil"
           color="neutral"
           variant="outline"
-          size="sm"
+          size="xs"
           square
           @click="isOpenEdit = true"
         />

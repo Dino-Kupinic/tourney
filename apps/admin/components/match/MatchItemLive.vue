@@ -137,9 +137,7 @@ const completeMatch = async () => {
     </p>
     <p v-if="winner === null">Somit ein Unentschieden.</p>
   </ModalMatch>
-  <div
-    class="rounded-md border border-neutral-200 shadow-sm dark:border-neutral-700"
-  >
+  <div class="rounded-md border border-neutral-200 dark:border-neutral-700">
     <div
       class="flex justify-between gap-0.5 rounded-t-md border-b border-neutral-200 bg-neutral-100 p-0.5 dark:border-neutral-700 dark:bg-neutral-800"
     >
@@ -153,8 +151,10 @@ const completeMatch = async () => {
         <UBadge
           :label="match.start_time!"
           color="neutral"
+          variant="subtle"
           icon="i-heroicons-clock"
           block
+          class="tabular-nums"
         />
       </div>
       <ClientOnly>
@@ -162,8 +162,9 @@ const completeMatch = async () => {
           :label="formattedTime"
           icon="i-heroicons-clock"
           color="neutral"
+          variant="subtle"
           :trailing="false"
-          class="w-[90px]"
+          class="min-w-26 shrink-0 justify-center tabular-nums"
           block
         />
       </ClientOnly>
