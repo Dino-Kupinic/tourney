@@ -466,15 +466,22 @@ const { data: history, refresh: refreshHistory } = await useAsyncData(
                 <div
                   v-for="group in groupedStandings"
                   :key="group.id"
-                  class="flex flex-col gap-2"
+                  class="flex items-stretch gap-2"
                 >
                   <UBadge
-                    :label="group.name"
                     color="neutral"
                     variant="subtle"
-                    class="w-fit rounded-full"
-                  />
-                  <StandingsTable :standings="group.standings" compact />
+                    class="flex w-8 shrink-0 items-center justify-center rounded-md px-1 py-3 text-center text-xs font-medium tracking-wide"
+                  >
+                    <span
+                      class="inline-block rotate-180 [writing-mode:vertical-rl]"
+                    >
+                      {{ group.name }}
+                    </span>
+                  </UBadge>
+                  <div class="min-w-0 flex-1">
+                    <StandingsTable :standings="group.standings" compact />
+                  </div>
                 </div>
               </template>
               <template v-else>
