@@ -67,21 +67,14 @@ export default defineEventHandler(async (event) => {
     (group) => group.count < tournament.group_teams,
   )
 
-  if (!targetGroup) {
-    throw createError({
-      statusCode: 400,
-      statusMessage:
-        "No available group for this team in the tournament, the tournament is full.",
-    })
-  }
-
   const team = {
     name: registration.class.name,
     logo_id: logo.id,
     logo_variant_id: logo_variant?.id ?? null,
     tournament_id: tournament.id,
     registration_id: registration.id,
-    group_id: targetGroup.groupId,
+    // When all group slots are filled, keep the team as registered but unassigned.
+    group_id: targetGroup?.groupId ?? null,
   }
 
   const { data, error } = await supabase.from("team").insert(team).select()

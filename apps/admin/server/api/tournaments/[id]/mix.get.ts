@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
     .from("team")
     .select("id, group_id")
     .eq("tournament_id", id)
+    .not("group_id", "is", null)
 
   if (teamError) {
     throw createError({

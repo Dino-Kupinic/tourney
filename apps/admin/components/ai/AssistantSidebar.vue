@@ -316,6 +316,7 @@ onBeforeUnmount(() => {
           v-model="input"
           class="w-full"
           size="sm"
+          variant="subtle"
           :ui="{
             base: 'text-sm leading-6 placeholder:text-sm',
           }"

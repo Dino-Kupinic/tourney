@@ -128,7 +128,7 @@ const onDelete = async () => {
           <div class="flex justify-between">
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-clipboard-document-list" />
-              <p>{{ data?.teams }}/{{ maxTeams }} Teams</p>
+              <p>{{ data?.teams }}/{{ maxTeams }} Spielteams</p>
             </div>
             <div class="flex items-center space-x-1">
               <UIcon name="i-heroicons-users" />
