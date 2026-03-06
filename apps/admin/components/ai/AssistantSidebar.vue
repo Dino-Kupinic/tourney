@@ -179,8 +179,8 @@ onBeforeUnmount(() => {
   >
     <template #header="{ collapsed }">
       <div v-if="!collapsed" class="w-full">
-        <div class="flex w-full items-start justify-between">
-          <div class="flex min-w-0 items-start gap-3">
+        <div class="flex w-full items-center justify-between">
+          <div class="flex min-w-0 items-center gap-3">
             <button
               type="button"
               class="flex min-w-0 items-center gap-2 text-left"
@@ -315,6 +315,10 @@ onBeforeUnmount(() => {
         <UChatPrompt
           v-model="input"
           class="w-full"
+          size="sm"
+          :ui="{
+            base: 'text-sm leading-6 placeholder:text-sm',
+          }"
           :rows="2"
           :maxrows="6"
           placeholder="Frag nach einer Funktion, einem Ablauf oder dem nächsten Schritt..."
@@ -326,7 +330,7 @@ onBeforeUnmount(() => {
               <div class="flex min-w-0 items-center gap-2">
                 <USelect
                   v-model="selectedModel"
-                  class="w-24"
+                  class="w-32"
                   color="neutral"
                   variant="ghost"
                   size="xs"
