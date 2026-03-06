@@ -7,7 +7,7 @@ defineProps<{
 <template>
   <div
     v-if="isLive"
-    class="ring-opacity-25 dark:bg-opacity-10 dark:ring-opacity-25 flex items-center space-x-1.5 rounded-md bg-neutral-50 px-2 py-1 ring-1 ring-red-400 ring-inset dark:bg-neutral-900"
+    class="ring-opacity-25 dark:bg-opacity-10 dark:ring-opacity-25 flex items-center space-x-1.5 rounded-md bg-transparent px-2 py-1 ring-1 ring-red-400 ring-inset dark:bg-neutral-900"
   >
     <span class="relative flex h-2 w-2">
       <span
