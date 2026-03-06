@@ -8,12 +8,26 @@ import type {
 } from "@tourney/types"
 import { useDatabaseClient } from "~/composables/useDatabaseClient"
 
+type LiveGroup = {
+  id: string
+  name: string
+  teams: Database["public"]["Tables"]["team"]["Row"][]
+}
+
+type GroupStanding = Database["public"]["Views"]["group_standings"]["Row"]
+type GroupStandingsSection = {
+  id: string
+  name: string
+  standings: Standing[]
+}
+
 const title = ref<string>("Live")
 useHead({
   title: () => title.value,
 })
 
 const { tournaments, fetchTournaments } = useLiveTournaments()
+const { showGroupedStandings } = useLiveSettings()
 const selected = useState<string>("selectedTournament", () => "")
 await fetchTournaments()
 const tournamentOptions = computed(() =>
@@ -75,22 +89,88 @@ const { data: matches, refresh: matchRefresh } = await useAsyncData<Match[]>(
 )
 
 const isOpenInfo = ref<boolean>(false)
-const { data: standings, refresh: standingsRefresh } = await useAsyncData<
-  Standing[]
+const { data: groups, refresh: groupsRefresh } = await useAsyncData<
+  LiveGroup[]
 >(
-  "admin-live-standings",
+  "admin-live-groups",
   async () => {
     if (!tournamentId.value) {
       return []
     }
 
-    return await $fetch(`/api/views/standings/${tournamentId.value}`)
+    return await $fetch(`/api/tournaments/${tournamentId.value}/groups`)
   },
   {
     default: () => [],
     watch: [tournamentId],
   },
 )
+
+const groupIds = computed(() => groups.value.map((group) => group.id).join(","))
+
+function normalizeGroupStanding(standing: GroupStanding): Standing {
+  return {
+    draws: standing.draws ?? 0,
+    goal_difference: standing.goal_difference ?? 0,
+    goals_conceded: standing.goals_conceded ?? 0,
+    goals_scored: standing.goals_scored ?? 0,
+    losses: standing.losses ?? 0,
+    points: standing.points ?? 0,
+    team_id: standing.team_id ?? "",
+    team_name: standing.team_name ?? "",
+    tournament_id: standing.tournament_id ?? tournamentId.value ?? "",
+    wins: standing.wins ?? 0,
+  }
+}
+
+const { data: fullStandings, refresh: fullStandingsRefresh } =
+  await useAsyncData<Standing[]>(
+    "admin-live-standings",
+    async () => {
+      if (!tournamentId.value) {
+        return []
+      }
+
+      return await $fetch(`/api/views/standings/${tournamentId.value}`)
+    },
+    {
+      default: () => [],
+      watch: [tournamentId],
+    },
+  )
+
+const { data: groupedStandings, refresh: groupedStandingsRefresh } =
+  await useAsyncData<GroupStandingsSection[]>(
+    "admin-live-grouped-standings",
+    async () => {
+      if (!groups.value.length) {
+        return []
+      }
+
+      return await Promise.all(
+        groups.value.map(async (group) => {
+          const standings = await $fetch<GroupStanding[]>(
+            `/api/views/standings/group/${group.id}`,
+          )
+
+          return {
+            id: group.id,
+            name: group.name,
+            standings: (standings ?? []).map(normalizeGroupStanding),
+          }
+        }),
+      )
+    },
+    {
+      default: () => [],
+      watch: [groupIds],
+    },
+  )
+
+const refreshStandings = async () => {
+  await fullStandingsRefresh()
+  await groupedStandingsRefresh()
+}
 
 const { data: liveMatches, refresh: refreshLiveMatches } = await useAsyncData<
   Match[]
@@ -112,8 +192,9 @@ const { data: liveMatches, refresh: refreshLiveMatches } = await useAsyncData<
 const refresh = async () => {
   await fetchTournaments()
   await tournamentRefresh()
+  await groupsRefresh()
   await matchRefresh()
-  await standingsRefresh()
+  await refreshStandings()
   await refreshLiveMatches()
   await refreshResults()
   await refreshHistory()
@@ -126,7 +207,7 @@ const refresh = async () => {
 const refreshMatches = async () => {
   await matchRefresh()
   await refreshLiveMatches()
-  await standingsRefresh()
+  await refreshStandings()
   await refreshResults()
   await refreshHistory()
 }
@@ -168,6 +249,7 @@ const generateGroupMatches = async () => {
       return
     }
     await refreshMatches()
+    await groupsRefresh()
     displaySuccessNotification(
       "Gruppenphase gestartet",
       "Die Gruppenphase wurde erfolgreich gestartet.",
@@ -377,7 +459,28 @@ const { data: history, refresh: refreshHistory } = await useAsyncData(
               variant="link"
               :ui="{ list: 'h-9', trigger: 'h-7' }"
             />
-            <StandingsTable :standings="standings" />
+            <div
+              class="mt-2 flex min-h-0 flex-1 flex-col gap-3 overflow-auto pb-12"
+            >
+              <template v-if="showGroupedStandings">
+                <div
+                  v-for="group in groupedStandings"
+                  :key="group.id"
+                  class="flex flex-col gap-2"
+                >
+                  <UBadge
+                    :label="group.name"
+                    color="neutral"
+                    variant="subtle"
+                    class="w-fit rounded-full"
+                  />
+                  <StandingsTable :standings="group.standings" compact />
+                </div>
+              </template>
+              <template v-else>
+                <StandingsTable :standings="fullStandings" compact />
+              </template>
+            </div>
           </div>
           <div class="flex w-1/3 flex-col gap-0.5">
             <UTabs

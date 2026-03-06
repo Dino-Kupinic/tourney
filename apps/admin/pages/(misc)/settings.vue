@@ -6,6 +6,7 @@ useHead({
 
 const { name, role, email, last_sign_in, logout } = useUser()
 const { enabled: aiAssistantEnabled } = useAiAssistant()
+const { showGroupedStandings } = useLiveSettings()
 
 const cardUi = {
   root: "border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900",
@@ -60,6 +61,21 @@ const onLogout = async () => {
       <template #footer>
         <UButton label="Logout" size="sm" @click="onLogout()" />
       </template>
+    </UCard>
+    <UCard variant="soft" :ui="cardUi">
+      <template #header> Live </template>
+      <BaseSettingsItem>
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <strong>Gruppenansicht bei Platzierungen</strong>
+            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Zeigt auf der Live-Seite alle Gruppen untereinander statt der
+              bisherigen Gesamtwertung.
+            </p>
+          </div>
+          <USwitch v-model="showGroupedStandings" />
+        </div>
+      </BaseSettingsItem>
     </UCard>
     <UCard variant="soft" :ui="cardUi">
       <template #header>
