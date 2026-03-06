@@ -81,6 +81,22 @@ const filteredRows = computed(() => {
 })
 
 const sort = ref([{ id: "status", desc: false }])
+const sortableHeaderButtonClass =
+  "flex items-center gap-1 font-medium text-neutral-700 transition-colors hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white"
+
+function getSortIcon(column: { getIsSorted: () => false | "asc" | "desc" }) {
+  const direction = column.getIsSorted()
+
+  if (direction === "asc") {
+    return "i-heroicons-chevron-up"
+  }
+
+  if (direction === "desc") {
+    return "i-heroicons-chevron-down"
+  }
+
+  return "i-heroicons-arrows-up-down"
+}
 
 const isOpenDelete = ref<boolean>(false)
 const isOpenEdit = ref<boolean>(false)
@@ -837,6 +853,81 @@ const onSubmitCreate = async () => {
           "
           @update:model-value="table.toggleAllPageRowsSelected(!!$event)"
         />
+      </template>
+
+      <template #name-header="{ column }">
+        <button
+          type="button"
+          :class="sortableHeaderButtonClass"
+          aria-label="Nach Name sortieren"
+          @click="column.getToggleSortingHandler()?.($event)"
+        >
+          <span>Name</span>
+          <UIcon
+            :name="getSortIcon(column)"
+            class="h-4 w-4 shrink-0 text-neutral-400 dark:text-neutral-500"
+          />
+        </button>
+      </template>
+
+      <template #class-header="{ column }">
+        <button
+          type="button"
+          :class="sortableHeaderButtonClass"
+          aria-label="Nach Klasse sortieren"
+          @click="column.getToggleSortingHandler()?.($event)"
+        >
+          <span>Klasse</span>
+          <UIcon
+            :name="getSortIcon(column)"
+            class="h-4 w-4 shrink-0 text-neutral-400 dark:text-neutral-500"
+          />
+        </button>
+      </template>
+
+      <template #date-header="{ column }">
+        <button
+          type="button"
+          :class="sortableHeaderButtonClass"
+          aria-label="Nach Ablaufdatum sortieren"
+          @click="column.getToggleSortingHandler()?.($event)"
+        >
+          <span>Ablaufdatum</span>
+          <UIcon
+            :name="getSortIcon(column)"
+            class="h-4 w-4 shrink-0 text-neutral-400 dark:text-neutral-500"
+          />
+        </button>
+      </template>
+
+      <template #status-header="{ column }">
+        <button
+          type="button"
+          :class="sortableHeaderButtonClass"
+          aria-label="Nach Status sortieren"
+          @click="column.getToggleSortingHandler()?.($event)"
+        >
+          <span>Status</span>
+          <UIcon
+            :name="getSortIcon(column)"
+            class="h-4 w-4 shrink-0 text-neutral-400 dark:text-neutral-500"
+          />
+        </button>
+      </template>
+
+      <template #allow_class_mixing-header="{ column }">
+        <button
+          type="button"
+          :class="sortableHeaderButtonClass"
+          aria-label="Nach Mischung sortieren"
+          @click="column.getToggleSortingHandler()?.($event)"
+        >
+          <span>Mischung</span>
+          <UIcon
+            :name="getSortIcon(column)"
+            class="h-4 w-4 shrink-0 text-neutral-400 dark:text-neutral-500"
+          />
+        </button>
       </template>
 
       <template #select-cell="{ row }">

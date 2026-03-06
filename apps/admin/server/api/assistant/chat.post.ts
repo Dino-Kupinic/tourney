@@ -1,4 +1,9 @@
-import { convertToModelMessages, streamText, type UIMessage } from "ai"
+import {
+  convertToModelMessages,
+  pruneMessages,
+  streamText,
+  type UIMessage,
+} from "ai"
 import { openai } from "@ai-sdk/openai"
 import {
   AI_ASSISTANT_DEFAULT_MODEL,
@@ -30,10 +35,14 @@ export default defineEventHandler(async (event) => {
   const messages = Array.isArray(body?.messages)
     ? (body.messages as UIMessage[])
     : []
+  const modelMessages = pruneMessages({
+    messages: await convertToModelMessages(messages),
+    reasoning: "all",
+  })
 
   return streamText({
     model: openai(model),
-    maxOutputTokens: 700,
+    maxOutputTokens: 2000,
     system: [
       "You are the Tourney admin assistant for a tournament management dashboard.",
       `The user is currently on the "${context}" page.`,
@@ -41,6 +50,8 @@ export default defineEventHandler(async (event) => {
       "Prioritize practical guidance, navigation hints, and clear next steps inside the admin app.",
       "If the user asks for an action you cannot perform from chat, explain where in the admin UI they should go.",
     ].join(" "),
-    messages: await convertToModelMessages(messages),
-  }).toUIMessageStreamResponse()
+    messages: modelMessages,
+  }).toUIMessageStreamResponse({
+    sendReasoning: false,
+  })
 })

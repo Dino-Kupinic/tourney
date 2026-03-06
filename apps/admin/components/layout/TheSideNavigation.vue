@@ -30,6 +30,98 @@ async function onLogout() {
   return navigateTo("/login")
 }
 
+const navigationSearchItems = computed(() => [
+  {
+    label: "Home",
+    icon: "i-heroicons-home",
+    to: "/",
+  },
+  {
+    label: "Dashboard",
+    icon: "i-heroicons-chart-bar",
+    to: "/dashboard",
+  },
+  {
+    label: "Live",
+    icon: "i-heroicons-signal",
+    to: "/live",
+  },
+  {
+    label: "Turniere",
+    icon: "i-heroicons-trophy",
+    to: "/tournaments",
+  },
+  {
+    label: "Anmeldung",
+    icon: "i-heroicons-ticket",
+    to: "/registration",
+  },
+  {
+    label: "Aktuelles",
+    icon: "i-heroicons-newspaper",
+    to: "/news",
+  },
+  {
+    label: "Galerie",
+    icon: "i-heroicons-photo",
+    to: "/gallery",
+  },
+  {
+    label: "Aktivität",
+    icon: "i-heroicons-queue-list",
+    to: "/logs",
+  },
+  {
+    label: "Verwaltung",
+    icon: "i-heroicons-squares-2x2",
+    to: "/management",
+  },
+])
+
+const searchGroups = computed(() => [
+  {
+    id: "navigation",
+    label: "Navigation",
+    items: navigationSearchItems.value,
+  },
+  {
+    id: "support",
+    label: "Hilfe & Konto",
+    items: [
+      {
+        label: "Einstellungen",
+        icon: "i-heroicons-cog-8-tooth",
+        to: "/settings",
+      },
+      {
+        label: "Dokumentation",
+        icon: "i-heroicons-book-open",
+        to: docsUrl,
+        external: true,
+        target: "_blank",
+      },
+      {
+        label: "Hilfe",
+        icon: "i-heroicons-question-mark-circle",
+        to: docsHelpUrl,
+        external: true,
+        target: "_blank",
+      },
+      {
+        label: "Was ist neu",
+        icon: "i-heroicons-sparkles",
+        to: "/new",
+      },
+      {
+        label: "Logout",
+        icon: "i-heroicons-arrow-right-on-rectangle",
+        color: "error",
+        onSelect: onLogout,
+      },
+    ],
+  },
+])
+
 const navigationLinks = computed(() => [
   [
     {
@@ -185,6 +277,7 @@ const userMenuItems = computed(() => [
       :kbds="['meta', 'k']"
       label="Suchen..."
     />
+    <UDashboardSearch :groups="searchGroups" size="lg" />
 
     <UNavigationMenu
       :items="navigationLinks"

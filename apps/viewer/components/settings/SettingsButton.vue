@@ -6,7 +6,7 @@ const { size = "lg" } = defineProps<{
 
 <template>
   <UButton
-    variant="solid"
+    variant="soft"
     color="neutral"
     to="/settings"
     :size="size"

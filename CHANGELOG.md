@@ -1,15 +1,14 @@
 # [0.33.0](https://github.com/HTL-Steyr/tourney/compare/v0.32.0...v0.33.0) (2026-03-06)
 
-
 ### Features
 
-* add team selection and participant management for tournaments ([33e5449](https://github.com/HTL-Steyr/tourney/commit/33e54492b7b61ee3ce18c0f8d188b23ffe7010d5))
-* enhance settings layout and update terminology in tournament display ([e3baa0e](https://github.com/HTL-Steyr/tourney/commit/e3baa0e5a64c747ff80580ca5bb4f3e24048743d))
-* enhance UI components for better alignment and responsiveness ([50ff9db](https://github.com/HTL-Steyr/tourney/commit/50ff9db23540347e269909d2eaf086678a8bb26c))
-* implement grouped standings feature and enhance standings display ([c073578](https://github.com/HTL-Steyr/tourney/commit/c0735780afc17ce58beafff97772ec35fdb61c30))
-* improve responsive layout ([b8be862](https://github.com/HTL-Steyr/tourney/commit/b8be8629656954b42c1b7b5da1a83b5d6532dfec))
-* refactor tournament management and enhance UI for better user experience ([c06b54d](https://github.com/HTL-Steyr/tourney/commit/c06b54d286bc9e2b0a4795c8de5cebcc2cf8d6cc))
-* update sidebar state management and enhance collapsible behavior ([d83db35](https://github.com/HTL-Steyr/tourney/commit/d83db35a662a092577da8307ca33291e2ca3bdf6))
+- add team selection and participant management for tournaments ([33e5449](https://github.com/HTL-Steyr/tourney/commit/33e54492b7b61ee3ce18c0f8d188b23ffe7010d5))
+- enhance settings layout and update terminology in tournament display ([e3baa0e](https://github.com/HTL-Steyr/tourney/commit/e3baa0e5a64c747ff80580ca5bb4f3e24048743d))
+- enhance UI components for better alignment and responsiveness ([50ff9db](https://github.com/HTL-Steyr/tourney/commit/50ff9db23540347e269909d2eaf086678a8bb26c))
+- implement grouped standings feature and enhance standings display ([c073578](https://github.com/HTL-Steyr/tourney/commit/c0735780afc17ce58beafff97772ec35fdb61c30))
+- improve responsive layout ([b8be862](https://github.com/HTL-Steyr/tourney/commit/b8be8629656954b42c1b7b5da1a83b5d6532dfec))
+- refactor tournament management and enhance UI for better user experience ([c06b54d](https://github.com/HTL-Steyr/tourney/commit/c06b54d286bc9e2b0a4795c8de5cebcc2cf8d6cc))
+- update sidebar state management and enhance collapsible behavior ([d83db35](https://github.com/HTL-Steyr/tourney/commit/d83db35a662a092577da8307ca33291e2ca3bdf6))
 
 # [0.32.0](https://github.com/HTL-Steyr/tourney/compare/v0.31.0...v0.32.0) (2026-03-04)
 

@@ -11,7 +11,13 @@ const rootPackage = JSON.parse(
 export default defineNuxtConfig({
   devtools: { enabled: true },
   compatibilityDate: "2025-07-28",
-  modules: ["@nuxt/ui", "@nuxt/fonts", "@nuxt/image", "@nuxtjs/supabase"],
+  modules: [
+    "@nuxt/ui",
+    "@nuxt/fonts",
+    "@nuxt/image",
+    "@nuxtjs/mdc",
+    "@nuxtjs/supabase",
+  ],
   devServer: {
     port: 3003,
   },
@@ -19,6 +25,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       clientVersion: rootPackage.version || "dev",
+    },
+  },
+  mdc: {
+    components: {
+      prose: false,
     },
   },
   ui: {

@@ -1,20 +1,16 @@
-export const AI_ASSISTANT_MODELS = ["gpt-4o-mini", "gpt-4o"] as const
+export const AI_ASSISTANT_MODELS = ["gpt-4.1-nano"] as const
 
 export type AiAssistantModel = (typeof AI_ASSISTANT_MODELS)[number]
 
-export const AI_ASSISTANT_DEFAULT_MODEL: AiAssistantModel = "gpt-4o-mini"
+export const AI_ASSISTANT_DEFAULT_MODEL: AiAssistantModel = "gpt-4.1-nano"
 
 export const AI_ASSISTANT_MODEL_OPTIONS: Array<{
   label: string
   value: AiAssistantModel
 }> = [
   {
-    label: "GPT-4o mini",
-    value: "gpt-4o-mini",
-  },
-  {
-    label: "GPT-4o",
-    value: "gpt-4o",
+    label: "GPT 4.1 Nano",
+    value: "gpt-4.1-nano",
   },
 ]
 
