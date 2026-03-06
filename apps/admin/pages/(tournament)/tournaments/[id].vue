@@ -287,6 +287,13 @@ const allTeamsRegistered = computed(() => {
   )
 })
 
+const TOURNAMENT_META_WIDE_MIN_WIDTH = 574
+const tournamentMetaRef = ref<HTMLElement | null>(null)
+const { width: tournamentMetaWidth } = useElementSize(tournamentMetaRef)
+const isTournamentMetaWide = computed(() => {
+  return tournamentMetaWidth.value >= TOURNAMENT_META_WIDE_MIN_WIDTH
+})
+
 const canGoLive = computed(() => {
   if (isTournamentLive.value) return true
   return allTeamsRegistered.value && data.value?.teams === maxTeams.value
@@ -390,25 +397,43 @@ const canGoLive = computed(() => {
         class="flex w-1/2 flex-col overflow-auto border-r border-neutral-200 2xl:w-2/5 dark:border-neutral-700"
       >
         <div
-          class="flex h-auto w-full gap-3 border-b border-neutral-200 bg-neutral-100 p-3 px-6 dark:border-neutral-800 dark:bg-neutral-900"
+          ref="tournamentMetaRef"
+          class="grid h-auto w-full gap-3 border-b border-neutral-200 bg-neutral-100 p-3 px-6 dark:border-neutral-800 dark:bg-neutral-900"
+          :class="
+            isTournamentMetaWide
+              ? 'grid-cols-[minmax(0,1fr)_16rem_minmax(0,1fr)]'
+              : 'grid-cols-1'
+          "
         >
           <div
             v-if="tournament"
-            class="flex w-auto grow items-center gap-1 rounded-md bg-neutral-50 p-3 pr-3 dark:bg-neutral-800"
+            class="w-full rounded-md bg-neutral-50 p-3 dark:bg-neutral-800"
           >
-            <div class="flex flex-col">
+            <div
+              :class="
+                isTournamentMetaWide
+                  ? 'flex flex-col gap-1'
+                  : 'grid grid-cols-2 gap-3'
+              "
+            >
               <TournamentItemInfoStart
                 :tournament
                 :truncate="false"
-                class="pr-3"
+                class="min-w-0"
               />
-              <div class="flex items-center">
+              <div
+                :class="[
+                  'flex min-w-0 items-center',
+                  !isTournamentMetaWide ? 'justify-end' : '',
+                ]"
+              >
                 <TournamentItemInfoTime :tournament :arrow-right="true" />
               </div>
             </div>
           </div>
           <div
-            class="flex w-64 flex-col gap-2 rounded-md bg-neutral-50 p-2 px-3 dark:bg-neutral-800"
+            class="flex flex-col gap-2 rounded-md bg-neutral-50 p-2 px-3 dark:bg-neutral-800"
+            :class="isTournamentMetaWide ? 'w-64' : 'w-full'"
             v-if="data"
           >
             <div class="flex justify-between">
@@ -428,24 +453,37 @@ const canGoLive = computed(() => {
             />
             <TournamentTeamStatus :data="data" class="grow" />
           </div>
-          <div
-            class="rounded-md bg-neutral-50 p-3 pr-3 text-sm 2xl:min-w-0 2xl:flex-1 dark:bg-neutral-800"
-          >
-            <div class="flex items-center space-x-1">
-              <UIcon name="i-heroicons-ticket" />
-              <p>{{ tournament?.sport }}</p>
-            </div>
-            <div class="flex items-center space-x-1">
-              <UIcon name="i-heroicons-user-group" />
-              <p>{{ tournament?.groups }} Gruppen</p>
-            </div>
-            <div class="flex items-center space-x-1">
-              <UIcon name="i-heroicons-identification" />
-              <p>{{ tournament?.group_teams }} Teams/Gruppe</p>
-            </div>
-            <div class="flex items-center space-x-1">
-              <UIcon name="i-heroicons-clock" />
-              <p>{{ tournament?.knockout_interval }}min Knockout</p>
+          <div class="rounded-md bg-neutral-50 p-3 text-sm dark:bg-neutral-800">
+            <div
+              class="grid gap-x-4 gap-y-1"
+              :class="isTournamentMetaWide ? 'grid-cols-1' : 'grid-cols-2'"
+            >
+              <div class="flex min-w-0 items-center space-x-1">
+                <UIcon name="i-heroicons-ticket" />
+                <p>{{ tournament?.sport }}</p>
+              </div>
+              <div
+                :class="[
+                  'flex min-w-0 items-center space-x-1',
+                  !isTournamentMetaWide ? 'justify-end' : '',
+                ]"
+              >
+                <UIcon name="i-heroicons-user-group" />
+                <p>{{ tournament?.groups }} Gruppen</p>
+              </div>
+              <div class="flex min-w-0 items-center space-x-1">
+                <UIcon name="i-heroicons-identification" />
+                <p>{{ tournament?.group_teams }} Teams/Gruppe</p>
+              </div>
+              <div
+                :class="[
+                  'flex min-w-0 items-center space-x-1',
+                  !isTournamentMetaWide ? 'justify-end' : '',
+                ]"
+              >
+                <UIcon name="i-heroicons-clock" />
+                <p>{{ tournament?.knockout_interval }}min Knockout</p>
+              </div>
             </div>
           </div>
         </div>
