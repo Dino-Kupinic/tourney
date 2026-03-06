@@ -4,7 +4,21 @@ import {
   VOLLEYBALL_BASKETBALL_MAX_TEAMS,
 } from "~/misc/constants"
 import { z } from "zod"
-import type { Enums, Group, ParsedJsonTournament } from "@tourney/types"
+import type {
+  Enums,
+  Group,
+  ParsedJsonTournament,
+  TournamentTeamSummary,
+} from "@tourney/types"
+
+type TournamentParticipant = {
+  id: string
+  name: string
+  group_id: string | null
+  registration: {
+    status: Enums<"registration_status">
+  } | null
+}
 
 const title = ref<string>("Turniere")
 useHead({
@@ -23,9 +37,12 @@ if (!tournament.value) {
   })
 }
 const tournamentName = ref<string>(tournament.value?.name ?? "Turnier")
-const { data, refresh: teamsRefresh } = await useFetch(
+const { data, refresh: teamsRefresh } = await useFetch<TournamentTeamSummary>(
   `/api/tournaments/${tournament.value.id}/teams`,
 )
+const { data: participants, refresh: participantsRefresh } = await useFetch<
+  TournamentParticipant[]
+>(`/api/tournaments/${tournament.value.id}/participants`)
 
 const maxTeams = computed(() => {
   switch (tournament.value?.sport) {
@@ -40,8 +57,20 @@ const maxTeams = computed(() => {
 })
 
 const groupAlert = computed(() => {
-  if (!groups.value || !data.value) return
-  return `Es fehlen noch ${maxTeams.value - data.value.teams} Teams.`
+  if (!data.value) return
+  if (data.value.teams < maxTeams.value) {
+    return `Es fehlen noch ${maxTeams.value - data.value.teams} Spielteams.`
+  }
+  if (data.value.teams > maxTeams.value) {
+    return `Es sind ${data.value.teams - maxTeams.value} Spielteams zu viel ausgewählt.`
+  }
+  return undefined
+})
+
+const waitingTeamsAlert = computed(() => {
+  if (!data.value || data.value.waiting <= 0) return
+
+  return `${data.value.waiting} ${data.value.waiting === 1 ? "Team ist" : "Teams sind"} angemeldet, aber aktuell nicht im Spielfeld.`
 })
 
 const links = [
@@ -100,6 +129,7 @@ const refreshTournament = async () => {
   await tournamentRefresh()
   await refreshGroups()
   await teamsRefresh()
+  await participantsRefresh()
   displaySuccessNotification("Aktualisiert", "Die Daten wurde aktualisiert.")
 }
 
@@ -107,6 +137,8 @@ const mixGroups = async () => {
   try {
     await $fetch(`/api/tournaments/${tournament.value?.id}/mix`)
     await refreshGroups()
+    await teamsRefresh()
+    await participantsRefresh()
     isOpenConfirm.value = false
     displaySuccessNotification(
       "Erfolgreich",
@@ -128,6 +160,132 @@ const timeline = [
   { label: "Kleines Finale" },
   { label: "Finale" },
 ]
+
+const isOpenTeamSelection = ref<boolean>(false)
+const selectedPlayableIds = ref<string[]>([])
+const currentPlayableIds = computed(() => {
+  return (
+    participants.value
+      ?.filter((team) => team.group_id !== null)
+      .map((team) => team.id) ?? []
+  )
+})
+watch(
+  currentPlayableIds,
+  (ids) => {
+    selectedPlayableIds.value = [...ids]
+  },
+  { immediate: true },
+)
+
+const eligibleParticipants = computed(() => {
+  return (
+    participants.value?.filter(
+      (team) => team.registration?.status !== "Abgelehnt",
+    ) ?? []
+  )
+})
+const selectedPlayableCount = computed(() => selectedPlayableIds.value.length)
+const selectedPlayableIdSet = computed(() => new Set(selectedPlayableIds.value))
+const selectionHasExactTeamCount = computed(() => {
+  return selectedPlayableCount.value === maxTeams.value
+})
+const canRandomizeSelection = computed(() => {
+  return eligibleParticipants.value.length >= maxTeams.value
+})
+
+function shuffleParticipants(
+  items: TournamentParticipant[],
+): TournamentParticipant[] {
+  const shuffled = [...items]
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const current = shuffled[i]
+    const random = shuffled[j]
+    if (current === undefined || random === undefined) continue
+    shuffled[i] = random
+    shuffled[j] = current
+  }
+  return shuffled
+}
+
+const sortedParticipants = computed(() => {
+  return [...(participants.value ?? [])].sort((a, b) => {
+    const aSelected = selectedPlayableIdSet.value.has(a.id)
+    const bSelected = selectedPlayableIdSet.value.has(b.id)
+    if (aSelected !== bSelected) {
+      return aSelected ? -1 : 1
+    }
+    return a.name.localeCompare(b.name)
+  })
+})
+
+const onResetTeamSelection = () => {
+  selectedPlayableIds.value = [...currentPlayableIds.value]
+}
+
+const onRandomizeTeamSelection = () => {
+  if (!canRandomizeSelection.value) {
+    displayFailureNotification(
+      "Zu wenig Teams",
+      `Für die Auslosung werden mindestens ${maxTeams.value} Teams benötigt.`,
+    )
+    return
+  }
+
+  const shuffled = shuffleParticipants(eligibleParticipants.value)
+  selectedPlayableIds.value = shuffled
+    .slice(0, maxTeams.value)
+    .map((team) => team.id)
+}
+
+const toggleTeamSelection = (teamId: string, checked: boolean) => {
+  if (checked) {
+    if (selectedPlayableIdSet.value.has(teamId)) return
+    if (selectedPlayableCount.value >= maxTeams.value) return
+    selectedPlayableIds.value = [...selectedPlayableIds.value, teamId]
+    return
+  }
+
+  selectedPlayableIds.value = selectedPlayableIds.value.filter(
+    (id) => id !== teamId,
+  )
+}
+
+const onSaveTeamSelection = async () => {
+  if (!selectionHasExactTeamCount.value) {
+    displayFailureNotification(
+      "Ungültige Auswahl",
+      `Es müssen genau ${maxTeams.value} Teams ausgewählt sein.`,
+    )
+    return
+  }
+
+  if (!tournament.value) return
+
+  try {
+    await $fetch(`/api/tournaments/${tournament.value.id}/participants`, {
+      method: "PUT",
+      body: {
+        selected_team_ids: selectedPlayableIds.value,
+      },
+    })
+    await refreshGroups()
+    await teamsRefresh()
+    await participantsRefresh()
+    isOpenTeamSelection.value = false
+    displaySuccessNotification(
+      "Auswahl gespeichert",
+      "Die Spielteams wurden gespeichert und neu gemischt.",
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler",
+      "Die Team-Auswahl konnte nicht gespeichert werden.",
+    )
+  }
+}
 
 const flowGroups = computed<Group[]>(() => {
   return (
@@ -275,7 +433,9 @@ const { data: matches } = await useFetch(
   `/api/tournaments/${tournament.value.id}/matches`,
 )
 
-const hasMatches = computed(() => matches.value && matches.value.length > 0)
+const hasMatches = computed<boolean>(() => {
+  return Boolean(matches.value && matches.value.length > 0)
+})
 
 const allTeamsRegistered = computed(() => {
   return (
@@ -285,6 +445,13 @@ const allTeamsRegistered = computed(() => {
       ),
     ) ?? false
   )
+})
+
+const TOURNAMENT_META_WIDE_MIN_WIDTH = 574
+const tournamentMetaRef = ref<HTMLElement | null>(null)
+const { width: tournamentMetaWidth } = useElementSize(tournamentMetaRef)
+const isTournamentMetaWide = computed(() => {
+  return tournamentMetaWidth.value >= TOURNAMENT_META_WIDE_MIN_WIDTH
 })
 
 const canGoLive = computed(() => {
@@ -330,6 +497,30 @@ const canGoLive = computed(() => {
           <p>Möchtest du die Gruppen neu mischen?</p>
         </ModalConfirm>
         <template v-if="hasMatches && !isTournamentLive">
+          <UTooltip text="Spiele existieren, Team-Auswahl nicht mehr möglich.">
+            <UButton
+              v-if="!tournament?.is_live"
+              label="Spielteams wählen..."
+              icon="i-heroicons-user-group"
+              variant="outline"
+              color="neutral"
+              size="sm"
+              :disabled="hasMatches"
+            />
+          </UTooltip>
+        </template>
+        <template v-else>
+          <UButton
+            v-if="!tournament?.is_live"
+            label="Spielteams wählen..."
+            icon="i-heroicons-user-group"
+            variant="outline"
+            color="neutral"
+            size="sm"
+            @click="isOpenTeamSelection = true"
+          />
+        </template>
+        <template v-if="hasMatches && !isTournamentLive">
           <UTooltip text="Spiele existieren, keine Gruppenmischung möglich.">
             <UButton
               v-if="!tournament?.is_live"
@@ -354,8 +545,156 @@ const canGoLive = computed(() => {
             @click="isOpenConfirm = true"
           />
         </template>
+        <UModal
+          v-model:open="isOpenTeamSelection"
+          :ui="{
+            content: 'w-full overflow-hidden sm:max-w-3xl sm:max-h-[90vh]',
+          }"
+          prevent-close
+        >
+          <template #content>
+            <UCard
+              :ui="{
+                root: 'flex max-h-[90vh] flex-col divide-y divide-neutral-100 overflow-hidden dark:divide-neutral-800',
+                body: 'flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-5',
+                header: 'px-4 py-3 sm:px-5',
+                footer: 'px-4 py-3 sm:px-5',
+              }"
+            >
+              <template #header>
+                <strong>Spielteams auswählen</strong>
+              </template>
+
+              <div class="space-y-3">
+                <UAlert
+                  icon="i-heroicons-information-circle"
+                  color="primary"
+                  variant="soft"
+                  title="Auswahl"
+                  :description="`Wähle genau ${maxTeams} Teams aus. Danach werden diese zufällig auf die Gruppen verteilt.`"
+                />
+
+                <div
+                  class="grid gap-2 rounded-md bg-neutral-100 p-3 text-sm sm:grid-cols-3 dark:bg-neutral-800"
+                >
+                  <div>
+                    <p class="text-neutral-500">Ausgewählt</p>
+                    <p class="font-semibold">
+                      {{ selectedPlayableCount }}/{{ maxTeams }}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-neutral-500">Anmeldbar</p>
+                    <p class="font-semibold">
+                      {{ eligibleParticipants.length }}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-neutral-500">Warteliste</p>
+                    <p class="font-semibold">{{ data?.waiting ?? 0 }}</p>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                  <UButton
+                    label="Zufällig auswählen"
+                    icon="i-heroicons-sparkles"
+                    color="warning"
+                    variant="soft"
+                    size="sm"
+                    :disabled="!canRandomizeSelection"
+                    @click="onRandomizeTeamSelection"
+                  />
+                  <UButton
+                    label="Zurücksetzen"
+                    icon="i-heroicons-arrow-uturn-left"
+                    color="neutral"
+                    variant="outline"
+                    size="sm"
+                    @click="onResetTeamSelection"
+                  />
+                </div>
+
+                <div
+                  class="min-h-0 overflow-y-auto rounded-md border border-neutral-200 dark:border-neutral-800"
+                  style="max-height: 26rem"
+                >
+                  <div
+                    v-for="participant in sortedParticipants"
+                    :key="participant.id"
+                    class="flex items-center justify-between border-b border-neutral-200 p-3 last:border-b-0 dark:border-neutral-800"
+                  >
+                    <div class="flex min-w-0 items-center gap-3">
+                      <UCheckbox
+                        :model-value="selectedPlayableIdSet.has(participant.id)"
+                        :disabled="
+                          participant.registration?.status === 'Abgelehnt' ||
+                          (!selectedPlayableIdSet.has(participant.id) &&
+                            selectedPlayableCount >= maxTeams)
+                        "
+                        @update:model-value="
+                          toggleTeamSelection(participant.id, Boolean($event))
+                        "
+                      />
+                      <div class="min-w-0">
+                        <p class="truncate font-medium">
+                          {{ participant.name }}
+                        </p>
+                        <p
+                          class="text-xs text-neutral-500 dark:text-neutral-400"
+                        >
+                          {{
+                            participant.group_id
+                              ? "Aktuell im Spielfeld"
+                              : "Aktuell Warteliste"
+                          }}
+                        </p>
+                      </div>
+                    </div>
+                    <UBadge
+                      :label="participant.registration?.status ?? 'Unbekannt'"
+                      :color="
+                        participant.registration?.status === 'Abgeschlossen'
+                          ? 'success'
+                          : participant.registration?.status === 'Abgesendet'
+                            ? 'warning'
+                            : participant.registration?.status === 'Abgelehnt'
+                              ? 'error'
+                              : 'neutral'
+                      "
+                      variant="subtle"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <template #footer>
+                <div class="flex justify-end gap-2">
+                  <UButton
+                    label="Abbrechen"
+                    color="neutral"
+                    variant="outline"
+                    size="sm"
+                    @click="isOpenTeamSelection = false"
+                  />
+                  <UButton
+                    label="Auswahl speichern"
+                    icon="i-heroicons-check"
+                    color="success"
+                    variant="soft"
+                    size="sm"
+                    :disabled="!selectionHasExactTeamCount"
+                    @click="onSaveTeamSelection"
+                  />
+                </div>
+              </template>
+            </UCard>
+          </template>
+        </UModal>
         <template v-if="!canGoLive">
-          <UTooltip text="Alle Teams müssen akzeptiert sein">
+          <UTooltip
+            text="Genaues Teamfeld + alle Spielteams müssen akzeptiert sein"
+          >
             <UButton
               :label="liveLabel"
               icon="i-heroicons-signal"
@@ -390,37 +729,58 @@ const canGoLive = computed(() => {
         class="flex w-1/2 flex-col overflow-auto border-r border-neutral-200 2xl:w-2/5 dark:border-neutral-700"
       >
         <div
-          class="flex h-auto w-full gap-3 border-b border-neutral-200 bg-neutral-100 p-3 px-6 dark:border-neutral-800 dark:bg-neutral-900"
+          ref="tournamentMetaRef"
+          class="grid h-auto w-full gap-3 border-b border-neutral-200 bg-neutral-100 p-3 px-6 dark:border-neutral-800 dark:bg-neutral-900"
+          :class="
+            isTournamentMetaWide
+              ? 'grid-cols-[minmax(0,1fr)_16rem_minmax(0,1fr)]'
+              : 'grid-cols-1'
+          "
         >
           <div
             v-if="tournament"
-            class="flex w-auto grow items-center gap-1 rounded-md bg-neutral-50 p-3 pr-3 dark:bg-neutral-800"
+            class="w-full rounded-md border border-neutral-200 bg-neutral-50 p-3 dark:border-none dark:bg-neutral-800"
           >
-            <div class="flex flex-col">
+            <div
+              :class="
+                isTournamentMetaWide
+                  ? 'flex flex-col gap-1'
+                  : 'grid grid-cols-2 gap-3'
+              "
+            >
               <TournamentItemInfoStart
                 :tournament
                 :truncate="false"
-                class="pr-3"
+                class="min-w-0"
               />
-              <div class="flex items-center">
+              <div
+                :class="[
+                  'flex min-w-0 items-center',
+                  !isTournamentMetaWide ? 'justify-end' : '',
+                ]"
+              >
                 <TournamentItemInfoTime :tournament :arrow-right="true" />
               </div>
             </div>
           </div>
           <div
-            class="flex w-64 flex-col gap-2 rounded-md bg-neutral-50 p-2 px-3 dark:bg-neutral-800"
+            class="flex flex-col gap-2 rounded-md border border-neutral-200 bg-neutral-50 p-2 px-3 dark:border-none dark:bg-neutral-800"
+            :class="isTournamentMetaWide ? 'w-64' : 'w-full'"
             v-if="data"
           >
             <div class="flex justify-between">
               <div class="flex items-center space-x-1">
                 <UIcon name="i-heroicons-clipboard-document-list" />
-                <p>{{ data?.teams }}/{{ maxTeams }} Teams</p>
+                <p>{{ data?.teams }}/{{ maxTeams }} Spielteams</p>
               </div>
               <div class="flex items-center space-x-1">
                 <UIcon name="i-heroicons-users" />
                 <p>{{ data?.students }} Schüler</p>
               </div>
             </div>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">
+              Insg. angemeldet: {{ data?.registered }} Teams
+            </p>
             <USeparator
               :ui="{
                 border: 'flex border-neutral-200 dark:border-neutral-700',
@@ -429,23 +789,38 @@ const canGoLive = computed(() => {
             <TournamentTeamStatus :data="data" class="grow" />
           </div>
           <div
-            class="rounded-md bg-neutral-50 p-3 pr-3 text-sm 2xl:min-w-0 2xl:flex-1 dark:bg-neutral-800"
+            class="rounded-md border border-neutral-200 bg-neutral-50 p-3 text-sm dark:border-none dark:bg-neutral-800"
           >
-            <div class="flex items-center space-x-1">
-              <UIcon name="i-heroicons-ticket" />
-              <p>{{ tournament?.sport }}</p>
-            </div>
-            <div class="flex items-center space-x-1">
-              <UIcon name="i-heroicons-user-group" />
-              <p>{{ tournament?.groups }} Gruppen</p>
-            </div>
-            <div class="flex items-center space-x-1">
-              <UIcon name="i-heroicons-identification" />
-              <p>{{ tournament?.group_teams }} Teams/Gruppe</p>
-            </div>
-            <div class="flex items-center space-x-1">
-              <UIcon name="i-heroicons-clock" />
-              <p>{{ tournament?.knockout_interval }}min Knockout</p>
+            <div
+              class="grid gap-x-4 gap-y-1"
+              :class="isTournamentMetaWide ? 'grid-cols-1' : 'grid-cols-2'"
+            >
+              <div class="flex min-w-0 items-center space-x-1">
+                <UIcon name="i-heroicons-ticket" />
+                <p>{{ tournament?.sport }}</p>
+              </div>
+              <div
+                :class="[
+                  'flex min-w-0 items-center space-x-1',
+                  !isTournamentMetaWide ? 'justify-end' : '',
+                ]"
+              >
+                <UIcon name="i-heroicons-user-group" />
+                <p>{{ tournament?.groups }} Gruppen</p>
+              </div>
+              <div class="flex min-w-0 items-center space-x-1">
+                <UIcon name="i-heroicons-identification" />
+                <p>{{ tournament?.group_teams }} Teams/Gruppe</p>
+              </div>
+              <div
+                :class="[
+                  'flex min-w-0 items-center space-x-1',
+                  !isTournamentMetaWide ? 'justify-end' : '',
+                ]"
+              >
+                <UIcon name="i-heroicons-clock" />
+                <p>{{ tournament?.knockout_interval }}min Knockout</p>
+              </div>
             </div>
           </div>
         </div>
@@ -533,6 +908,16 @@ const canGoLive = computed(() => {
               :description="groupAlert"
             />
           </div>
+          <div>
+            <UAlert
+              v-if="waitingTeamsAlert"
+              icon="i-heroicons-users"
+              color="warning"
+              variant="soft"
+              title="Warteliste"
+              :description="waitingTeamsAlert"
+            />
+          </div>
           <div class="flex w-full justify-between">
             <strong>Teams</strong>
             <SearchInput v-model="search" placeholder="Suche nach Teams..." />
@@ -567,7 +952,6 @@ const canGoLive = computed(() => {
                           icon="i-heroicons-check"
                           color="neutral"
                           variant="outline"
-                          size="sm"
                           square
                           @click="editPlayerNote(player.id, player.note)"
                         />

@@ -10,6 +10,7 @@
   "scripts": {
     "clean": "git clean -xdf node_modules",
     "create:users": "turbo run create --filter=@tourney/user-creator",
+    "fill:tournament": "cd ./apps/user-creator && bun run fill:tournament",
     "install:browsers": "bunx puppeteer browsers install",
     "start:docs": "vitepress preview docs",
     "start:admin": "cd ./apps/admin && bun .output/server/index.mjs",

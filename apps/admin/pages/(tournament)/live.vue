@@ -8,47 +8,193 @@ import type {
 } from "@tourney/types"
 import { useDatabaseClient } from "~/composables/useDatabaseClient"
 
+type LiveGroup = {
+  id: string
+  name: string
+  teams: Database["public"]["Tables"]["team"]["Row"][]
+}
+
+type GroupStanding = Database["public"]["Views"]["group_standings"]["Row"]
+type GroupStandingsSection = {
+  id: string
+  name: string
+  standings: Standing[]
+}
+
 const title = ref<string>("Live")
 useHead({
   title: () => title.value,
 })
 
 const { tournaments, fetchTournaments } = useLiveTournaments()
+const { showGroupedStandings } = useLiveSettings()
 const selected = useState<string>("selectedTournament", () => "")
 await fetchTournaments()
-const firstTournament = tournaments.value[0]
-if (!selected.value && firstTournament) {
-  selected.value = firstTournament.id
-}
+const tournamentOptions = computed(() =>
+  tournaments.value.map((item) => ({
+    label: item.name,
+    value: item.id,
+  })),
+)
+const hasTournaments = computed(() => tournamentOptions.value.length > 0)
+
+watch(
+  tournamentOptions,
+  (options) => {
+    if (!options.length) {
+      selected.value = ""
+      return
+    }
+
+    if (!options.some((option) => option.value === selected.value)) {
+      selected.value = options[0]?.value ?? ""
+    }
+  },
+  { immediate: true },
+)
+
+const selectedTournamentId = computed(() => selected.value || null)
 
 const { data: tournament, refresh: tournamentRefresh } =
-  await useFetch<ParsedJsonTournament | null>(
-    () => `/api/tournaments/${selected.value}`,
-  )
-if (!tournament.value) {
-  throw createError({
-    statusCode: 404,
-    message: "Turnier nicht gefunden",
-  })
-}
+  await useAsyncData<ParsedJsonTournament | null>(
+    "admin-live-tournament",
+    async () => {
+      if (!selectedTournamentId.value) {
+        return null
+      }
 
-const { data: matches, refresh: matchRefresh } = await useFetch<Match[]>(
-  `/api/views/matches/${tournament.value.id}`,
+      return await $fetch(`/api/tournaments/${selectedTournamentId.value}`)
+    },
+    {
+      default: () => null,
+      watch: [selectedTournamentId],
+    },
+  )
+
+const tournamentId = computed(() => tournament.value?.id ?? null)
+
+const { data: matches, refresh: matchRefresh } = await useAsyncData<Match[]>(
+  "admin-live-matches",
+  async () => {
+    if (!tournamentId.value) {
+      return []
+    }
+
+    return await $fetch(`/api/views/matches/${tournamentId.value}`)
+  },
+  {
+    default: () => [],
+    watch: [tournamentId],
+  },
 )
 
 const isOpenInfo = ref<boolean>(false)
-const { data: standings, refresh: standingsRefresh } = await useFetch<
-  Standing[]
->(`/api/views/standings/${tournament.value.id}`)
+const { data: groups, refresh: groupsRefresh } = await useAsyncData<
+  LiveGroup[]
+>(
+  "admin-live-groups",
+  async () => {
+    if (!tournamentId.value) {
+      return []
+    }
 
-const { data: liveMatches, refresh: refreshLiveMatches } = await useFetch<
+    return await $fetch(`/api/tournaments/${tournamentId.value}/groups`)
+  },
+  {
+    default: () => [],
+    watch: [tournamentId],
+  },
+)
+
+const groupIds = computed(() => groups.value.map((group) => group.id).join(","))
+
+function normalizeGroupStanding(standing: GroupStanding): Standing {
+  return {
+    draws: standing.draws ?? 0,
+    goal_difference: standing.goal_difference ?? 0,
+    goals_conceded: standing.goals_conceded ?? 0,
+    goals_scored: standing.goals_scored ?? 0,
+    losses: standing.losses ?? 0,
+    points: standing.points ?? 0,
+    team_id: standing.team_id ?? "",
+    team_name: standing.team_name ?? "",
+    tournament_id: standing.tournament_id ?? tournamentId.value ?? "",
+    wins: standing.wins ?? 0,
+  }
+}
+
+const { data: fullStandings, refresh: fullStandingsRefresh } =
+  await useAsyncData<Standing[]>(
+    "admin-live-standings",
+    async () => {
+      if (!tournamentId.value) {
+        return []
+      }
+
+      return await $fetch(`/api/views/standings/${tournamentId.value}`)
+    },
+    {
+      default: () => [],
+      watch: [tournamentId],
+    },
+  )
+
+const { data: groupedStandings, refresh: groupedStandingsRefresh } =
+  await useAsyncData<GroupStandingsSection[]>(
+    "admin-live-grouped-standings",
+    async () => {
+      if (!groups.value.length) {
+        return []
+      }
+
+      return await Promise.all(
+        groups.value.map(async (group) => {
+          const standings = await $fetch<GroupStanding[]>(
+            `/api/views/standings/group/${group.id}`,
+          )
+
+          return {
+            id: group.id,
+            name: group.name,
+            standings: (standings ?? []).map(normalizeGroupStanding),
+          }
+        }),
+      )
+    },
+    {
+      default: () => [],
+      watch: [groupIds],
+    },
+  )
+
+const refreshStandings = async () => {
+  await fullStandingsRefresh()
+  await groupedStandingsRefresh()
+}
+
+const { data: liveMatches, refresh: refreshLiveMatches } = await useAsyncData<
   Match[]
->(`/api/views/matches/live/${tournament.value.id}`)
+>(
+  "admin-live-live-matches",
+  async () => {
+    if (!tournamentId.value) {
+      return []
+    }
+
+    return await $fetch(`/api/views/matches/live/${tournamentId.value}`)
+  },
+  {
+    default: () => [],
+    watch: [tournamentId],
+  },
+)
 
 const refresh = async () => {
+  await fetchTournaments()
   await tournamentRefresh()
+  await groupsRefresh()
   await matchRefresh()
-  await standingsRefresh()
+  await refreshStandings()
   await refreshLiveMatches()
   await refreshResults()
   await refreshHistory()
@@ -61,7 +207,7 @@ const refresh = async () => {
 const refreshMatches = async () => {
   await matchRefresh()
   await refreshLiveMatches()
-  await standingsRefresh()
+  await refreshStandings()
   await refreshResults()
   await refreshHistory()
 }
@@ -73,8 +219,16 @@ const schema = z.object({
 
 const state = reactive({
   interval: 12,
-  start_time: tournament.value?.from,
+  start_time: "",
 })
+
+watch(
+  () => tournament.value?.from,
+  (startTime) => {
+    state.start_time = startTime ?? ""
+  },
+  { immediate: true },
+)
 
 const supabase = useDatabaseClient()
 const isOpenCreate = ref<boolean>(false)
@@ -95,6 +249,7 @@ const generateGroupMatches = async () => {
       return
     }
     await refreshMatches()
+    await groupsRefresh()
     displaySuccessNotification(
       "Gruppenphase gestartet",
       "Die Gruppenphase wurde erfolgreich gestartet.",
@@ -110,8 +265,19 @@ const generateGroupMatches = async () => {
 }
 
 const isOpenWinners = ref<boolean>(false)
-const { data: results, refresh: refreshResults } = await useFetch(
-  `/api/tournament_results/${tournament.value.id}`,
+const { data: results, refresh: refreshResults } = await useAsyncData(
+  "admin-live-results",
+  async () => {
+    if (!tournamentId.value) {
+      return []
+    }
+
+    return await $fetch(`/api/tournament_results/${tournamentId.value}`)
+  },
+  {
+    default: () => [],
+    watch: [tournamentId],
+  },
 )
 
 const getTeamName = (index: number) =>
@@ -155,8 +321,19 @@ const tabLive = [
   },
 ]
 
-const { data: history, refresh: refreshHistory } = await useFetch(
-  `/api/results/${tournament.value.id}`,
+const { data: history, refresh: refreshHistory } = await useAsyncData(
+  "admin-live-history",
+  async () => {
+    if (!tournamentId.value) {
+      return []
+    }
+
+    return await $fetch(`/api/results/${tournamentId.value}`)
+  },
+  {
+    default: () => [],
+    watch: [tournamentId],
+  },
 )
 </script>
 
@@ -169,7 +346,7 @@ const { data: history, refresh: refreshHistory } = await useFetch(
         color="warning"
         label="Gewinner anzeigen"
         icon="i-heroicons-trophy"
-        v-if="results?.length"
+        v-if="tournament && results?.length"
         @click="isOpenWinners = true"
       />
       <ModalInfo v-model="isOpenWinners">
@@ -187,7 +364,12 @@ const { data: history, refresh: refreshHistory } = await useFetch(
         color="primary"
         label="Gruppenphase starten..."
         @click="isOpenCreate = true"
-        v-if="!matches?.length && !liveMatches?.length && !results?.length"
+        v-if="
+          tournament &&
+          !matches?.length &&
+          !liveMatches?.length &&
+          !results?.length
+        "
       />
       <ModalCreate
         title="Gruppenphase starten"
@@ -221,14 +403,16 @@ const { data: history, refresh: refreshHistory } = await useFetch(
         variant="outline"
         size="sm"
         square
+        :disabled="!hasTournaments"
         @click="refresh"
       />
       <USelect
-        :items="tournaments"
+        :items="tournamentOptions"
         v-model="selected"
-        size="xs"
-        value-attribute="id"
-        option-attribute="name"
+        placeholder="Kein Live-Turnier verfügbar"
+        size="sm"
+        class="min-w-64"
+        :disabled="!hasTournaments"
       />
       <UButton
         @click="isOpenInfo = true"
@@ -252,81 +436,119 @@ const { data: history, refresh: refreshHistory } = await useFetch(
     </ToolbarContainer>
   </BasePageHeader>
   <BasePageContent>
-    <div class="h-full w-full">
-      <div class="h-1/3">
-        <ClientOnly>
-          <LiveFlow :tournament-id="tournament?.id as string" />
-          <template #fallback>
-            <div
-              class="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-neutral-800"
-            >
-              <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
-            </div>
-          </template>
-        </ClientOnly>
-      </div>
-      <div
-        class="flex h-2/3 justify-between gap-6 border-t border-neutral-200 p-6 pt-3 dark:border-neutral-700"
-      >
-        <div class="flex w-1/3 flex-col gap-0.5">
-          <UTabs :items="tabTable" :ui="{ list: 'h-9', trigger: 'h-7' }" />
-          <StandingsTable v-if="standings" :standings="standings" />
-        </div>
-        <div class="flex w-1/3 flex-col gap-0.5">
-          <UTabs
-            :items="tabsMatches"
-            :ui="{
-              list: 'relative mb-0.5 h-9',
-              trigger: 'h-7',
-            }"
-          >
-            <template #matches>
-              <!-- TODO: fix height constraint, adjust padding -->
+    <template v-if="tournament">
+      <div class="h-full w-full">
+        <div class="h-1/3">
+          <ClientOnly>
+            <LiveFlow :tournament-id="tournament.id" />
+            <template #fallback>
               <div
-                class="flex h-[500px] flex-col gap-1 overflow-auto border-t border-neutral-200 pt-2 pb-48 dark:border-neutral-700"
+                class="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-neutral-800"
               >
-                <MatchItemRow
-                  v-for="(match, index) in matches"
-                  :match
-                  :next="index < 2"
-                  :key="match.match_id!"
-                  @live="refreshMatches"
-                />
+                <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
               </div>
             </template>
-            <template #history>
-              <!-- TODO: fix height constraint, adjust padding -->
-              <div
-                class="flex h-[500px] flex-col gap-1 overflow-auto border-t border-neutral-200 pt-2 pb-48 dark:border-neutral-700"
-              >
-                <!-- @vue-ignore -->
-                <ResultItem
-                  v-for="result in history"
-                  :match="result.match as Match"
-                  :id="result.id"
-                  :score1="result.team1_score"
-                  :score2="result.team2_score"
-                  :winner="result.winner_id"
-                  @refresh="refreshMatches"
-                />
-              </div>
-            </template>
-          </UTabs>
+          </ClientOnly>
         </div>
-        <div class="flex w-1/3 flex-col gap-0.5">
-          <UTabs :items="tabLive" :ui="{ list: 'h-9', trigger: 'h-7' }" />
-          <div
-            class="flex h-full flex-col gap-1 overflow-auto border-t border-neutral-200 pt-2 pb-12 dark:border-neutral-700"
-          >
-            <MatchItemLive
-              v-for="match in liveMatches"
-              :key="match.match_id!"
-              :match
-              @finish="refreshMatches"
+        <div
+          class="flex h-2/3 justify-between gap-6 border-t border-neutral-200 p-6 pt-3 dark:border-neutral-700"
+        >
+          <div class="flex w-1/3 flex-col gap-0.5">
+            <UTabs
+              :items="tabTable"
+              variant="link"
+              :ui="{ list: 'h-9', trigger: 'h-7' }"
             />
+            <div
+              class="mt-2 flex min-h-0 flex-1 flex-col gap-3 overflow-auto pb-12"
+            >
+              <template v-if="showGroupedStandings">
+                <div
+                  v-for="group in groupedStandings"
+                  :key="group.id"
+                  class="flex flex-col gap-2"
+                >
+                  <UBadge
+                    :label="group.name"
+                    color="neutral"
+                    variant="subtle"
+                    class="w-fit rounded-full"
+                  />
+                  <StandingsTable :standings="group.standings" compact />
+                </div>
+              </template>
+              <template v-else>
+                <StandingsTable :standings="fullStandings" compact />
+              </template>
+            </div>
+          </div>
+          <div class="flex w-1/3 flex-col gap-0.5">
+            <UTabs
+              :items="tabsMatches"
+              variant="link"
+              :ui="{
+                list: 'relative mb-0.5 h-9',
+                trigger: 'h-7',
+              }"
+            >
+              <template #matches>
+                <!-- TODO: fix height constraint, adjust padding -->
+                <div
+                  class="flex h-[500px] flex-col gap-1.5 overflow-auto pt-2 pb-48"
+                >
+                  <MatchItemRow
+                    v-for="(match, index) in matches"
+                    :match
+                    :next="index < 2"
+                    :key="match.match_id!"
+                    @live="refreshMatches"
+                  />
+                </div>
+              </template>
+              <template #history>
+                <!-- TODO: fix height constraint, adjust padding -->
+                <div
+                  class="flex h-[500px] flex-col gap-1.5 overflow-auto pt-2 pb-48"
+                >
+                  <!-- @vue-ignore -->
+                  <ResultItem
+                    v-for="result in history"
+                    :match="result.match as Match"
+                    :id="result.id"
+                    :score1="result.team1_score"
+                    :score2="result.team2_score"
+                    :winner="result.winner_id"
+                    @refresh="refreshMatches"
+                  />
+                </div>
+              </template>
+            </UTabs>
+          </div>
+          <div class="flex w-1/3 flex-col gap-0.5">
+            <UTabs
+              :items="tabLive"
+              variant="link"
+              :ui="{ list: 'h-9', trigger: 'h-7' }"
+            />
+            <div class="flex h-full flex-col gap-1.5 overflow-auto pt-2 pb-12">
+              <MatchItemLive
+                v-for="match in liveMatches"
+                :key="match.match_id!"
+                :match
+                @finish="refreshMatches"
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </template>
+    <template v-else>
+      <div class="flex h-full items-center justify-center p-6">
+        <EmptyState
+          title="Keine Live-Turniere"
+          description="Sobald ein Turnier live geschaltet ist, kannst du es hier auswählen und verwalten."
+        />
+      </div>
+    </template>
   </BasePageContent>
 </template>
