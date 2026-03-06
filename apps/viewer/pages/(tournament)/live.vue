@@ -1,13 +1,56 @@
 <script setup lang="ts">
-import type { Match, ParsedJsonTournament, Standing } from "@tourney/types"
+import type {
+  Database,
+  Match,
+  ParsedJsonTournament,
+  Standing,
+} from "@tourney/types"
+
+type TournamentGroup = Database["public"]["Tables"]["group"]["Row"]
+type GroupStanding = Database["public"]["Views"]["group_standings"]["Row"]
+type GroupStandingsSection = {
+  id: string
+  name: string
+  standings: Standing[]
+}
+type HistoryItem = {
+  id: string
+  match: Match
+  team1_score: number
+  team2_score: number
+  winner_id: string | null
+}
+type TournamentResult = {
+  team?: {
+    name?: string | null
+  } | null
+}
 
 const { tournaments, fetchTournaments } = useLiveTournaments()
 const selected = useState<string>("selectedTournament", () => "")
 await fetchTournaments()
-const firstTournament = tournaments.value[0]
-if (!selected.value && firstTournament) {
-  selected.value = firstTournament.id
-}
+const tournamentOptions = computed(() =>
+  tournaments.value.map((item) => ({
+    label: item.name,
+    value: item.id,
+  })),
+)
+const hasTournaments = computed(() => tournamentOptions.value.length > 0)
+
+watch(
+  tournamentOptions,
+  (options) => {
+    if (!options.length) {
+      selected.value = ""
+      return
+    }
+
+    if (!options.some((option) => option.value === selected.value)) {
+      selected.value = options[0]?.value ?? ""
+    }
+  },
+  { immediate: true },
+)
 
 const { data: tournament, refresh: tournamentRefresh } =
   await useFetch<ParsedJsonTournament | null>(
@@ -20,40 +63,131 @@ if (!tournament.value) {
   })
 }
 
-const { data: matches, refresh: matchRefresh } = await useFetch<Match[]>(
-  `/api/views/matches/${tournament.value.id}`,
+const tournamentId = computed(() => tournament.value?.id ?? "")
+
+const { data: matches, refresh: matchRefresh } = await useAsyncData<Match[]>(
+  "viewer-live-matches",
+  async () => {
+    if (!tournamentId.value) {
+      return []
+    }
+
+    return await $fetch<Match[]>(
+      `/api/views/matches/${tournamentId.value}` as string,
+    )
+  },
+  {
+    default: () => [],
+    watch: [tournamentId],
+  },
 )
 
-const { data: groups } = tournament.value
-  ? await useFetch(`/api/groups/${tournament.value.id}`)
-  : { data: ref(null) }
+const { data: groups } = await useAsyncData<TournamentGroup[]>(
+  "viewer-live-groups",
+  async () => {
+    if (!tournamentId.value) {
+      return []
+    }
 
-const selectedGroup = useState<string>("selectedGroup", () => "")
-const firstGroup = groups.value?.[0]
-if (firstGroup) {
-  selectedGroup.value = firstGroup.id
+    return await $fetch<TournamentGroup[]>(
+      `/api/groups/${tournamentId.value}` as string,
+    )
+  },
+  {
+    default: () => [],
+    watch: [tournamentId],
+  },
+)
+
+const { data: fullStandings, refresh: fullStandingsRefresh } =
+  await useAsyncData<Standing[]>(
+    "viewer-live-standings",
+    async () => {
+      if (!tournamentId.value) {
+        return []
+      }
+
+      return await $fetch<Standing[]>(
+        `/api/views/standings/${tournamentId.value}` as string,
+      )
+    },
+    {
+      default: () => [],
+      watch: [tournamentId],
+    },
+  )
+
+const groupIds = computed(
+  () => groups.value?.map((group) => group.id).join(",") ?? "",
+)
+
+function normalizeGroupStanding(standing: GroupStanding): Standing {
+  return {
+    draws: standing.draws ?? 0,
+    goal_difference: standing.goal_difference ?? 0,
+    goals_conceded: standing.goals_conceded ?? 0,
+    goals_scored: standing.goals_scored ?? 0,
+    losses: standing.losses ?? 0,
+    points: standing.points ?? 0,
+    team_id: standing.team_id ?? "",
+    team_name: standing.team_name ?? "",
+    tournament_id: standing.tournament_id ?? tournamentId.value,
+    wins: standing.wins ?? 0,
+  }
 }
 
-const { data: standings, refresh: standingsRefresh } = selectedGroup.value
-  ? await useFetch<Standing[]>(
-      () => `/api/views/standings/group/${selectedGroup.value}`,
+const { data: groupedStandings } = await useAsyncData<GroupStandingsSection[]>(
+  "viewer-live-grouped-standings",
+  async () => {
+    if (!groups.value?.length) {
+      return []
+    }
+
+    return await Promise.all(
+      groups.value.map(async (group) => {
+        const standings = await $fetch<GroupStanding[]>(
+          `/api/views/standings/group/${group.id}` as string,
+        )
+
+        return {
+          id: group.id,
+          name: group.name,
+          standings: (standings ?? []).map(normalizeGroupStanding),
+        }
+      }),
     )
-  : { data: ref([]), refresh: () => Promise.resolve() }
+  },
+  {
+    default: () => [],
+    watch: [groupIds],
+  },
+)
 
-watch(selectedGroup, async () => {
-  if (selectedGroup.value) {
-    await standingsRefresh()
-  }
-})
-
-const { data: liveMatches, refresh: refreshLiveMatches } = await useFetch<
+const { data: liveMatches, refresh: refreshLiveMatches } = await useAsyncData<
   Match[]
->(`/api/views/matches/live/${tournament.value.id}`)
+>(
+  "viewer-live-live-matches",
+  async () => {
+    if (!tournamentId.value) {
+      return []
+    }
+
+    return await $fetch<Match[]>(
+      `/api/views/matches/live/${tournamentId.value}` as string,
+    )
+  },
+  {
+    default: () => [],
+    watch: [tournamentId],
+  },
+)
 
 const refresh = async () => {
   await tournamentRefresh()
   await matchRefresh()
   await refreshLiveMatches()
+  await fullStandingsRefresh()
+  await refreshResults()
   await refreshHistory()
 }
 
@@ -76,12 +210,42 @@ supabase
   )
   .subscribe()
 
-const { data: history, refresh: refreshHistory } = await useFetch(
-  `/api/results/${tournament.value.id}`,
+const { data: history, refresh: refreshHistory } = await useAsyncData<
+  HistoryItem[]
+>(
+  "viewer-live-history",
+  async () => {
+    if (!tournamentId.value) {
+      return []
+    }
+
+    return await $fetch<HistoryItem[]>(
+      `/api/results/${tournamentId.value}` as string,
+    )
+  },
+  {
+    default: () => [],
+    watch: [tournamentId],
+  },
 )
 
-const { data: results, refresh: refreshResults } = await useFetch(
-  `/api/tournament_results/${tournament.value.id}`,
+const { data: results, refresh: refreshResults } = await useAsyncData<
+  TournamentResult[]
+>(
+  "viewer-live-results",
+  async () => {
+    if (!tournamentId.value) {
+      return []
+    }
+
+    return await $fetch<TournamentResult[]>(
+      `/api/tournament_results/${tournamentId.value}` as string,
+    )
+  },
+  {
+    default: () => [],
+    watch: [tournamentId],
+  },
 )
 
 const getTeamName = (index: number) =>
@@ -100,159 +264,166 @@ const { isDesktop } = useDevice()
 </script>
 
 <template>
-  <PageHeader
-    v-if="isDesktop"
-    title="Live"
-    description="Verfolge hier das Turnier"
-  />
-  <div
-    :class="[
-      'h-full w-full',
-      isDesktop && 'rounded-md border dark:border-neutral-800',
-    ]"
-  >
-    <template v-if="tournaments.length">
+  <div class="w-full">
+    <div v-if="isDesktop" class="mb-2">
+      <PageHeader title="Live" description="Verfolge hier das Turnier" />
+    </div>
+    <template v-if="hasTournaments">
       <div
         :class="[
-          'w-full border-b bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-900',
-          isDesktop ? 'rounded-t-md' : '',
+          'h-full w-full overflow-hidden',
+          isDesktop &&
+            'rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950',
         ]"
       >
-        <USelect
-          :items="tournaments"
-          v-model="selected"
-          size="lg"
-          value-attribute="id"
-          option-attribute="name"
-        />
-      </div>
-      <div
-        class="flex h-56 items-center justify-center border-b bg-neutral-50 sm:h-96 dark:border-neutral-700 dark:bg-neutral-900"
-      >
-        <ClientOnly>
-          <LiveFlow :tournament-id="tournament?.id as string" />
-          <template #fallback>
+        <div
+          :class="[
+            'w-full border-b border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-900',
+            isDesktop ? 'rounded-t-xl' : '',
+          ]"
+        >
+          <USelect
+            :items="tournamentOptions"
+            v-model="selected"
+            placeholder="Kein Live-Turnier verfügbar"
+            :size="isDesktop ? 'sm' : 'lg'"
+            :class="isDesktop ? 'min-w-64' : 'w-full'"
+            :disabled="!hasTournaments"
+          />
+        </div>
+        <div
+          class="flex h-56 items-center justify-center border-b border-neutral-200 bg-neutral-50 sm:h-96 dark:border-neutral-700 dark:bg-neutral-900"
+        >
+          <ClientOnly>
+            <LiveFlow :tournament-id="tournament?.id as string" />
+            <template #fallback>
+              <div
+                class="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-neutral-800"
+              >
+                <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
+              </div>
+            </template>
+          </ClientOnly>
+        </div>
+
+        <div
+          :class="[
+            isDesktop
+              ? 'xl:grid xl:grid-cols-2 xl:items-start xl:gap-4'
+              : 'flex flex-col gap-3',
+            'p-4',
+          ]"
+        >
+          <template v-if="results?.length">
             <div
-              class="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-neutral-800"
+              class="rounded-xl border border-neutral-200 bg-neutral-50 p-4 shadow-sm xl:col-span-2 dark:border-neutral-800 dark:bg-neutral-900"
             >
-              <UIcon name="i-svg-spinners-180-ring-with-bg" size="24" />
+              <PageHeading>Gewinner</PageHeading>
+              <TournamentPlaces
+                :first="first!"
+                :second="second!"
+                :third="third!"
+                :fourth="fourth!"
+              />
             </div>
           </template>
-        </ClientOnly>
-      </div>
 
-      <div
-        :class="[
-          isDesktop ? 'lg:grid lg:grid-cols-2 lg:gap-4' : 'flex flex-col gap-2',
-          'p-3',
-        ]"
-      >
-        <template v-if="results?.length">
-          <div class="lg:col-span-2">
-            <PageHeading>Gewinner</PageHeading>
-            <TournamentPlaces
-              :first="first!"
-              :second="second!"
-              :third="third!"
-              :fourth="fourth!"
-            />
-          </div>
-        </template>
-
-        <template v-else>
-          <div class="flex flex-col gap-1.5 lg:col-span-2">
-            <div>
+          <template v-else>
+            <div
+              class="flex flex-col gap-3 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm xl:col-span-2 dark:border-neutral-800 dark:bg-neutral-950"
+            >
+              <div>
+                <div
+                  class="ring-opacity-25 dark:bg-opacity-10 dark:ring-opacity-25 flex items-center justify-center space-x-1.5 rounded-md bg-red-50 px-2.5 py-0.5 ring-1 ring-red-500 ring-inset dark:bg-red-500 dark:ring-red-400"
+                >
+                  <span class="relative flex h-2 w-2">
+                    <span
+                      class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"
+                    ></span>
+                    <span
+                      class="relative inline-flex h-2 w-2 rounded-full bg-red-500"
+                    ></span>
+                  </span>
+                  <p class="text-sm font-medium text-red-500 dark:text-red-400">
+                    Live
+                  </p>
+                </div>
+              </div>
               <div
-                class="ring-opacity-25 dark:bg-opacity-10 dark:ring-opacity-25 flex items-center justify-center space-x-1.5 rounded-md bg-red-50 px-2.5 py-0.5 ring-1 ring-red-500 ring-inset dark:bg-red-500 dark:ring-red-400"
+                class="flex flex-col gap-1.5 rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900"
               >
-                <span class="relative flex h-2 w-2">
-                  <span
-                    class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"
-                  ></span>
-                  <span
-                    class="relative inline-flex h-2 w-2 rounded-full bg-red-500"
-                  ></span>
-                </span>
-                <p class="text-sm font-medium text-red-500 dark:text-red-400">
-                  Live
-                </p>
+                <template v-if="liveMatches?.length">
+                  <div
+                    :class="[
+                      isDesktop ? 'lg:grid lg:grid-cols-2 lg:gap-3' : '',
+                    ]"
+                  >
+                    <MatchItemLive
+                      v-for="match in liveMatches"
+                      :key="match.match_id!"
+                      :match
+                      class="lg:min-w-0"
+                    />
+                  </div>
+                </template>
+                <template v-else>
+                  <UAlert
+                    icon="i-heroicons-information-circle"
+                    color="primary"
+                    variant="soft"
+                    title="Zurzeit keine Live Spiele"
+                    description="Das nächste Spiel beginnt in Kürze."
+                  />
+                </template>
               </div>
             </div>
+
             <div
-              class="flex flex-col gap-1.5 rounded-md bg-neutral-50 p-3 dark:bg-neutral-900"
+              class="flex flex-col gap-1.5 self-start rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-950"
             >
-              <template v-if="liveMatches?.length">
-                <div
-                  :class="[isDesktop ? 'lg:grid lg:grid-cols-2 lg:gap-3' : '']"
-                >
-                  <MatchItemLive
-                    v-for="match in liveMatches"
-                    :key="match.match_id!"
-                    :match
-                    class="lg:min-w-0"
-                  />
-                </div>
-              </template>
-              <template v-else>
-                <UAlert
-                  icon="i-heroicons-information-circle"
-                  color="primary"
-                  variant="soft"
-                  title="Zurzeit keine Live Spiele"
-                  description="Das nächste Spiel beginnt in Kürze."
+              <USeparator>Anstehende Spiele</USeparator>
+              <div
+                class="flex h-96 flex-col gap-1.5 overflow-auto rounded-lg border border-neutral-200 bg-neutral-50 p-3 pb-8 dark:border-neutral-800 dark:bg-neutral-900"
+              >
+                <MatchItemRow
+                  v-for="(match, index) in matches"
+                  :match
+                  :next="index < 2"
+                  :key="match.match_id!"
                 />
-              </template>
+              </div>
             </div>
-          </div>
 
-          <div class="flex flex-col gap-1.5">
-            <USeparator>Anstehende Spiele</USeparator>
             <div
-              class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md bg-neutral-50 p-3 pb-8 dark:bg-neutral-900"
+              class="flex flex-col gap-1.5 self-start rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-950"
             >
-              <MatchItemRow
-                v-for="(match, index) in matches"
-                :match
-                :next="index < 2"
-                :key="match.match_id!"
+              <USeparator>Historie</USeparator>
+              <div
+                class="flex h-96 flex-col gap-1.5 overflow-auto rounded-lg border border-neutral-200 bg-neutral-50 p-3 pb-8 dark:border-neutral-800 dark:bg-neutral-900"
+              >
+                <!-- @vue-ignore -->
+                <ResultItem
+                  v-for="result in history"
+                  :match="result.match as Match"
+                  :id="result.id"
+                  :score1="result.team1_score"
+                  :score2="result.team2_score"
+                  :winner="result.winner_id"
+                />
+              </div>
+            </div>
+
+            <div
+              class="flex flex-col gap-1.5 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm xl:col-span-2 dark:border-neutral-800 dark:bg-neutral-950"
+            >
+              <USeparator>Platzierungen</USeparator>
+              <GroupedStandingsList
+                :grouped-standings="groupedStandings ?? []"
+                :full-standings="fullStandings ?? []"
               />
             </div>
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <USeparator>Historie</USeparator>
-            <div
-              class="flex h-96 flex-col gap-1.5 overflow-auto rounded-md bg-neutral-50 p-3 pb-8 dark:bg-neutral-900"
-            >
-              <!-- @vue-ignore -->
-              <ResultItem
-                v-for="result in history"
-                :match="result.match as Match"
-                :id="result.id"
-                :score1="result.team1_score"
-                :score2="result.team2_score"
-                :winner="result.winner_id"
-              />
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-1.5 lg:col-span-2">
-            <USeparator>Platzierungen</USeparator>
-            <USelect
-              v-if="groups"
-              :items="groups"
-              v-model="selectedGroup"
-              size="lg"
-              value-attribute="id"
-              option-attribute="name"
-            />
-            <StandingsTable
-              v-if="standings"
-              :standings="standings"
-              class="lg:max-w-full"
-            />
-          </div>
-        </template>
+          </template>
+        </div>
       </div>
     </template>
     <template v-else>
