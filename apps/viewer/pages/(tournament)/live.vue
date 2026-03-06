@@ -332,22 +332,18 @@ const { isDesktop } = useDevice()
             <div
               class="flex flex-col gap-3 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm xl:col-span-2 dark:border-neutral-800 dark:bg-neutral-950"
             >
-              <div>
-                <div
-                  class="ring-opacity-25 dark:bg-opacity-10 dark:ring-opacity-25 flex items-center justify-center space-x-1.5 rounded-md bg-red-50 px-2.5 py-0.5 ring-1 ring-red-500 ring-inset dark:bg-red-500 dark:ring-red-400"
-                >
-                  <span class="relative flex h-2 w-2">
-                    <span
-                      class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"
-                    ></span>
-                    <span
-                      class="relative inline-flex h-2 w-2 rounded-full bg-red-500"
-                    ></span>
-                  </span>
-                  <p class="text-sm font-medium text-red-500 dark:text-red-400">
-                    Live
-                  </p>
-                </div>
+              <div
+                class="ring-opacity-25 dark:bg-opacity-10 dark:ring-opacity-25 flex w-full items-center justify-center space-x-1.5 rounded-md bg-transparent px-2 py-1 ring-1 ring-red-400 ring-inset dark:bg-neutral-900"
+              >
+                <span class="relative flex h-2 w-2">
+                  <span
+                    class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"
+                  ></span>
+                  <span
+                    class="relative inline-flex h-2 w-2 rounded-full bg-red-400"
+                  ></span>
+                </span>
+                <p class="text-xs font-medium text-red-400">Live</p>
               </div>
               <div
                 class="flex flex-col gap-1.5 rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900"
@@ -379,7 +375,7 @@ const { isDesktop } = useDevice()
             </div>
 
             <div
-              class="flex flex-col gap-1.5 self-start rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-950"
+              class="flex w-full flex-col gap-1.5 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm xl:self-start dark:border-neutral-800 dark:bg-neutral-950"
             >
               <USeparator>Anstehende Spiele</USeparator>
               <div
@@ -395,7 +391,7 @@ const { isDesktop } = useDevice()
             </div>
 
             <div
-              class="flex flex-col gap-1.5 self-start rounded-xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-950"
+              class="flex w-full flex-col gap-1.5 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm xl:self-start dark:border-neutral-800 dark:bg-neutral-950"
             >
               <USeparator>Historie</USeparator>
               <div
