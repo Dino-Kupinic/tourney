@@ -167,9 +167,7 @@ onBeforeUnmount(() => {
     collapsible
     :toggle="false"
     :ui="{
-      root: isCollapsed
-        ? '!hidden !w-0 !min-w-0 overflow-hidden border-0 bg-transparent p-0 shadow-none'
-        : 'h-full !min-h-0 rounded-md border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900',
+      root: 'h-full !min-h-0 rounded-md border border-neutral-200 bg-white data-[collapsed=true]:!hidden data-[collapsed=true]:!w-0 data-[collapsed=true]:!min-w-0 data-[collapsed=true]:overflow-hidden data-[collapsed=true]:border-0 data-[collapsed=true]:bg-transparent data-[collapsed=true]:p-0 data-[collapsed=true]:shadow-none dark:border-neutral-800 dark:bg-neutral-900',
       header:
         'border-b border-neutral-200 h-11 px-4 py-2.5 dark:border-neutral-800',
       body: 'min-h-0 px-0 py-0',

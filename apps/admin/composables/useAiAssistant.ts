@@ -2,14 +2,28 @@ export const useAiAssistant = () => {
   const storedPreference = useCookie<boolean>("admin-ai-assistant-enabled", {
     default: () => false,
   })
+  const storedSidebarState = useCookie<{
+    collapsed: boolean
+    size: number
+  }>("admin-dashboard-sidebar-assistant", {
+    default: () => ({
+      collapsed: false,
+      size: 25,
+    }),
+  })
   const enabled = useState<boolean>(
     "admin-ai-assistant-enabled",
     () => storedPreference.value ?? false,
   )
-  const collapsed = useState<boolean>(
-    "admin-ai-assistant-collapsed",
-    () => false,
-  )
+  const collapsed = computed<boolean>({
+    get: () => storedSidebarState.value?.collapsed ?? false,
+    set: (value) => {
+      storedSidebarState.value = {
+        collapsed: value,
+        size: storedSidebarState.value?.size ?? 25,
+      }
+    },
+  })
 
   if (import.meta.server) {
     enabled.value = storedPreference.value ?? false
