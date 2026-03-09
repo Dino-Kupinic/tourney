@@ -537,7 +537,7 @@ onBeforeUnmount(() => {
         </div>
         <button
           type="button"
-          class="group flex cursor-row-resize items-center justify-center border-y border-neutral-200 bg-neutral-50/80 text-neutral-400 transition hover:bg-neutral-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-500 dark:hover:bg-neutral-800"
+          class="group focus-visible:ring-primary-500 flex cursor-row-resize items-center justify-center border-y border-neutral-200 bg-neutral-50/80 text-neutral-400 transition hover:bg-neutral-100 focus:outline-none focus-visible:ring-2 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-500 dark:hover:bg-neutral-800"
           aria-label="LiveFlow Höhe anpassen"
           @pointerdown="startLiveFlowResize"
           @dblclick="resetLiveFlowPanelRatio"
