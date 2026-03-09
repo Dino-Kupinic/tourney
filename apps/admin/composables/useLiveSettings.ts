@@ -1,35 +1,24 @@
-export const useLiveSettings = () => {
-  const storedGroupedStandings = useCookie<boolean>(
-    "admin-live-grouped-standings",
-    {
-      default: () => true,
-    },
-  )
-  const showGroupedStandings = useState<boolean>(
-    "admin-live-grouped-standings",
-    () => storedGroupedStandings.value ?? true,
-  )
+const usePersistedLiveSetting = <T>(key: string, defaultValue: T) => {
+  const storedValue = useCookie<T>(key, {
+    default: () => defaultValue,
+  })
+  const state = useState<T>(key, () => storedValue.value ?? defaultValue)
 
   if (import.meta.server) {
-    showGroupedStandings.value = storedGroupedStandings.value ?? true
+    state.value = storedValue.value ?? defaultValue
 
-    return {
-      showGroupedStandings,
-    }
+    return state
   }
 
-  const isInitialized = useState<boolean>(
-    "admin-live-grouped-standings-initialized",
-    () => false,
-  )
+  const isInitialized = useState<boolean>(`${key}-initialized`, () => false)
 
   if (!isInitialized.value) {
-    showGroupedStandings.value = storedGroupedStandings.value ?? true
+    state.value = storedValue.value ?? defaultValue
 
     watch(
-      showGroupedStandings,
+      state,
       (value) => {
-        storedGroupedStandings.value = value
+        storedValue.value = value
       },
       { immediate: true },
     )
@@ -37,7 +26,21 @@ export const useLiveSettings = () => {
     isInitialized.value = true
   }
 
+  return state
+}
+
+export const useLiveSettings = () => {
+  const showGroupedStandings = usePersistedLiveSetting<boolean>(
+    "admin-live-grouped-standings",
+    true,
+  )
+  const flowPanelRatio = usePersistedLiveSetting<number>(
+    "admin-live-flow-panel-ratio",
+    0.34,
+  )
+
   return {
     showGroupedStandings,
+    flowPanelRatio,
   }
 }

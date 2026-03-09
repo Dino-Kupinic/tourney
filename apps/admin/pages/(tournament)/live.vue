@@ -27,7 +27,7 @@ useHead({
 })
 
 const { tournaments, fetchTournaments } = useLiveTournaments()
-const { showGroupedStandings } = useLiveSettings()
+const { showGroupedStandings, flowPanelRatio } = useLiveSettings()
 const selected = useState<string>("selectedTournament", () => "")
 await fetchTournaments()
 const tournamentOptions = computed(() =>
@@ -321,6 +321,74 @@ const tabLive = [
   },
 ]
 
+const LIVE_FLOW_HANDLE_HEIGHT = 16
+const LIVE_FLOW_DEFAULT_RATIO = 0.34
+const LIVE_FLOW_MIN_RATIO = 0.2
+const LIVE_FLOW_MAX_RATIO = 0.75
+
+const clampLiveFlowRatio = (value: number) =>
+  Math.min(LIVE_FLOW_MAX_RATIO, Math.max(LIVE_FLOW_MIN_RATIO, value))
+
+const livePageLayoutRef = ref<HTMLElement | null>(null)
+const { height: livePageLayoutHeight } = useElementSize(livePageLayoutRef)
+const isResizingLiveFlow = ref(false)
+
+const liveFlowPanelRatio = computed(() =>
+  clampLiveFlowRatio(flowPanelRatio.value),
+)
+const livePageGridTemplateRows = computed(() => {
+  return `calc((100% - ${LIVE_FLOW_HANDLE_HEIGHT}px) * ${liveFlowPanelRatio.value}) ${LIVE_FLOW_HANDLE_HEIGHT}px minmax(0, 1fr)`
+})
+
+const setLiveFlowCursor = (isActive: boolean) => {
+  if (!import.meta.client) return
+
+  document.body.style.userSelect = isActive ? "none" : ""
+  document.body.style.cursor = isActive ? "row-resize" : ""
+}
+
+const setLiveFlowPanelRatio = (value: number) => {
+  flowPanelRatio.value = clampLiveFlowRatio(value)
+}
+
+const adjustLiveFlowPanelRatio = (delta: number) => {
+  setLiveFlowPanelRatio(liveFlowPanelRatio.value + delta)
+}
+
+const updateLiveFlowPanelRatio = (event: PointerEvent) => {
+  if (
+    !isResizingLiveFlow.value ||
+    !livePageLayoutRef.value ||
+    livePageLayoutHeight.value <= LIVE_FLOW_HANDLE_HEIGHT
+  ) {
+    return
+  }
+
+  const { top } = livePageLayoutRef.value.getBoundingClientRect()
+  const availableHeight = livePageLayoutHeight.value - LIVE_FLOW_HANDLE_HEIGHT
+  const offsetY = event.clientY - top
+
+  setLiveFlowPanelRatio(offsetY / availableHeight)
+}
+
+const startLiveFlowResize = (event: PointerEvent) => {
+  event.preventDefault()
+  isResizingLiveFlow.value = true
+  setLiveFlowCursor(true)
+  updateLiveFlowPanelRatio(event)
+}
+
+const stopLiveFlowResize = () => {
+  if (!isResizingLiveFlow.value) return
+
+  isResizingLiveFlow.value = false
+  setLiveFlowCursor(false)
+}
+
+const resetLiveFlowPanelRatio = () => {
+  setLiveFlowPanelRatio(LIVE_FLOW_DEFAULT_RATIO)
+}
+
 const { data: history, refresh: refreshHistory } = await useAsyncData(
   "admin-live-history",
   async () => {
@@ -335,6 +403,19 @@ const { data: history, refresh: refreshHistory } = await useAsyncData(
     watch: [tournamentId],
   },
 )
+
+onMounted(() => {
+  window.addEventListener("pointermove", updateLiveFlowPanelRatio)
+  window.addEventListener("pointerup", stopLiveFlowResize)
+  window.addEventListener("pointercancel", stopLiveFlowResize)
+})
+
+onBeforeUnmount(() => {
+  stopLiveFlowResize()
+  window.removeEventListener("pointermove", updateLiveFlowPanelRatio)
+  window.removeEventListener("pointerup", stopLiveFlowResize)
+  window.removeEventListener("pointercancel", stopLiveFlowResize)
+})
 </script>
 
 <template>
@@ -437,8 +518,12 @@ const { data: history, refresh: refreshHistory } = await useAsyncData(
   </BasePageHeader>
   <BasePageContent>
     <template v-if="tournament">
-      <div class="h-full w-full">
-        <div class="h-1/3">
+      <div
+        ref="livePageLayoutRef"
+        class="grid h-full w-full overflow-hidden"
+        :style="{ gridTemplateRows: livePageGridTemplateRows }"
+      >
+        <div class="min-h-0">
           <ClientOnly>
             <LiveFlow :tournament-id="tournament.id" />
             <template #fallback>
@@ -450,8 +535,21 @@ const { data: history, refresh: refreshHistory } = await useAsyncData(
             </template>
           </ClientOnly>
         </div>
+        <button
+          type="button"
+          class="group flex cursor-row-resize items-center justify-center border-y border-neutral-200 bg-neutral-50/80 text-neutral-400 transition hover:bg-neutral-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-500 dark:hover:bg-neutral-800"
+          aria-label="LiveFlow Höhe anpassen"
+          @pointerdown="startLiveFlowResize"
+          @dblclick="resetLiveFlowPanelRatio"
+          @keydown.up.prevent="adjustLiveFlowPanelRatio(-0.05)"
+          @keydown.down.prevent="adjustLiveFlowPanelRatio(0.05)"
+        >
+          <span
+            class="h-1 w-14 rounded-full bg-current opacity-70 transition group-hover:opacity-100"
+          />
+        </button>
         <div
-          class="flex h-2/3 justify-between gap-6 border-t border-neutral-200 p-6 pt-3 dark:border-neutral-700"
+          class="flex min-h-0 justify-between gap-6 overflow-hidden p-6 pt-3"
         >
           <div class="flex w-1/3 flex-col gap-0.5">
             <UTabs
