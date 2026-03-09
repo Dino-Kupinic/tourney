@@ -1,3 +1,16 @@
+# [0.34.0](https://github.com/HTL-Steyr/tourney/compare/v0.33.0...v0.34.0) (2026-03-06)
+
+
+### Features
+
+* enhance live display component with improved styling and layout adjustments ([445d16c](https://github.com/HTL-Steyr/tourney/commit/445d16ca530623bf919f43738d3184fa5ad7a032))
+* enhance sidebar navigation with search functionality and new links ([4640d14](https://github.com/HTL-Steyr/tourney/commit/4640d1428551081446b8cb01e8cb94ebfda0994d))
+* implement grouped standings feature and enhance UI layout for tournament details ([c5c68cd](https://github.com/HTL-Steyr/tourney/commit/c5c68cdbf323ff848923b8db9743585f39bf02ac))
+* improve standings display layout with vertical group names and enhanced styling ([9ee6f9c](https://github.com/HTL-Steyr/tourney/commit/9ee6f9cee9e4e3f53e29735603a66c86d446f75a))
+* update AI assistant models and enhance chat message processing ([b1d00f9](https://github.com/HTL-Steyr/tourney/commit/b1d00f9c58afb7df2bddc0906b295cfb553306a7))
+* update date formatting and improve live display styling ([1cfa6ca](https://github.com/HTL-Steyr/tourney/commit/1cfa6ca2d44a9f6e26c6def7a8d7cb732d28bfd6))
+* update media component to handle loading state and improve content display; add public read policy for misc bucket ([1ca5138](https://github.com/HTL-Steyr/tourney/commit/1ca5138cd6cf56316cb71749b4474b4f4ec78e09))
+
 # [0.33.0](https://github.com/HTL-Steyr/tourney/compare/v0.32.0...v0.33.0) (2026-03-06)
 
 ### Features
