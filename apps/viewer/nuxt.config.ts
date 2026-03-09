@@ -1,11 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   extends: ["../../packages/core"],
+  srcDir: "app",
   compatibilityDate: "2025-07-28",
   devtools: { enabled: true },
   modules: ["@nuxtjs/device", "@vueuse/nuxt", "@vite-pwa/nuxt"],
   supabase: {
     redirect: false,
+    types: "~~/types/database.types.ts",
   },
   nitro: {
     serverAssets: [

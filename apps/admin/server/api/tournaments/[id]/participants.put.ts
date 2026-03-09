@@ -1,7 +1,7 @@
 import {
   FOOTBALL_MAX_TEAMS,
   VOLLEYBALL_BASKETBALL_MAX_TEAMS,
-} from "~/misc/constants"
+} from "#shared/constants"
 
 type Body = {
   selected_team_ids: string[]
