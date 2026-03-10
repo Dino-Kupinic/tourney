@@ -16,28 +16,28 @@
     "check-types": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@iconify-json/heroicons": "^1.2.3",
-    "@iconify-json/svg-spinners": "^1.2.4",
-    "@nuxtjs/device": "^4.0.0",
-    "@nuxtjs/supabase": "^2.0.4",
-    "@supabase/supabase-js": "^2.97.0",
-    "@vite-pwa/nuxt": "1.1.1",
-    "@vue-flow/background": "^1.3.2",
-    "@vue-flow/controls": "^1.1.3",
-    "@vue-flow/core": "^1.48.2",
-    "@vue-flow/minimap": "^1.5.4",
-    "@vueuse/core": "^14.2.1",
-    "@vueuse/nuxt": "^14.2.1",
-    "handlebars": "^4.7.8",
-    "nuxt": "4.3.1",
-    "puppeteer": "24.6.1",
-    "vue": "3.5.29",
-    "vue-router": "5.0.3",
-    "zod": "^3.24.1"
+    "@iconify-json/heroicons": "catalog:ui",
+    "@iconify-json/svg-spinners": "catalog:ui",
+    "@nuxtjs/device": "catalog:framework",
+    "@nuxtjs/supabase": "catalog:data",
+    "@supabase/supabase-js": "catalog:data",
+    "@vite-pwa/nuxt": "catalog:viewer-tooling",
+    "@vue-flow/background": "catalog:flow",
+    "@vue-flow/controls": "catalog:flow",
+    "@vue-flow/core": "catalog:flow",
+    "@vue-flow/minimap": "catalog:flow",
+    "@vueuse/core": "catalog:framework",
+    "@vueuse/nuxt": "catalog:framework",
+    "handlebars": "catalog:viewer-tooling",
+    "nuxt": "catalog:framework",
+    "puppeteer": "catalog:viewer-tooling",
+    "vue": "catalog:framework",
+    "vue-router": "catalog:framework",
+    "zod": "catalog:validation"
   },
   "devDependencies": {
     "@tourney/types": "workspace:*",
-    "@types/k6": "^1.6.0",
-    "@vite-pwa/assets-generator": "^1.0.0"
+    "@types/k6": "catalog:viewer-tooling",
+    "@vite-pwa/assets-generator": "catalog:viewer-tooling"
   }
 }

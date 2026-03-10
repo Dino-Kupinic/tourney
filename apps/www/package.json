@@ -15,9 +15,9 @@
     "check-types": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@iconify-json/heroicons": "^1.2.3",
-    "nuxt": "4.3.1",
-    "vue": "3.5.29",
-    "vue-router": "5.0.3"
+    "@iconify-json/heroicons": "catalog:ui",
+    "nuxt": "catalog:framework",
+    "vue": "catalog:framework",
+    "vue-router": "catalog:framework"
   }
 }
