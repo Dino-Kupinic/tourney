@@ -4,6 +4,16 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
+  runtimeConfig: {
+    public: {
+      adminAppUrl:
+        process.env.NUXT_PUBLIC_ADMIN_APP_URL ??
+        "https://tourney-admin.dino-kupinic.dev",
+      viewerAppUrl:
+        process.env.NUXT_PUBLIC_VIEWER_APP_URL ??
+        "https://tourney-viewer.dino-kupinic.dev",
+    },
+  },
   supabase: {
     redirect: false,
     types: "~~/types/database.types.ts",

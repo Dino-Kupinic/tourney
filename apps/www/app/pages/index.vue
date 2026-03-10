@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { PageFeatureProps, ButtonProps } from "@nuxt/ui"
+import type { PageFeatureProps } from "@nuxt/ui"
 
-// TODO: move to config
-const adminAppUrl = "https://tourney-admin.dino-kupinic.dev"
-const viewerAppUrl = "https://tourney-viewer.dino-kupinic.dev"
+const {
+  public: { adminAppUrl, viewerAppUrl },
+} = useRuntimeConfig()
 const demoVideoRef = ref<HTMLVideoElement | null>(null)
 const isVideoPlaying = ref(false)
 
@@ -46,8 +46,8 @@ const items = [
     target: "_blank",
   },
   {
-    label: "Dino Kupinic",
-    to: "https://dino-kupinic.dev",
+    label: "Impressum",
+    to: "https://dino-kupinic.dev/impressum",
     target: "_blank",
   },
   {
@@ -59,43 +59,57 @@ const items = [
 
 const cards = ref([
   {
-    title: "Turniere planen und steuern",
+    title: "Turniere",
     description:
       "Erstelle Fußball-, Volleyball- oder Basketballturniere mit Regeln, Zeitfenstern, Preisen und automatischer Gruppeneinteilung.",
     icon: "i-lucide-trophy",
-    to: `${adminAppUrl}/tournaments`,
     target: "_blank",
     class: "lg:col-span-2",
     orientation: "horizontal" as const,
   },
   {
-    title: "Live-Betrieb im Admin",
+    title: "Live-Steuerung",
     description:
       "Starte Gruppenphasen, setze Matches live und aktualisiere Ergebnisse direkt während des Events.",
     icon: "i-lucide-signal",
-    to: `${adminAppUrl}/live`,
     target: "_blank",
     variant: "soft" as const,
   },
   {
-    title: "Anmeldungen und Teams",
+    title: "Klassen und Jahrgänge pflegen",
     description:
-      "Erstelle Registrierungslinks, verwalte Klassen-Teams und bearbeite den Status von Anmeldungen zentral.",
+      "Verwalte Klassen pro Schuljahr als Grundlage für Team- und Anmeldelogik.",
+    icon: "i-lucide-graduation-cap",
+    target: "_blank",
+    variant: "soft" as const,
+  },
+  {
+    title: "Aktuelles veröffentlichen",
+    description: "Bearbeite Neuigkeiten direkt im Dashboard",
+    icon: "i-lucide-newspaper",
+    target: "_blank",
+    variant: "soft" as const,
+  },
+  {
+    title: "Anmeldungen verwalten",
+    description:
+      "Erstelle Registrierungslinks, verwalte Teams und bearbeite den Status von Anmeldungen zentral.",
     icon: "i-lucide-ticket",
-    to: `${adminAppUrl}/registration`,
     target: "_blank",
-    variant: "soft" as const,
+    class: "lg:row-span-2",
   },
   {
-    title: "Live-Ansicht für Zuschauer",
-    description:
-      "Zeige Live-Spiele, Bracket-Visualisierung, Platzierungen und Ergebnisverlauf in Echtzeit.",
-    icon: "i-lucide-monitor-play",
-    to: `${viewerAppUrl}/live`,
+    title: "Galerie verwalten",
+    description: "Lade Fotos hoch und verwalte diese im Medienbereich.",
+    icon: "i-lucide-images",
     target: "_blank",
-    class: "lg:col-span-2",
-    orientation: "horizontal" as const,
-    reverse: true,
+  },
+  {
+    title: "Turnierdetails und Platzierungen",
+    description: "Jedes Turnier hat eine öffentliche Detailseite",
+    icon: "i-lucide-list-ordered",
+    target: "_blank",
+    variant: "soft" as const,
   },
 ])
 
@@ -122,32 +136,15 @@ const features = ref<PageFeatureProps[]>([
     to: `${viewerAppUrl}/media`,
   },
 ])
-const links = ref<ButtonProps[]>([
-  {
-    label: "Admin Dashboard öffnen",
-    to: adminAppUrl,
-    target: "_blank",
-    color: "neutral",
-    variant: "subtle",
-    trailingIcon: "i-lucide-arrow-right",
-  },
-  {
-    label: "Live Viewer öffnen",
-    to: `${viewerAppUrl}/live`,
-    target: "_blank",
-    trailingIcon: "i-lucide-external-link",
-  },
-])
 </script>
 
 <template>
   <UPage>
     <main class="relative overflow-hidden pt-32 pb-24 md:pt-40">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
-        <!-- Hero Section -->
         <div class="max-w-3xl">
           <h1
-            class="mb-6 text-5xl leading-tight font-semibold tracking-tighter text-neutral-900 md:text-7xl"
+            class="mb-6 text-5xl leading-tight font-bold tracking-tighter text-neutral-900 sm:font-semibold md:text-7xl"
           >
             Turniere veranstalten. <br />
             Ohne das Chaos.
@@ -160,7 +157,7 @@ const links = ref<ButtonProps[]>([
             dein Team auf alles andere konzentriert.
           </p>
           <div
-            class="flex flex-col items-start gap-4 sm:flex-row sm:items-center"
+            class="flex flex-row items-start gap-2 sm:flex-row sm:items-center sm:gap-4"
           >
             <NuxtLink
               :to="viewerAppUrl"
@@ -248,16 +245,28 @@ const links = ref<ButtonProps[]>([
             icon="i-lucide-layout-dashboard"
             orientation="horizontal"
             :features="features"
-            :links="links"
           >
-            <NuxtImg
-              src="/football.jpg"
-              width="600"
-              height="700"
-              alt="Illustration"
-              class="w-full rounded-lg"
-              loading="lazy"
-            />
+            <div class="w-full">
+              <NuxtImg
+                src="/football.jpg"
+                width="600"
+                height="700"
+                alt="Fußballspieler bei einem Turnier"
+                class="w-full rounded-lg"
+                loading="lazy"
+              />
+              <p class="mt-2 text-right text-xs text-neutral-500">
+                Bildquelle:
+                <NuxtLink
+                  to="https://www.freepik.com"
+                  external
+                  target="_blank"
+                  class="underline underline-offset-2"
+                >
+                  freepik.com
+                </NuxtLink>
+              </p>
+            </div>
           </UPageSection>
         </div>
 
