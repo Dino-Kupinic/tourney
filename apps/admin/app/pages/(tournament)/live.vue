@@ -229,6 +229,11 @@ const state = reactive({
   start_time: "",
 })
 
+const resetCreateState = () => {
+  state.interval = 12
+  state.start_time = tournament.value?.from ?? ""
+}
+
 watch(
   () => tournament.value?.from,
   (startTime) => {
@@ -239,6 +244,13 @@ watch(
 
 const supabase = useDatabaseClient()
 const isOpenCreate = ref<boolean>(false)
+
+watch(isOpenCreate, (isOpen) => {
+  if (isOpen) return
+
+  resetCreateState()
+})
+
 const generateGroupMatches = async () => {
   try {
     schema.parse(state)

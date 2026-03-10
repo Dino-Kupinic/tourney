@@ -35,6 +35,26 @@ const editState = reactive({
   score2: score2,
 })
 
+const resetEditState = () => {
+  editState.score1 = score1
+  editState.score2 = score2
+}
+
+watch(isOpenEdit, (isOpen) => {
+  if (isOpen) return
+
+  resetEditState()
+})
+
+watch(
+  () => [score1, score2],
+  () => {
+    if (isOpenEdit.value) return
+
+    resetEditState()
+  },
+)
+
 const supabase = useDatabaseClient()
 const emit = defineEmits(["refresh"])
 const onSubmitEdit = async () => {

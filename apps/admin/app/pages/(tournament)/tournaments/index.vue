@@ -101,12 +101,37 @@ const creationState = reactive({
   knockout_interval: 15,
 })
 
+const resetCreationState = () => {
+  creationState.name = undefined
+  creationState.rules = ""
+  creationState.start_date = undefined
+  creationState.from = undefined
+  creationState.to = undefined
+  creationState.year = 0
+  creationState.sport = "Fußball"
+  creationState.prizes.first = ""
+  creationState.prizes.second = ""
+  creationState.prizes.third = ""
+  creationState.prizes.bonus = ""
+  creationState.thumbnail_path = undefined
+  creationState.location = "Sportplatz"
+  creationState.groups = 0
+  creationState.group_teams = 0
+  creationState.knockout_interval = 15
+}
+
 watch(
   () => creationState.start_date,
   (value: unknown) => {
-    creationState.year = new Date(value as string).getFullYear()
+    creationState.year = value ? new Date(value as string).getFullYear() : 0
   },
 )
+
+watch(isOpenCreate, (isOpen) => {
+  if (isOpen) return
+
+  resetCreationState()
+})
 
 const FOOTBALL_GROUPS: number = 4
 const FOOTBALL_TEAMS: number = 5

@@ -96,6 +96,11 @@ const creationStateSingle = reactive({
   year: selectedYear.value,
 })
 
+const resetCreateSingleState = () => {
+  creationStateSingle.name = ""
+  creationStateSingle.year = selectedYear.value
+}
+
 const predefinedClasses = ref([
   "1AHITN",
   "2AHITN",
@@ -145,11 +150,17 @@ const creationSchemaMultiple = z.object({
 })
 
 const creationStateMultiple = reactive({
-  classes: predefinedClasses.value,
+  classes: [...predefinedClasses.value],
   year: selectedYear.value,
 })
 
 const customClassName = ref<string>("")
+const resetCreateMultipleState = () => {
+  creationStateMultiple.classes = [...predefinedClasses.value]
+  creationStateMultiple.year = selectedYear.value
+  customClassName.value = ""
+}
+
 const addCustomClass = () => {
   if (
     customClassName.value.trim() &&
@@ -178,6 +189,12 @@ const editState = reactive({
   name: "",
   year: "",
 })
+
+const resetEditState = () => {
+  editState.id = ""
+  editState.name = ""
+  editState.year = ""
+}
 
 const onSubmitCreateSingle = async () => {
   try {
@@ -259,6 +276,34 @@ const onSubmitEdit = async () => {
     )
   }
 }
+
+watch(selectedYear, (value) => {
+  if (!isOpenCreate.value) {
+    creationStateSingle.year = value
+  }
+
+  if (!isOpenMultipleCreate.value) {
+    creationStateMultiple.year = value
+  }
+})
+
+watch(isOpenCreate, (isOpen) => {
+  if (isOpen) return
+
+  resetCreateSingleState()
+})
+
+watch(isOpenMultipleCreate, (isOpen) => {
+  if (isOpen) return
+
+  resetCreateMultipleState()
+})
+
+watch(isOpenEdit, (isOpen) => {
+  if (isOpen) return
+
+  resetEditState()
+})
 
 const classIds = computed(() => selectedRows.value.map((row) => row.id))
 const onDeleteClick = (row?: ClassColumn) => {

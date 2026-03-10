@@ -109,7 +109,8 @@ const years = Array.from(
   (_, i) =>
     `${new Date().getFullYear() + i - 1}/${(new Date().getFullYear() + i).toString().slice(2)}`,
 )
-const classYear = ref<string>(years[0] ?? "")
+const getDefaultClassYear = () => years[0] ?? ""
+const classYear = ref<string>(getDefaultClassYear())
 const encodedYear = computed(() => encodeURIComponent(classYear.value))
 
 const { data: classes } = await useFetch<
@@ -133,6 +134,12 @@ const creationStateMultiple = reactive({
   teams: 1,
   year: classYear.value,
 })
+
+const resetCreateMultipleState = () => {
+  creationStateMultiple.expire_date = undefined
+  creationStateMultiple.teams = 1
+  creationStateMultiple.year = classYear.value
+}
 
 const onSubmitCreateMultiple = async () => {
   try {
@@ -171,6 +178,21 @@ const creationStateSingle = reactive({
   schoolClass: undefined,
   allow_class_mixing: false,
 })
+
+const resetCreateSingleState = () => {
+  creationStateSingle.expire_date = undefined
+  creationStateSingle.name = "Team 1"
+  creationStateSingle.year = classYear.value
+  creationStateSingle.schoolClass = undefined
+  creationStateSingle.allow_class_mixing = false
+}
+
+const resetCreateForms = () => {
+  classYear.value = getDefaultClassYear()
+  currentTab.value = "multiple"
+  resetCreateMultipleState()
+  resetCreateSingleState()
+}
 
 const onSubmitCreateSingle = async () => {
   try {
@@ -276,6 +298,14 @@ const editState = reactive({
   allow_class_mixing: false,
   class: "",
 })
+
+const resetEditState = () => {
+  editState.id = ""
+  editState.expire_date = ""
+  editState.name = ""
+  editState.allow_class_mixing = false
+  editState.class = ""
+}
 
 const onEdit = async (row: RegistrationColumn) => {
   isOpenEdit.value = true
@@ -400,6 +430,23 @@ const columnVisibility = ref({})
 
 type TabKey = "multiple" | "single"
 const currentTab = ref<TabKey>((tabItems[0]?.key as TabKey) ?? "multiple")
+
+watch(classYear, (value) => {
+  creationStateMultiple.year = value
+  creationStateSingle.year = value
+})
+
+watch(isOpenCreate, (isOpen) => {
+  if (isOpen) return
+
+  resetCreateForms()
+})
+
+watch(isOpenEdit, (isOpen) => {
+  if (isOpen) return
+
+  resetEditState()
+})
 
 const onSubmitCreate = async () => {
   if (currentTab.value === "multiple") {

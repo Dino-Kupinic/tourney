@@ -463,7 +463,40 @@ const editState = reactive({
   knockout_interval: tournament.value.knockout_interval,
 })
 
+const resetEditState = () => {
+  if (!tournament.value) return
+
+  editState.name = tournament.value.name
+  editState.rules = tournament.value.rules
+  editState.start_date = tournament.value.start_date
+  editState.from = tournament.value.from
+  editState.to = tournament.value.to
+  editState.year = tournament.value.year
+  editState.sport = tournament.value.sport
+  editState.prizes.first = tournament.value.prizes?.first ?? ""
+  editState.prizes.second = tournament.value.prizes?.second ?? ""
+  editState.prizes.third = tournament.value.prizes?.third ?? ""
+  editState.prizes.bonus = tournament.value.prizes?.bonus ?? ""
+  editState.thumbnail_path = tournament.value.thumbnail_path
+  editState.location = tournament.value.location
+  editState.groups = tournament.value.groups
+  editState.group_teams = tournament.value.group_teams
+  editState.knockout_interval = tournament.value.knockout_interval
+}
+
 const isOpenEdit = ref<boolean>(false)
+watch(isOpenEdit, (isOpen) => {
+  if (isOpen) return
+
+  resetEditState()
+})
+
+watch(tournament, () => {
+  if (isOpenEdit.value) return
+
+  resetEditState()
+})
+
 const onSubmitEdit = async () => {
   try {
     const editorId = await getCurrentUserId()
@@ -477,8 +510,9 @@ const onSubmitEdit = async () => {
         },
       },
     })
-    isOpenEdit.value = false
     await tournamentRefresh()
+    resetEditState()
+    isOpenEdit.value = false
     displaySuccessNotification(
       "Turnier bearbeitet",
       "Das Turnier wurde erfolgreich bearbeitet.",
