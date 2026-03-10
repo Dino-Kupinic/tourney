@@ -1,8 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   extends: ["../../packages/core"],
+  srcDir: "app",
   compatibilityDate: "2025-07-28",
   modules: ["@vueuse/nuxt"],
+  supabase: {
+    types: "~~/types/database.types.ts",
+  },
   devtools: { enabled: true },
   vite: {
     optimizeDeps: {

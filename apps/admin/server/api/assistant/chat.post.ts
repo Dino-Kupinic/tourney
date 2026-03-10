@@ -8,7 +8,7 @@ import { openai } from "@ai-sdk/openai"
 import {
   AI_ASSISTANT_DEFAULT_MODEL,
   isAiAssistantModel,
-} from "~/utils/aiAssistant"
+} from "#shared/aiAssistant"
 
 export default defineEventHandler(async (event) => {
   if (!process.env.OPENAI_API_KEY) {

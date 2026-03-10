@@ -17,7 +17,6 @@ type Body = {
   start_date: string
   from: string
   to: string
-  year: number
   sport: Enums<"sport_type">
   prizes: {
     first: string
@@ -42,7 +41,6 @@ export default defineEventHandler(async (event) => {
     start_date,
     from,
     to,
-    year,
     sport,
     prizes,
     thumbnail_path,
@@ -68,7 +66,6 @@ export default defineEventHandler(async (event) => {
     !start_date ||
     !from ||
     !to ||
-    !year ||
     !sport ||
     !prizes ||
     !thumbnail_path ||
@@ -90,7 +87,7 @@ export default defineEventHandler(async (event) => {
     start_date,
     from,
     to,
-    year,
+    year: Number(start_date.slice(0, 4)),
     sport,
     prizes,
     thumbnail_path,
