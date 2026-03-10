@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { PageFeatureProps } from "@nuxt/ui"
 
+definePageMeta({
+  colorMode: "light",
+})
+
 const {
   public: { adminAppUrl, viewerAppUrl },
 } = useRuntimeConfig()
@@ -144,13 +148,13 @@ const features = ref<PageFeatureProps[]>([
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="max-w-3xl">
           <h1
-            class="mb-6 text-5xl leading-tight font-bold tracking-tighter text-neutral-900 sm:font-semibold md:text-7xl"
+            class="mb-6 text-3xl leading-tight font-bold tracking-tighter text-neutral-900 sm:font-semibold md:text-7xl"
           >
             Turniere veranstalten. <br />
             Ohne das Chaos.
           </h1>
           <p
-            class="mb-10 max-w-2xl text-lg leading-tight text-neutral-500 md:text-xl"
+            class="mb-6 max-w-2xl text-lg leading-tight text-neutral-500 sm:mb-10 md:text-xl"
           >
             Die Plattform, die komplexe Brackets verwaltet, maßgeschneiderte
             Spielpläne entwirft und die Organisation übernimmt, während sich
@@ -216,7 +220,7 @@ const features = ref<PageFeatureProps[]>([
             </button>
 
             <div
-              class="pointer-events-none absolute top-0 right-0 left-0 flex h-12 items-center gap-2 border-b border-white/10 bg-neutral-950/50 px-6 backdrop-blur-md"
+              class="pointer-events-none absolute top-0 right-0 left-0 hidden h-12 items-center gap-2 border-b border-white/10 bg-neutral-950/50 px-6 backdrop-blur-md sm:flex"
             >
               <div class="flex gap-2">
                 <div class="h-3 w-3 rounded-full bg-red-500/80"></div>

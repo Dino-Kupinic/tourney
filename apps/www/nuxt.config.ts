@@ -4,6 +4,10 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
+  colorMode: {
+    preference: "light",
+    fallback: "light",
+  },
   runtimeConfig: {
     public: {
       adminAppUrl:
@@ -16,7 +20,6 @@ export default defineNuxtConfig({
   },
   supabase: {
     redirect: false,
-    types: "~~/types/database.types.ts",
   },
   devServer: {
     port: 3002,
