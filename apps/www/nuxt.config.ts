@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["@nuxt/ui"],
+  extends: ["../../packages/core"],
 
   devtools: {
     enabled: true,
@@ -9,8 +9,6 @@ export default defineNuxtConfig({
   devServer: {
     port: 3002,
   },
-
-  css: ["~/assets/css/main.css"],
 
   routeRules: {
     "/": { prerender: true },
