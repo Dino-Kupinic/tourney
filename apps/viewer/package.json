@@ -15,6 +15,9 @@
     "format:write": "prettier . --write",
     "check-types": "vue-tsc --noEmit"
   },
+  "engines": {
+    "node": "22"
+  },
   "dependencies": {
     "@iconify-json/heroicons": "catalog:ui",
     "@iconify-json/svg-spinners": "catalog:ui",

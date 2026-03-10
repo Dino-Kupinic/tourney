@@ -14,6 +14,9 @@
     "format:write": "prettier . --write",
     "check-types": "vue-tsc --noEmit"
   },
+  "engines": {
+    "node": "22"
+  },
   "dependencies": {
     "@iconify-json/heroicons": "catalog:ui",
     "nuxt": "catalog:framework",
