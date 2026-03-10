@@ -1,56 +1,99 @@
 <script setup lang="ts">
-useHead({
+const adminAppUrl = "http://localhost:3000"
+const viewerAppUrl = "http://localhost:3001"
+const currentYear = new Date().getFullYear()
+const demoVideoRef = ref<HTMLVideoElement | null>(null)
+const isVideoPlaying = ref(false)
+
+const playDemoVideo = async () => {
+  if (!demoVideoRef.value) return
+
+  try {
+    await demoVideoRef.value.play()
+    isVideoPlaying.value = true
+  } catch {
+    isVideoPlaying.value = false
+  }
+}
+
+const syncVideoState = () => {
+  if (!demoVideoRef.value) return
+  isVideoPlaying.value = !demoVideoRef.value.paused
+}
+
+useSeoMeta({
   title: "Tourney - Tournament Management on Autopilot",
-  meta: [
-    {
-      name: "description",
-      content:
-        "The platform that automatically manages brackets, crafts custom schedules, and runs events while your team does anything else.",
-    },
-  ],
+  description:
+    "The platform that automatically manages brackets, crafts custom schedules, and runs events while your team does anything else.",
+  ogTitle: "Tourney - Tournament Management on Autopilot",
+  ogDescription:
+    "The platform that automatically manages brackets, crafts custom schedules, and runs events while your team does anything else.",
+  twitterCard: "summary_large_image",
 })
+
+useHead({
+  htmlAttrs: {
+    lang: "de",
+  },
+})
+
+const items = [
+  {
+    label: "Figma Kit",
+    to: "https://go.nuxt.com/figma-ui",
+    target: "_blank",
+  },
+  {
+    label: "Playground",
+    to: "https://stackblitz.com/edit/nuxt-ui",
+    target: "_blank",
+  },
+  {
+    label: "Releases",
+    to: "https://github.com/nuxt/ui/releases",
+    target: "_blank",
+  },
+]
 </script>
 
 <template>
-  <div
-    class="min-h-screen bg-white font-sans text-neutral-900 selection:bg-neutral-200"
-  >
-    <!-- Header -->
+  <UPage>
     <header
       class="fixed top-0 right-0 left-0 z-50 border-b border-neutral-100 bg-white/80 backdrop-blur-md"
     >
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
           <div class="flex items-center gap-8">
-            <a href="/" class="flex items-center gap-2">
-              <div class="h-6 w-6 rounded-[6px] bg-blue-600"></div>
+            <NuxtLink to="/" class="flex items-center gap-2">
               <span class="text-xl font-bold tracking-tight">Tourney</span>
-            </a>
+            </NuxtLink>
             <nav class="hidden items-center gap-6 md:flex">
-              <a
-                href="#"
+              <NuxtLink
+                to="#features"
                 class="text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900"
-                >Produkt</a
+                >Produkt</NuxtLink
               >
-              <a
-                href="#"
+              <NuxtLink
+                to="#how-it-works"
                 class="text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900"
-                >Ressourcen</a
+                >Ressourcen</NuxtLink
               >
             </nav>
           </div>
           <div class="flex items-center gap-4">
-            <a
-              href="http://localhost:3001"
+            <NuxtLink
+              :to="adminAppUrl"
+              external
               class="hidden text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 sm:block"
-              >Zuschauer App</a
+              >Dashboard</NuxtLink
             >
-            <a
-              href="http://localhost:3000"
+            <NuxtLink
+              :to="viewerAppUrl"
+              external
               class="rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700 active:scale-95"
             >
-              Admin Bereich
-            </a>
+              Zuschauer
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -73,49 +116,54 @@ useHead({
             Ohne das Chaos.
           </h1>
           <p
-            class="mb-10 max-w-2xl text-lg leading-relaxed text-neutral-500 md:text-xl"
+            class="mb-10 max-w-2xl text-lg leading-tight text-neutral-500 md:text-xl"
           >
-            Die Plattform, die automatisch optimale Setzlisten erstellt,
-            komplexe Brackets verwaltet, maßgeschneiderte Spielpläne entwirft
-            und die Organisation übernimmt, während sich dein Team auf alles
-            andere konzentriert.
+            Die Plattform, die komplexe Brackets verwaltet, maßgeschneiderte
+            Spielpläne entwirft und die Organisation übernimmt, während sich
+            dein Team auf alles andere konzentriert.
           </p>
           <div
             class="flex flex-col items-start gap-4 sm:flex-row sm:items-center"
           >
-            <a
-              href="http://localhost:3000"
+            <NuxtLink
+              :to="viewerAppUrl"
+              external
               class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-base font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:outline-none active:scale-95"
             >
-              Admin Bereich
-            </a>
-            <a
-              href="http://localhost:3001"
+              Zuschauen
+            </NuxtLink>
+            <NuxtLink
+              :to="adminAppUrl"
+              external
               class="inline-flex items-center justify-center rounded-full border border-neutral-200 bg-white px-6 py-3 text-base font-medium text-neutral-700 transition-all hover:border-neutral-300 hover:bg-neutral-50"
             >
-              Zuschauer App
-            </a>
+              Dashboard
+            </NuxtLink>
           </div>
         </div>
 
-        <!-- Video / Dashboard Placeholder -->
         <div id="video-demo" class="relative mt-20">
-          <!-- Subtle blurred background for the video container -->
-          <div
-            class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 opacity-70 blur-2xl"
-          ></div>
-
           <div
             class="group relative flex aspect-video w-full cursor-pointer items-center justify-center overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-950 shadow-2xl"
           >
-            <!-- Simulated Video UI -->
-            <div
-              class="absolute inset-0 bg-gradient-to-tr from-neutral-900 to-neutral-800"
-            ></div>
+            <video
+              ref="demoVideoRef"
+              class="h-full w-full object-cover"
+              src="/dkupinic-2.mp4"
+              preload="metadata"
+              playsinline
+              controls
+              @play="syncVideoState"
+              @pause="syncVideoState"
+              @ended="syncVideoState"
+            />
 
-            <!-- Play Button Overlay -->
-            <div
-              class="relative z-10 flex flex-col items-center gap-4 transition-transform duration-300 group-hover:scale-110"
+            <button
+              v-if="!isVideoPlaying"
+              type="button"
+              aria-label="Produktdemo abspielen"
+              class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-neutral-950/40 transition-transform duration-300 group-hover:scale-105"
+              @click="playDemoVideo"
             >
               <div
                 class="flex h-20 w-20 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-lg backdrop-blur-sm"
@@ -132,11 +180,10 @@ useHead({
                 class="text-sm font-medium tracking-wide text-white/60 uppercase"
                 >Product Demo</span
               >
-            </div>
+            </button>
 
-            <!-- Fake Browser/App Header -->
             <div
-              class="absolute top-0 right-0 left-0 flex h-12 items-center gap-2 border-b border-white/10 bg-neutral-950/50 px-6 backdrop-blur-md"
+              class="pointer-events-none absolute top-0 right-0 left-0 flex h-12 items-center gap-2 border-b border-white/10 bg-neutral-950/50 px-6 backdrop-blur-md"
             >
               <div class="flex gap-2">
                 <div class="h-3 w-3 rounded-full bg-red-500/80"></div>
@@ -148,7 +195,7 @@ useHead({
         </div>
 
         <!-- Features Section -->
-        <div class="mt-32 border-t border-neutral-100 pt-16">
+        <div id="features" class="mt-32 border-t border-neutral-100 pt-16">
           <div class="mb-16 text-center">
             <h2
               class="mb-4 text-3xl font-semibold tracking-tight text-neutral-900 md:text-5xl"
@@ -188,10 +235,9 @@ useHead({
                 Automatisierte Spielpläne
               </h3>
               <p class="leading-relaxed text-neutral-500">
-                Generiere sofort optimierte Single- oder
-                Double-Elimination-Brackets. Intelligente Setzlisten-Algorithmen
-                stellen sicher, dass deine besten Spieler im Finale und nicht in
-                der ersten Runde aufeinandertreffen.
+                Intelligente Algorithmen stellen sicher, dass deine besten
+                Spieler im Finale und nicht in der ersten Runde
+                aufeinandertreffen.
               </p>
             </div>
 
@@ -248,19 +294,18 @@ useHead({
                 </svg>
               </div>
               <h3 class="mb-3 text-xl font-semibold text-neutral-900">
-                Teilnehmerverwaltung
+                Verwaltung
               </h3>
               <p class="leading-relaxed text-neutral-500">
-                Verwalte Anmeldungen, Check-ins, Wartelisten und Team-Roster mit
-                einem einzigen Klick. Versende sofort Nachrichten an alle
-                Teilnehmer.
+                Verwalte Anmeldungen, Turniere, usw. mit nur wenigen Klicks.
+                Halte Teilnehmer mit Neuigkeiten up-to-date.
               </p>
             </div>
           </div>
         </div>
 
         <!-- How it Works Section -->
-        <div class="mt-32">
+        <div id="how-it-works" class="mt-32">
           <div class="flex flex-col items-center gap-16 md:flex-row">
             <div class="flex-1">
               <span
@@ -282,11 +327,10 @@ useHead({
                   </div>
                   <div>
                     <h4 class="text-lg font-semibold text-neutral-900">
-                      Regelwerk erstellen
+                      Turnier erstellen
                     </h4>
                     <p class="mt-1 text-neutral-500">
-                      Definiere Spielformate, Punktesysteme und Phasensysteme.
-                      Mit unseren Vorlagen legst du in Sekunden los.
+                      Definiere Startdatum, Regeln, Turnierart, Preise und mehr.
                     </p>
                   </div>
                 </div>
@@ -298,12 +342,12 @@ useHead({
                   </div>
                   <div>
                     <h4 class="text-lg font-semibold text-neutral-900">
-                      Teilnehmer einladen
+                      Anmeldungen erstellen und teilen
                     </h4>
                     <p class="mt-1 text-neutral-500">
-                      Teile einen einzigen Link. Spieler registrieren sich,
-                      bilden Teams und verwalten ihre eigenen Check-ins in der
-                      Zuschauer App.
+                      Erstelle und versende die Links. Spieler registrieren
+                      sich, bilden Teams und verwalten ihre eigenen Check-ins in
+                      der Zuschauer App.
                     </p>
                   </div>
                 </div>
@@ -318,9 +362,9 @@ useHead({
                       Lass Tourney die Arbeit machen
                     </h4>
                     <p class="mt-1 text-neutral-500">
-                      Sobald die Matches beginnen, zieht Tourney automatisch
-                      Sieger vor, benachrichtigt nächste Spieler und berechnet
-                      Tabellenstände.
+                      Gehe live und sobald die Matches beginnen, zieht Tourney
+                      automatisch Sieger vor, benachrichtigt nächste Spieler und
+                      berechnet Tabellenstände.
                     </p>
                   </div>
                 </div>
@@ -362,47 +406,6 @@ useHead({
           </div>
         </div>
 
-        <!-- Testimonial Section -->
-        <div
-          class="relative mt-32 overflow-hidden rounded-[3rem] bg-neutral-50 px-6 py-20 text-center lg:px-20"
-        >
-          <!-- Quote Icon backbg -->
-          <div
-            class="pointer-events-none absolute -top-10 -left-10 font-serif text-[15rem] leading-none text-neutral-200/50 select-none"
-          >
-            "
-          </div>
-
-          <div class="relative z-10 mx-auto max-w-4xl">
-            <p
-              class="mb-10 text-2xl leading-snug font-medium tracking-tight text-neutral-900 md:text-4xl"
-            >
-              "Früher haben wir um die 5 Stunden gebraucht, um Setzlisten
-              manuell zu erstellen und Diskussionen aufzulösen. Mit Tourney
-              veranstalten wir unsere wöchentlichen Events beinahe automatisch.
-              Unser administrativer Aufwand ist quasi bei Null."
-            </p>
-            <div class="flex flex-col items-center justify-center gap-4">
-              <div
-                class="h-14 w-14 overflow-hidden rounded-full bg-neutral-300 shadow-sm"
-              >
-                <!-- Fallback avatar -->
-                <div
-                  class="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200 text-xl font-semibold text-blue-800"
-                >
-                  JD
-                </div>
-              </div>
-              <div>
-                <div class="font-semibold text-neutral-900">John Doe</div>
-                <div class="text-sm text-neutral-500">
-                  Hauptorganisator, Global Esports League
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Final CTA Section -->
         <div
           class="relative my-32 overflow-hidden rounded-[3rem] bg-neutral-900 px-6 py-20 text-center text-white lg:py-24"
@@ -418,56 +421,68 @@ useHead({
               Bereit, deine Turniere auf das nächste Level zu bringen?
             </h2>
             <p class="mx-auto mb-10 max-w-xl text-lg text-neutral-400">
-              Schließe dich tausenden Organisatoren an, die entspanntere,
-              schnellere und größere Turniere mit Tourney ausrichten.
+              Erstelle dein erstes Turnier in Sekunden und erlebe, wie Tourney
+              die Organisation übernimmt, damit du dich auf das Wesentliche
+              konzentrieren kannst
             </p>
             <div
               class="flex flex-col items-center justify-center gap-4 sm:flex-row"
             >
-              <a
-                href="http://localhost:3000"
+              <NuxtLink
+                :to="adminAppUrl"
+                external
                 class="inline-flex w-full items-center justify-center rounded-full bg-blue-600 px-8 py-4 text-base font-medium text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all hover:bg-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:outline-none active:scale-95 sm:w-auto"
               >
-                Kostenlos starten
-              </a>
-              <a
-                href="http://localhost:3001"
+                Dashboard
+              </NuxtLink>
+              <NuxtLink
+                :to="viewerAppUrl"
+                external
                 class="inline-flex w-full items-center justify-center rounded-full border border-white/10 bg-white/10 px-8 py-4 text-base font-medium text-white backdrop-blur-md transition-all hover:bg-white/20 sm:w-auto"
               >
-                Zuschauer App entdecken
-              </a>
+                Zuschauen
+              </NuxtLink>
             </div>
-            <p class="mt-6 text-sm text-neutral-500">
-              Keine Kreditkarte nötig • Unlimitierte 16-Spieler-Brackets
-            </p>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-neutral-100 bg-neutral-50 py-12">
-      <div
-        class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-6 text-sm text-neutral-500 md:flex-row lg:px-8"
-      >
-        <div class="flex items-center gap-2">
-          <div class="h-5 w-5 rounded-[4px] bg-blue-600"></div>
-          <span class="font-semibold text-neutral-900">Tourney</span>
-        </div>
-        <p>© 2026 Tourney Inc. Alle Rechte vorbehalten.</p>
-        /p>
-        <div class="flex gap-6">
-          <a href="#" class="transition-colors hover:text-neutral-900"
-            >Twitter</a
-          >
-          <a href="#" class="transition-colors hover:text-neutral-900"
-            >GitHub</a
-          >
-          <a href="#" class="transition-colors hover:text-neutral-900"
-            >Discord</a
-          >
-        </div>
-      </div>
-    </footer>
-  </div>
+    <UFooter>
+      <template #left>
+        <p class="text-muted text-sm">
+          Copyright © {{ new Date().getFullYear() }} Dino Kupinic
+        </p>
+      </template>
+
+      <UNavigationMenu :items="items" variant="link" />
+
+      <template #right>
+        <UButton
+          icon="i-simple-icons-discord"
+          color="neutral"
+          variant="ghost"
+          to="https://go.nuxt.com/discord"
+          target="_blank"
+          aria-label="Discord"
+        />
+        <UButton
+          icon="i-simple-icons-x"
+          color="neutral"
+          variant="ghost"
+          to="https://go.nuxt.com/x"
+          target="_blank"
+          aria-label="X"
+        />
+        <UButton
+          icon="i-simple-icons-github"
+          color="neutral"
+          variant="ghost"
+          to="https://github.com/nuxt/nuxt"
+          target="_blank"
+          aria-label="GitHub"
+        />
+      </template>
+    </UFooter>
+  </UPage>
 </template>
