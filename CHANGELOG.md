@@ -1,3 +1,10 @@
+# [0.36.0](https://github.com/HTL-Steyr/tourney/compare/v0.35.0...v0.36.0) (2026-03-10)
+
+
+### Features
+
+* add engine property to packages ([d656bc0](https://github.com/HTL-Steyr/tourney/commit/d656bc0f1e23a7296eb020ff36a217c0049d282c))
+
 # [0.35.0](https://github.com/HTL-Steyr/tourney/compare/v0.34.0...v0.35.0) (2026-03-10)
 
 
