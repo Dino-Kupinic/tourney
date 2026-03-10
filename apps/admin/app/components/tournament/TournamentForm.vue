@@ -8,9 +8,21 @@ defineProps<{
 
 const sports: Enums<"sport_type">[] = ["Fußball", "Basketball", "Volleyball"]
 const client = useSupabaseClient()
-const { data } = await client.storage.from("images").list("tournament")
+const { data: images } = useAsyncData(
+  "admin-tournament-thumbnails",
+  async () => {
+    const { data } = await client.storage.from("images").list("tournament")
+    return data ?? []
+  },
+  {
+    default: () => [],
+  },
+)
+
 const thumbnails = computed(() => {
-  const temp = data?.filter((image) => image.name !== ".emptyFolderPlaceholder")
+  const temp = images.value?.filter(
+    (image) => image.name !== ".emptyFolderPlaceholder",
+  )
   return temp?.map((image) => `/tournament/${image.name}`)
 })
 </script>
