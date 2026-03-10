@@ -13,6 +13,9 @@
     "format:write": "prettier . --write",
     "check-types": "tsc --noEmit"
   },
+  "engines": {
+    "node": "22"
+  },
   "dependencies": {
     "nuxt": "catalog:framework",
     "vue": "catalog:framework",

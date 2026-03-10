@@ -7,6 +7,9 @@
     "packages/*",
     "apps/*"
   ],
+  "engines": {
+    "node": "22"
+  },
   "scripts": {
     "clean": "git clean -xdf node_modules",
     "create:users": "turbo run create --filter=@tourney/user-creator",
