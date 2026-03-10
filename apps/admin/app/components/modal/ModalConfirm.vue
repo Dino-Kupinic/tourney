@@ -1,12 +1,22 @@
 <script setup lang="ts">
 const isOpenConfirm = defineModel<boolean>()
+const { title = "Bestätigung", description = "Bestätigungsdialog." } =
+  defineProps<{
+    title?: string
+    description?: string
+  }>()
 const emit = defineEmits<{
   confirm: []
 }>()
 </script>
 
 <template>
-  <UModal v-model:open="isOpenConfirm" :ui="{ content: 'w-full sm:max-w-md' }">
+  <UModal
+    v-model:open="isOpenConfirm"
+    :title="title"
+    :description="description"
+    :ui="{ content: 'w-full sm:max-w-md' }"
+  >
     <template #content>
       <UCard
         :ui="{
@@ -17,7 +27,7 @@ const emit = defineEmits<{
         }"
       >
         <template #header>
-          <strong> Bestätigung </strong>
+          <strong> {{ title }} </strong>
         </template>
 
         <slot />

@@ -1,9 +1,18 @@
 <script setup lang="ts">
 const isOpenInfo = defineModel<boolean>()
+const { title = "Info", description = "Informationsdialog." } = defineProps<{
+  title?: string
+  description?: string
+}>()
 </script>
 
 <template>
-  <UModal v-model:open="isOpenInfo" :ui="{ content: 'w-full sm:max-w-md' }">
+  <UModal
+    v-model:open="isOpenInfo"
+    :title="title"
+    :description="description"
+    :ui="{ content: 'w-full sm:max-w-md' }"
+  >
     <template #content>
       <UCard
         :ui="{
@@ -14,7 +23,7 @@ const isOpenInfo = defineModel<boolean>()
         }"
       >
         <template #header>
-          <strong> Info </strong>
+          <strong> {{ title }} </strong>
         </template>
 
         <slot />

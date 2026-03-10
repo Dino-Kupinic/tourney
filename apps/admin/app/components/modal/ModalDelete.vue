@@ -1,12 +1,24 @@
 <script setup lang="ts">
 const isOpenDelete = defineModel<boolean>()
+const {
+  title = "Löschen",
+  description = "Bestätigungsdialog zum Löschen des aktuellen Eintrags.",
+} = defineProps<{
+  title?: string
+  description?: string
+}>()
 const emit = defineEmits<{
   delete: []
 }>()
 </script>
 
 <template>
-  <UModal v-model:open="isOpenDelete" :ui="{ content: 'w-full sm:max-w-md' }">
+  <UModal
+    v-model:open="isOpenDelete"
+    :title="title"
+    :description="description"
+    :ui="{ content: 'w-full sm:max-w-md' }"
+  >
     <template #content>
       <UCard
         :ui="{
@@ -17,7 +29,7 @@ const emit = defineEmits<{
         }"
       >
         <template #header>
-          <strong> Löschen </strong>
+          <strong> {{ title }} </strong>
         </template>
 
         <slot />

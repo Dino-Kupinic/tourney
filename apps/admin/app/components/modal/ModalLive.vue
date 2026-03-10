@@ -10,10 +10,23 @@ const liveButtonLabel = computed(() => {
 const liveIcon = computed(() => {
   return is_live.value ? "i-heroicons-signal-slash" : "i-heroicons-signal"
 })
+const liveTitle = computed(() => {
+  return is_live.value ? "Offline gehen?" : "Live gehen?"
+})
+const liveDescription = computed(() => {
+  return is_live.value
+    ? "Bestätigungsdialog zum Deaktivieren des Live-Status."
+    : "Bestätigungsdialog zum Aktivieren des Live-Status."
+})
 </script>
 
 <template>
-  <UModal v-model:open="isOpenLive" :ui="{ content: 'w-full sm:max-w-md' }">
+  <UModal
+    v-model:open="isOpenLive"
+    :title="liveTitle"
+    :description="liveDescription"
+    :ui="{ content: 'w-full sm:max-w-md' }"
+  >
     <template #content>
       <UCard
         :ui="{
@@ -24,8 +37,7 @@ const liveIcon = computed(() => {
         }"
       >
         <template #header>
-          <strong v-if="!is_live"> Live gehen? </strong>
-          <strong v-else> Offline gehen? </strong>
+          <strong>{{ liveTitle }}</strong>
         </template>
 
         <div

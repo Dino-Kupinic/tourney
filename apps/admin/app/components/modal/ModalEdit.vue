@@ -1,6 +1,12 @@
 <script setup lang="ts">
 const isOpenEdit = defineModel<boolean>()
-const { modalWidth } = defineProps<{
+const {
+  title = "Editieren",
+  description,
+  modalWidth,
+} = defineProps<{
+  title?: string
+  description?: string
   modalWidth?: string
 }>()
 
@@ -15,7 +21,14 @@ const modalUI = computed(() => ({
 </script>
 
 <template>
-  <UModal v-model:open="isOpenEdit" :ui="modalUI">
+  <UModal
+    v-model:open="isOpenEdit"
+    :title="title"
+    :description="
+      description || 'Dialog zum Bearbeiten des aktuellen Eintrags.'
+    "
+    :ui="modalUI"
+  >
     <template #content>
       <UCard
         :ui="{
@@ -26,7 +39,7 @@ const modalUI = computed(() => ({
         }"
       >
         <template #header>
-          <strong> Editieren </strong>
+          <strong> {{ title }} </strong>
         </template>
 
         <slot />

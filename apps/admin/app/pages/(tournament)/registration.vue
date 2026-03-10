@@ -328,8 +328,13 @@ const linksState = reactive({
 })
 
 const links = ref<LinkGroup>({})
+const teamLinkNameCollator = new Intl.Collator(undefined, {
+  numeric: true,
+  sensitivity: "base",
+})
+
 const groupLinks = () => {
-  return selectedRows.value.reduce((acc, row) => {
+  const groupedLinks = selectedRows.value.reduce((acc, row) => {
     const { class: className, name, id } = row
     const url: string = `${config.public.clientUrl}/registrations/${id}`
 
@@ -340,6 +345,12 @@ const groupLinks = () => {
     acc[className].links.push({ name, url, class: className })
     return acc
   }, {} as LinkGroup)
+
+  Object.values(groupedLinks).forEach((group) => {
+    group.links.sort((a, b) => teamLinkNameCollator.compare(a.name, b.name))
+  })
+
+  return groupedLinks
 }
 
 const generateLinks = () => {
@@ -630,9 +641,8 @@ const onSubmitCreate = async () => {
           class="w-full"
           :ui="{ list: 'h-9', trigger: 'h-7' }"
         >
-          <template #content="{ item }">
+          <template #multiple>
             <UForm
-              v-if="item.key === 'multiple'"
               :schema="creationSchemaMultiple"
               :state="creationStateMultiple"
               class="space-y-4 pt-2"
@@ -697,9 +707,10 @@ const onSubmitCreate = async () => {
                 />
               </UFormField>
             </UForm>
+          </template>
 
+          <template #single>
             <UForm
-              v-else-if="item.key === 'single'"
               :schema="creationSchemaSingle"
               :state="creationStateSingle"
               class="space-y-4 pt-2"

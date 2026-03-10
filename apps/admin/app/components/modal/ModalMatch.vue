@@ -8,7 +8,12 @@ const loading = defineModel<boolean>("loading")
 </script>
 
 <template>
-  <UModal v-model:open="isOpenConfirm" :ui="{ content: 'w-full sm:max-w-md' }">
+  <UModal
+    v-model:open="isOpenConfirm"
+    title="Spiel beenden?"
+    description="Bestätigungsdialog zum Beenden des aktuellen Spiels."
+    :ui="{ content: 'w-full sm:max-w-md' }"
+  >
     <template #content>
       <UCard
         :ui="{

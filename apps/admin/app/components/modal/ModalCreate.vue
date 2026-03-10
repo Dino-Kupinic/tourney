@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const isOpenCreate = defineModel<boolean>()
-const { title, modalWidth } = defineProps<{
+const { title, description, modalWidth } = defineProps<{
   title: string
+  description?: string
   modalWidth?: string
 }>()
 
@@ -16,7 +17,12 @@ const modalUI = computed(() => ({
 </script>
 
 <template>
-  <UModal v-model:open="isOpenCreate" :ui="modalUI">
+  <UModal
+    v-model:open="isOpenCreate"
+    :title="title"
+    :description="description || 'Dialog zum Erstellen eines neuen Eintrags.'"
+    :ui="modalUI"
+  >
     <template #content>
       <UCard
         :ui="{
