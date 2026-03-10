@@ -65,7 +65,6 @@ const creationSchema = z.object({
   start_date: z.string().date(),
   from: z.string(),
   to: z.string(),
-  year: z.number(),
   sport: z.custom<Enums<"sport_type">>(),
   prizes: z.object({
     first: z.string(),
@@ -86,7 +85,6 @@ const creationState = reactive({
   start_date: undefined,
   from: undefined,
   to: undefined,
-  year: 0,
   sport: "Fußball",
   prizes: {
     first: "",
@@ -107,7 +105,6 @@ const resetCreationState = () => {
   creationState.start_date = undefined
   creationState.from = undefined
   creationState.to = undefined
-  creationState.year = 0
   creationState.sport = "Fußball"
   creationState.prizes.first = ""
   creationState.prizes.second = ""
@@ -119,13 +116,6 @@ const resetCreationState = () => {
   creationState.group_teams = 0
   creationState.knockout_interval = 15
 }
-
-watch(
-  () => creationState.start_date,
-  (value: unknown) => {
-    creationState.year = value ? new Date(value as string).getFullYear() : 0
-  },
-)
 
 watch(isOpenCreate, (isOpen) => {
   if (isOpen) return

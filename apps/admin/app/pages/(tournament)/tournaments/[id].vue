@@ -427,7 +427,6 @@ const editSchema = z.object({
   start_date: z.string().date(),
   from: z.string().time(),
   to: z.string().time(),
-  year: z.number(),
   sport: z.custom<Enums<"sport_type">>(),
   prizes: z.object({
     first: z.string(),
@@ -448,7 +447,6 @@ const editState = reactive({
   start_date: tournament.value.start_date,
   from: tournament.value.from,
   to: tournament.value.to,
-  year: tournament.value.year,
   sport: tournament.value.sport,
   prizes: {
     first: tournament.value.prizes?.first ?? "",
@@ -471,7 +469,6 @@ const resetEditState = () => {
   editState.start_date = tournament.value.start_date
   editState.from = tournament.value.from
   editState.to = tournament.value.to
-  editState.year = tournament.value.year
   editState.sport = tournament.value.sport
   editState.prizes.first = tournament.value.prizes?.first ?? ""
   editState.prizes.second = tournament.value.prizes?.second ?? ""

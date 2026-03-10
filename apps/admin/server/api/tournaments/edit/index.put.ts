@@ -19,7 +19,6 @@ type Body = {
     start_date: string
     from: string
     to: string
-    year: number
     sport: Enums<"sport_type">
     prizes: {
       first: string
@@ -63,6 +62,7 @@ export default defineEventHandler(async (event) => {
     .from("tournament")
     .update({
       ...tournament,
+      year: Number(tournament.start_date.slice(0, 4)),
       last_edited_by_id: editorId,
     })
     .eq("id", id)
