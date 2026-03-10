@@ -756,13 +756,15 @@ const canGoLive = computed(() => {
         </UModal>
         <UModal
           v-model:open="isOpenRemoveTeam"
-          :ui="{ content: 'w-full sm:max-w-2xl' }"
+          :ui="{
+            content: 'w-full overflow-hidden sm:max-w-4xl sm:max-h-[90vh]',
+          }"
         >
           <template #content>
             <UCard
               :ui="{
-                root: 'divide-y divide-neutral-100 dark:divide-neutral-800',
-                body: 'space-y-4 px-4 py-5 sm:p-6',
+                root: 'flex max-h-[80vh] flex-col divide-y divide-neutral-100 overflow-hidden dark:divide-neutral-800',
+                body: 'flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-6',
                 header: 'px-4 py-3 sm:px-6',
                 footer: 'px-4 py-3 sm:px-6',
               }"
@@ -771,67 +773,69 @@ const canGoLive = computed(() => {
                 <strong>Team entfernen</strong>
               </template>
 
-              <UAlert
-                icon="i-heroicons-information-circle"
-                color="warning"
-                variant="soft"
-                title="Turnier-Zuordnung entfernen"
-                description="Das Team wird aus allen Gruppen genommen und aus diesem Turnier entfernt."
-              />
-
-              <div
-                v-if="removableParticipants.length"
-                class="overflow-hidden rounded-md border border-neutral-200 dark:border-neutral-800"
-              >
+              <div class="flex min-h-0 flex-1 flex-col space-y-4">
                 <div
-                  v-for="participant in removableParticipants"
-                  :key="participant.id"
-                  class="flex items-center justify-between gap-3 border-b border-neutral-200 p-3 last:border-b-0 dark:border-neutral-800"
+                  v-if="removableParticipants.length"
+                  class="min-h-0 overflow-y-auto rounded-md border border-neutral-200 p-3 dark:border-neutral-800"
                 >
-                  <div class="min-w-0">
-                    <p class="truncate font-medium">
-                      {{ participant.name }}
-                    </p>
-                    <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                      {{
-                        participant.group_id
-                          ? "Aktuell im Spielfeld"
-                          : "Aktuell Warteliste"
-                      }}
-                    </p>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <UBadge
-                      :label="participant.registration?.status ?? 'Unbekannt'"
-                      :color="
-                        participant.registration?.status === 'Abgeschlossen'
-                          ? 'success'
-                          : participant.registration?.status === 'Abgesendet'
-                            ? 'warning'
-                            : participant.registration?.status === 'Abgelehnt'
-                              ? 'error'
-                              : 'neutral'
-                      "
-                      variant="subtle"
-                    />
-                    <UButton
-                      icon="i-heroicons-trash"
-                      color="error"
-                      variant="soft"
-                      size="sm"
-                      square
-                      @click="onRemoveTeamClick(participant)"
-                    />
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <div
+                      v-for="participant in removableParticipants"
+                      :key="participant.id"
+                      class="flex items-start justify-between gap-3 rounded-md border border-neutral-200 p-3 dark:border-neutral-800"
+                    >
+                      <div class="min-w-0 space-y-2">
+                        <div>
+                          <p class="truncate font-medium">
+                            {{ participant.name }}
+                          </p>
+                          <p
+                            class="text-xs text-neutral-500 dark:text-neutral-400"
+                          >
+                            {{
+                              participant.group_id
+                                ? "Aktuell im Spielfeld"
+                                : "Aktuell Warteliste"
+                            }}
+                          </p>
+                        </div>
+                        <UBadge
+                          :label="
+                            participant.registration?.status ?? 'Unbekannt'
+                          "
+                          :color="
+                            participant.registration?.status === 'Abgeschlossen'
+                              ? 'success'
+                              : participant.registration?.status ===
+                                  'Abgesendet'
+                                ? 'warning'
+                                : participant.registration?.status ===
+                                    'Abgelehnt'
+                                  ? 'error'
+                                  : 'neutral'
+                          "
+                          variant="subtle"
+                        />
+                      </div>
+                      <UButton
+                        icon="i-heroicons-trash"
+                        color="error"
+                        variant="soft"
+                        size="sm"
+                        square
+                        @click="onRemoveTeamClick(participant)"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <p
-                v-else
-                class="rounded-md border border-dashed border-neutral-200 px-4 py-8 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400"
-              >
-                Dieses Turnier hat aktuell keine Teams.
-              </p>
+                <p
+                  v-else
+                  class="rounded-md border border-dashed border-neutral-200 px-4 py-8 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400"
+                >
+                  Dieses Turnier hat aktuell keine Teams.
+                </p>
+              </div>
 
               <template #footer>
                 <div class="flex justify-end">
@@ -1058,33 +1062,15 @@ const canGoLive = computed(() => {
 
           <div class="flex items-center justify-between gap-3">
             <strong>Gruppen</strong>
-            <template v-if="!tournament?.is_live">
-              <template v-if="hasMatches">
-                <UTooltip
-                  text="Spiele existieren, Teams können nicht mehr entfernt werden."
-                >
-                  <UButton
-                    label="Team entfernen..."
-                    icon="i-heroicons-user-minus"
-                    variant="outline"
-                    color="neutral"
-                    size="sm"
-                    :disabled="hasMatches as boolean"
-                  />
-                </UTooltip>
-              </template>
-              <template v-else>
-                <UButton
-                  label="Team entfernen..."
-                  icon="i-heroicons-user-minus"
-                  variant="outline"
-                  color="neutral"
-                  size="sm"
-                  :disabled="!participants?.length"
-                  @click="isOpenRemoveTeam = true"
-                />
-              </template>
-            </template>
+            <UButton
+              label="Team entfernen..."
+              icon="i-heroicons-user-minus"
+              variant="outline"
+              color="neutral"
+              size="sm"
+              :disabled="!participants?.length"
+              @click="isOpenRemoveTeam = true"
+            />
           </div>
           <div
             class="shrink-0 overflow-hidden rounded-md border border-neutral-300 dark:border-neutral-700"
@@ -1202,7 +1188,6 @@ const canGoLive = computed(() => {
                           icon="i-heroicons-x-mark"
                           color="error"
                           variant="soft"
-                          size="sm"
                           square
                           @click="onDeleteClick(player.id)"
                         />

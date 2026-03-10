@@ -10,26 +10,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { data: matches, error: matchesError } = await supabase
-    .from("match")
-    .select("id")
-    .eq("tournament_id", tournamentId)
-    .limit(1)
-
-  if (matchesError) {
-    throw createError({
-      statusCode: 500,
-      message: matchesError.message,
-    })
-  }
-
-  if ((matches?.length ?? 0) > 0) {
-    throw createError({
-      statusCode: 409,
-      message: "Teams cannot be removed after matches have been created",
-    })
-  }
-
   const { data: team, error: teamError } = await supabase
     .from("team")
     .select("id")

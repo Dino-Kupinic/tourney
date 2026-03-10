@@ -520,7 +520,10 @@ const onSubmitCreate = async () => {
                             :key="link.url"
                             class="min-w-0"
                           >
-                            <p class="truncate text-xs">{{ link.name }}</p>
+                            <p class="truncate text-xs">
+                              <!-- Ugly hack but client wants it #220 -->
+                              {{ link.name.replace("Team", "Bewerb") }}
+                            </p>
                             <code class="block overflow-x-auto text-xs">{{
                               link.url
                             }}</code>
