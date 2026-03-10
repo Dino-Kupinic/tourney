@@ -1,30 +1,27 @@
 # [0.36.0](https://github.com/HTL-Steyr/tourney/compare/v0.35.0...v0.36.0) (2026-03-10)
 
-
 ### Features
 
-* add engine property to packages ([d656bc0](https://github.com/HTL-Steyr/tourney/commit/d656bc0f1e23a7296eb020ff36a217c0049d282c))
+- add engine property to packages ([d656bc0](https://github.com/HTL-Steyr/tourney/commit/d656bc0f1e23a7296eb020ff36a217c0049d282c))
 
 # [0.35.0](https://github.com/HTL-Steyr/tourney/compare/v0.34.0...v0.35.0) (2026-03-10)
 
-
 ### Bug Fixes
 
-* adjust logic ([01725f8](https://github.com/HTL-Steyr/tourney/commit/01725f8e3baf0c2e87dc67c30433eae0ab31903c))
-* clear forms after submit ([9ffff40](https://github.com/HTL-Steyr/tourney/commit/9ffff40e6cbf794e1dc0c1a17c1053d326a29aa0))
-* content shift modal ([97f95ab](https://github.com/HTL-Steyr/tourney/commit/97f95ab0375b60bb91141185d3dcbddb8cdfce2c))
-* update year property when start date is moved ([664b9a4](https://github.com/HTL-Steyr/tourney/commit/664b9a44f607a65b8996b3c6ac770d5696f36168))
-
+- adjust logic ([01725f8](https://github.com/HTL-Steyr/tourney/commit/01725f8e3baf0c2e87dc67c30433eae0ab31903c))
+- clear forms after submit ([9ffff40](https://github.com/HTL-Steyr/tourney/commit/9ffff40e6cbf794e1dc0c1a17c1053d326a29aa0))
+- content shift modal ([97f95ab](https://github.com/HTL-Steyr/tourney/commit/97f95ab0375b60bb91141185d3dcbddb8cdfce2c))
+- update year property when start date is moved ([664b9a4](https://github.com/HTL-Steyr/tourney/commit/664b9a44f607a65b8996b3c6ac770d5696f36168))
 
 ### Features
 
-* add ability to remove teams ([481fe97](https://github.com/HTL-Steyr/tourney/commit/481fe97d19e4bfb1a71058e0579c234e956de721))
-* add adjustable live flow panel ratio and enhance live page layout ([cfc933f](https://github.com/HTL-Steyr/tourney/commit/cfc933fbd9542001b50ae86b6193ff1e64553764))
-* improve button styling for live flow panel resizing ([ffdbbb0](https://github.com/HTL-Steyr/tourney/commit/ffdbbb0e5808ccf688286157f6077e0b54bfba4e))
-* restructure project files and update imports for shared modules ([d16a2de](https://github.com/HTL-Steyr/tourney/commit/d16a2de2b445d6214a264b61c9c1965f2e391851))
-* simplify app configuration and update package dependencies ([5caa621](https://github.com/HTL-Steyr/tourney/commit/5caa621145b477170b0c87f737b99d204199e9ed))
-* update modals ([0392768](https://github.com/HTL-Steyr/tourney/commit/0392768db8b099e99e104c7f1a827329658c325b))
-* update package dependencies to use catalog references ([704bc65](https://github.com/HTL-Steyr/tourney/commit/704bc65bfe88b47e975f79885571dd48165c6d6b))
+- add ability to remove teams ([481fe97](https://github.com/HTL-Steyr/tourney/commit/481fe97d19e4bfb1a71058e0579c234e956de721))
+- add adjustable live flow panel ratio and enhance live page layout ([cfc933f](https://github.com/HTL-Steyr/tourney/commit/cfc933fbd9542001b50ae86b6193ff1e64553764))
+- improve button styling for live flow panel resizing ([ffdbbb0](https://github.com/HTL-Steyr/tourney/commit/ffdbbb0e5808ccf688286157f6077e0b54bfba4e))
+- restructure project files and update imports for shared modules ([d16a2de](https://github.com/HTL-Steyr/tourney/commit/d16a2de2b445d6214a264b61c9c1965f2e391851))
+- simplify app configuration and update package dependencies ([5caa621](https://github.com/HTL-Steyr/tourney/commit/5caa621145b477170b0c87f737b99d204199e9ed))
+- update modals ([0392768](https://github.com/HTL-Steyr/tourney/commit/0392768db8b099e99e104c7f1a827329658c325b))
+- update package dependencies to use catalog references ([704bc65](https://github.com/HTL-Steyr/tourney/commit/704bc65bfe88b47e975f79885571dd48165c6d6b))
 
 # [0.34.0](https://github.com/HTL-Steyr/tourney/compare/v0.33.0...v0.34.0) (2026-03-06)
 
