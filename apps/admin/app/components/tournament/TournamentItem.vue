@@ -44,6 +44,7 @@ const items = [
 
 const isOpenDelete = ref<boolean>(false)
 const emit = defineEmits(["refresh"])
+
 const onDelete = async () => {
   try {
     await $fetch(`/api/tournaments/delete/${tournament.id}`, {

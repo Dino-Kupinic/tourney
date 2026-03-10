@@ -239,6 +239,69 @@ const onRandomizeTeamSelection = () => {
     .map((team) => team.id)
 }
 
+const isOpenRemoveTeam = ref<boolean>(false)
+const isOpenRemoveTeamConfirm = ref<boolean>(false)
+const teamToRemove = ref<TournamentParticipant | null>(null)
+const removingTeamId = ref<string | null>(null)
+
+const removableParticipants = computed(() => {
+  return [...(participants.value ?? [])].sort((a, b) => {
+    if (Boolean(a.group_id) !== Boolean(b.group_id)) {
+      return a.group_id ? -1 : 1
+    }
+
+    return a.name.localeCompare(b.name)
+  })
+})
+
+const onRemoveTeamClick = (participant: TournamentParticipant) => {
+  teamToRemove.value = participant
+  isOpenRemoveTeamConfirm.value = true
+}
+
+watch(isOpenRemoveTeam, (isOpen) => {
+  if (isOpen) return
+
+  isOpenRemoveTeamConfirm.value = false
+  teamToRemove.value = null
+})
+
+const onRemoveTeam = async () => {
+  if (!teamToRemove.value || !tournament.value) return
+
+  try {
+    const teamName = teamToRemove.value.name
+    removingTeamId.value = teamToRemove.value.id
+
+    await $fetch(
+      `/api/tournaments/${tournament.value.id}/team/${teamToRemove.value.id}`,
+      {
+        method: "DELETE",
+      },
+    )
+
+    await refreshGroups()
+    await teamsRefresh()
+    await participantsRefresh()
+    isOpenRemoveTeamConfirm.value = false
+    teamToRemove.value = null
+    displaySuccessNotification(
+      "Team entfernt",
+      `${teamName} wurde aus dem Turnier entfernt.`,
+    )
+  } catch (err) {
+    console.error(err)
+    displayFailureNotification(
+      "Fehler beim Entfernen",
+      err instanceof Error
+        ? err.message
+        : "Das Team konnte nicht aus dem Turnier entfernt werden.",
+    )
+  } finally {
+    removingTeamId.value = null
+  }
+}
+
 const toggleTeamSelection = (teamId: string, checked: boolean) => {
   if (checked) {
     if (selectedPlayableIdSet.value.has(teamId)) return
@@ -691,6 +754,150 @@ const canGoLive = computed(() => {
             </UCard>
           </template>
         </UModal>
+        <UModal
+          v-model:open="isOpenRemoveTeam"
+          :ui="{ content: 'w-full sm:max-w-2xl' }"
+        >
+          <template #content>
+            <UCard
+              :ui="{
+                root: 'divide-y divide-neutral-100 dark:divide-neutral-800',
+                body: 'space-y-4 px-4 py-5 sm:p-6',
+                header: 'px-4 py-3 sm:px-6',
+                footer: 'px-4 py-3 sm:px-6',
+              }"
+            >
+              <template #header>
+                <strong>Team entfernen</strong>
+              </template>
+
+              <UAlert
+                icon="i-heroicons-information-circle"
+                color="warning"
+                variant="soft"
+                title="Turnier-Zuordnung entfernen"
+                description="Das Team wird aus allen Gruppen genommen und aus diesem Turnier entfernt."
+              />
+
+              <div
+                v-if="removableParticipants.length"
+                class="overflow-hidden rounded-md border border-neutral-200 dark:border-neutral-800"
+              >
+                <div
+                  v-for="participant in removableParticipants"
+                  :key="participant.id"
+                  class="flex items-center justify-between gap-3 border-b border-neutral-200 p-3 last:border-b-0 dark:border-neutral-800"
+                >
+                  <div class="min-w-0">
+                    <p class="truncate font-medium">
+                      {{ participant.name }}
+                    </p>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                      {{
+                        participant.group_id
+                          ? "Aktuell im Spielfeld"
+                          : "Aktuell Warteliste"
+                      }}
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <UBadge
+                      :label="participant.registration?.status ?? 'Unbekannt'"
+                      :color="
+                        participant.registration?.status === 'Abgeschlossen'
+                          ? 'success'
+                          : participant.registration?.status === 'Abgesendet'
+                            ? 'warning'
+                            : participant.registration?.status === 'Abgelehnt'
+                              ? 'error'
+                              : 'neutral'
+                      "
+                      variant="subtle"
+                    />
+                    <UButton
+                      icon="i-heroicons-trash"
+                      color="error"
+                      variant="soft"
+                      size="sm"
+                      square
+                      @click="onRemoveTeamClick(participant)"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <p
+                v-else
+                class="rounded-md border border-dashed border-neutral-200 px-4 py-8 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400"
+              >
+                Dieses Turnier hat aktuell keine Teams.
+              </p>
+
+              <template #footer>
+                <div class="flex justify-end">
+                  <UButton
+                    color="neutral"
+                    variant="outline"
+                    size="sm"
+                    label="Schließen"
+                    @click="isOpenRemoveTeam = false"
+                  />
+                </div>
+              </template>
+            </UCard>
+          </template>
+        </UModal>
+        <UModal
+          v-model:open="isOpenRemoveTeamConfirm"
+          :ui="{ content: 'w-full sm:max-w-md' }"
+        >
+          <template #content>
+            <UCard
+              :ui="{
+                root: 'divide-y divide-neutral-100 dark:divide-neutral-800',
+                body: 'space-y-3 px-4 py-5 sm:p-6',
+                header: 'px-4 py-3 sm:px-6',
+                footer: 'px-4 py-3 sm:px-6',
+              }"
+            >
+              <template #header>
+                <strong>Team entfernen</strong>
+              </template>
+
+              <p>
+                Möchtest du <strong>{{ teamToRemove?.name }}</strong> wirklich
+                aus diesem Turnier entfernen?
+              </p>
+              <UAlert
+                icon="i-heroicons-exclamation-triangle"
+                color="error"
+                variant="soft"
+                title="Achtung"
+                description="Das Team wird aus allen Gruppen genommen. Die Anmeldung bleibt bestehen."
+              />
+
+              <template #footer>
+                <div class="flex items-center gap-2">
+                  <UButton
+                    label="Entfernen"
+                    color="error"
+                    variant="soft"
+                    size="sm"
+                    :loading="removingTeamId === teamToRemove?.id"
+                    @click="onRemoveTeam"
+                  />
+                  <UButton
+                    label="Abbrechen"
+                    color="neutral"
+                    variant="outline"
+                    size="sm"
+                    @click="isOpenRemoveTeamConfirm = false"
+                  />
+                </div>
+              </template>
+            </UCard>
+          </template>
+        </UModal>
         <template v-if="!canGoLive">
           <UTooltip
             text="Genaues Teamfeld + alle Spielteams müssen akzeptiert sein"
@@ -825,26 +1032,60 @@ const canGoLive = computed(() => {
           </div>
         </div>
         <div class="flex h-full w-full flex-col gap-3 p-6">
-          <strong>Ablauf</strong>
-          <UBreadcrumb
-            :items="timeline"
-            separator-icon="i-heroicons-arrow-long-right"
-            :ui="{
-              root: 'w-full',
-              list: 'flex w-full flex-wrap items-center gap-1.5',
-            }"
-          >
-            <template #item="{ item }">
-              <UBadge
-                color="neutral"
-                variant="outline"
-                class="truncate rounded-full"
+          <div class="flex flex-col gap-2">
+            <strong>Ablauf</strong>
+            <div class="rounded-lg bg-neutral-100 p-3 dark:bg-neutral-800">
+              <UBreadcrumb
+                :items="timeline"
+                separator-icon="i-heroicons-arrow-long-right"
+                :ui="{
+                  root: 'w-full',
+                  list: 'flex w-full flex-wrap items-center gap-1.5',
+                }"
               >
-                {{ item.label }}
-              </UBadge>
+                <template #item="{ item }">
+                  <UBadge
+                    color="neutral"
+                    variant="outline"
+                    class="truncate rounded-full"
+                  >
+                    {{ item.label }}
+                  </UBadge>
+                </template>
+              </UBreadcrumb>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between gap-3">
+            <strong>Gruppen</strong>
+            <template v-if="!tournament?.is_live">
+              <template v-if="hasMatches">
+                <UTooltip
+                  text="Spiele existieren, Teams können nicht mehr entfernt werden."
+                >
+                  <UButton
+                    label="Team entfernen..."
+                    icon="i-heroicons-user-minus"
+                    variant="outline"
+                    color="neutral"
+                    size="sm"
+                    :disabled="hasMatches as boolean"
+                  />
+                </UTooltip>
+              </template>
+              <template v-else>
+                <UButton
+                  label="Team entfernen..."
+                  icon="i-heroicons-user-minus"
+                  variant="outline"
+                  color="neutral"
+                  size="sm"
+                  :disabled="!participants?.length"
+                  @click="isOpenRemoveTeam = true"
+                />
+              </template>
             </template>
-          </UBreadcrumb>
-          <strong>Gruppen</strong>
+          </div>
           <div
             class="shrink-0 overflow-hidden rounded-md border border-neutral-300 dark:border-neutral-700"
           >
