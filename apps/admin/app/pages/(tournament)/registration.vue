@@ -782,7 +782,7 @@ const onSubmitCreate = async () => {
                   v-model="creationStateSingle.schoolClass"
                   placeholder="Klasse auswählen"
                   :items="classes ?? []"
-                  option-attribute="name"
+                  label-key="name"
                   class="w-full"
                 />
               </UFormField>

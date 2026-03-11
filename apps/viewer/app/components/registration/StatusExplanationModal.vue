@@ -11,7 +11,7 @@ const isOpen = defineModel<boolean>()
           class="my-4 flex flex-col gap-3 text-base text-neutral-700 sm:text-sm dark:text-neutral-300"
         >
           <div class="space-y-2">
-            <UBadge label="Ausstehend" color="warning" variant="subtle" />
+            <UBadge label="Ausstehend" color="neutral" variant="subtle" />
             <p>Die Anmeldung muss noch ausgefüllt werden.</p>
           </div>
           <div class="space-y-2">

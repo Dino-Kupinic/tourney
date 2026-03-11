@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { formLocked } from "../../../keys/isFormLocked"
-import { classMixing } from "../../../keys/allowClassMixing"
+import { formLocked } from "~/keys/isFormLocked"
+import { classMixing } from "~/keys/allowClassMixing"
 import type {
   FormPlayer,
   ParsedJsonTournament,
@@ -93,6 +93,7 @@ watch(selectedLogo, () => {
 })
 
 const isOpen = ref<boolean>(false)
+const isGeneratingPdf = ref<boolean>(false)
 const pdfName = ref<string>(`anmeldung_${registration.value?.class?.name}.pdf`)
 
 const formPlayers = ref<FormPlayer[]>()
@@ -108,6 +109,8 @@ const downloadPdf = (response: Blob) => {
 }
 
 const generatePDF = async () => {
+  isGeneratingPdf.value = true
+
   try {
     await fetchTeam()
 
@@ -131,8 +134,10 @@ const generatePDF = async () => {
   } catch (error) {
     throw createError({
       message: "Error generating PDF",
-      data: error,
+      data: error.message,
     })
+  } finally {
+    isGeneratingPdf.value = false
   }
 }
 
@@ -234,7 +239,7 @@ const submit = async () => {
               :disabled="isFormLocked"
               :items="tournaments ?? []"
               placeholder="Wähle das Turnier"
-              option-attribute="name"
+              label-key="name"
               size="lg"
             />
           </div>
@@ -430,6 +435,8 @@ const submit = async () => {
             size="lg"
             variant="soft"
             icon="i-heroicons-document-arrow-down"
+            :loading="isGeneratingPdf"
+            :disabled="isGeneratingPdf"
             @click="generatePDF"
           />
           <UAlert

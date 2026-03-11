@@ -18,34 +18,53 @@ const allowClassMixing = inject(classMixing)
 
 const fNameInput = `players.${index}.firstName`
 const lNameInput = `players.${index}.lastName`
+const schoolClassInput = `players.${index}.schoolClass`
 </script>
 
 <template>
   <RegistrationItem>
-    <div class="flex grow flex-col gap-3">
+    <div class="flex w-full grow flex-col gap-3">
       <div
-        class="w-full rounded-md border bg-white p-1 text-center dark:border-neutral-700 dark:bg-neutral-700"
+        class="w-full rounded-md border border-neutral-200 bg-white p-1 text-center dark:border-neutral-600 dark:bg-neutral-700"
       >
         <strong class="text-base"> {{ name }} </strong>
       </div>
-      <div class="flex flex-col gap-3 sm:flex-row">
-        <UFormField label="Vorname" :name="fNameInput" size="lg">
-          <UInput v-model="firstName" placeholder="Max" :disabled="isLocked" />
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <UFormField label="Vorname" :name="fNameInput" size="lg" class="w-full">
+          <UInput
+            v-model="firstName"
+            placeholder="Max"
+            :disabled="isLocked"
+            class="w-full"
+          />
         </UFormField>
-        <UFormField label="Nachname" :name="lNameInput" size="lg" class="grow">
+        <UFormField
+          label="Nachname"
+          :name="lNameInput"
+          size="lg"
+          class="w-full"
+        >
           <UInput
             v-model="lastName"
             placeholder="Mustermann"
             :disabled="isLocked"
+            class="w-full"
           />
         </UFormField>
       </div>
-      <UFormField label="Klasse" name="email" size="lg" v-if="allowClassMixing">
+      <UFormField
+        v-if="allowClassMixing"
+        label="Klasse"
+        :name="schoolClassInput"
+        size="lg"
+        class="w-full"
+      >
         <USelectMenu
           v-model="schoolClass"
           :items="schoolClasses ?? []"
-          option-attribute="name"
+          label-key="name"
           :disabled="isLocked"
+          class="w-full"
         />
       </UFormField>
     </div>
