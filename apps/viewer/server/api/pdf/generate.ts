@@ -1,8 +1,38 @@
+import { existsSync } from "node:fs"
 import puppeteer from "puppeteer"
 import Handlebars from "handlebars"
 import { H3Event } from "h3"
 import { useDateFormat } from "@vueuse/core"
 import type { Enums, Tables } from "@tourney/types"
+
+const CHROMIUM_CANDIDATES = [
+  "/usr/bin/chromium",
+  "/usr/bin/chromium-browser",
+  "/usr/bin/google-chrome-stable",
+  "/usr/bin/google-chrome",
+]
+
+function resolveExecutablePath() {
+  const configuredPath =
+    process.env.PUPPETEER_EXECUTABLE_PATH ||
+    process.env.CHROME_EXECUTABLE_PATH ||
+    process.env.CHROMIUM_PATH
+
+  if (configuredPath) {
+    return configuredPath
+  }
+
+  const systemPath = CHROMIUM_CANDIDATES.find((path) => existsSync(path))
+  if (systemPath) {
+    return systemPath
+  }
+
+  try {
+    return puppeteer.executablePath()
+  } catch {
+    return undefined
+  }
+}
 
 export default defineEventHandler(async (event: H3Event) => {
   const {
@@ -80,10 +110,22 @@ export default defineEventHandler(async (event: H3Event) => {
     money,
   })
 
-  const browser = await puppeteer.launch({
+  const launchOptions: Parameters<typeof puppeteer.launch>[0] = {
     headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  })
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+    ],
+  }
+
+  const executablePath = resolveExecutablePath()
+  if (executablePath) {
+    launchOptions.executablePath = executablePath
+  }
+
+  const browser = await puppeteer.launch(launchOptions)
 
   try {
     const page = await browser.newPage()
@@ -96,8 +138,6 @@ export default defineEventHandler(async (event: H3Event) => {
       printBackground: true,
     })
 
-    await browser.close()
-
     event.node.res.setHeader("Content-Type", "application/pdf")
     event.node.res.setHeader(
       "Content-Disposition",
@@ -105,10 +145,16 @@ export default defineEventHandler(async (event: H3Event) => {
     )
     return pdfBuffer
   } catch (error) {
-    await browser.close()
+    console.error("Error generating PDF", {
+      error,
+      executablePath: executablePath || null,
+    })
+
     throw createError({
       statusCode: 500,
       statusMessage: "Error generating PDF",
     })
+  } finally {
+    await browser.close()
   }
 })

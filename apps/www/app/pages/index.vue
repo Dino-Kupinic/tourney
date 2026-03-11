@@ -1,95 +1,339 @@
+<script setup lang="ts">
+import type { PageFeatureProps } from "@nuxt/ui"
+
+definePageMeta({
+  colorMode: "light",
+})
+
+const {
+  public: { adminAppUrl, viewerAppUrl },
+} = useRuntimeConfig()
+const demoVideoRef = ref<HTMLVideoElement | null>(null)
+const isVideoPlaying = ref(false)
+
+const playDemoVideo = async () => {
+  if (!demoVideoRef.value) return
+
+  try {
+    await demoVideoRef.value.play()
+    isVideoPlaying.value = true
+  } catch {
+    isVideoPlaying.value = false
+  }
+}
+
+const syncVideoState = () => {
+  if (!demoVideoRef.value) return
+  isVideoPlaying.value = !demoVideoRef.value.paused
+}
+
+useSeoMeta({
+  title: "Tourney - Tournament Management on Autopilot",
+  description:
+    "The platform that automatically manages brackets, crafts custom schedules, and runs events while your team does anything else.",
+  ogTitle: "Tourney - Tournament Management on Autopilot",
+  ogDescription:
+    "The platform that automatically manages brackets, crafts custom schedules, and runs events while your team does anything else.",
+  twitterCard: "summary_large_image",
+})
+
+useHead({
+  htmlAttrs: {
+    lang: "de",
+  },
+})
+
+const items = [
+  {
+    label: "GitHub",
+    to: "https://github.com/HTL-Steyr/tourney",
+    target: "_blank",
+  },
+  {
+    label: "Impressum",
+    to: "https://dino-kupinic.dev/impressum",
+    target: "_blank",
+  },
+  {
+    label: "Releases",
+    to: "https://github.com/HTL-Steyr/tourney/releases",
+    target: "_blank",
+  },
+]
+
+const cards = ref([
+  {
+    title: "Turniere",
+    description:
+      "Erstelle Fußball-, Volleyball- oder Basketballturniere mit Regeln, Zeitfenstern, Preisen und automatischer Gruppeneinteilung.",
+    icon: "i-lucide-trophy",
+    target: "_blank",
+    class: "lg:col-span-2",
+    orientation: "horizontal" as const,
+  },
+  {
+    title: "Live-Steuerung",
+    description:
+      "Starte Gruppenphasen, setze Matches live und aktualisiere Ergebnisse direkt während des Events.",
+    icon: "i-lucide-signal",
+    target: "_blank",
+    variant: "soft" as const,
+  },
+  {
+    title: "Klassen und Jahrgänge pflegen",
+    description:
+      "Verwalte Klassen pro Schuljahr als Grundlage für Team- und Anmeldelogik.",
+    icon: "i-lucide-graduation-cap",
+    target: "_blank",
+    variant: "soft" as const,
+  },
+  {
+    title: "Aktuelles veröffentlichen",
+    description: "Bearbeite Neuigkeiten direkt im Dashboard",
+    icon: "i-lucide-newspaper",
+    target: "_blank",
+    variant: "soft" as const,
+  },
+  {
+    title: "Anmeldungen verwalten",
+    description:
+      "Erstelle Registrierungslinks, verwalte Teams und bearbeite den Status von Anmeldungen zentral.",
+    icon: "i-lucide-ticket",
+    target: "_blank",
+    class: "lg:row-span-2",
+  },
+  {
+    title: "Galerie verwalten",
+    description: "Lade Fotos hoch und verwalte diese im Medienbereich.",
+    icon: "i-lucide-images",
+    target: "_blank",
+  },
+  {
+    title: "Turnierdetails und Platzierungen",
+    description: "Jedes Turnier hat eine öffentliche Detailseite",
+    icon: "i-lucide-list-ordered",
+    target: "_blank",
+    variant: "soft" as const,
+  },
+])
+
+const features = ref<PageFeatureProps[]>([
+  {
+    title: "Turnierdetails für alle",
+    description:
+      "Alle Turniere mit Datum, Ort, Regeln und Preisen sind im Viewer öffentlich verfügbar.",
+    icon: "i-lucide-calendar-days",
+    to: `${viewerAppUrl}/tournaments`,
+  },
+  {
+    title: "Live-Flow und Tabellen",
+    description:
+      "Der Turnierbaum, laufende Matches und Gruppenstände werden automatisch aktualisiert.",
+    icon: "i-lucide-git-branch-plus",
+    to: `${viewerAppUrl}/live`,
+  },
+  {
+    title: "Medien und Updates",
+    description:
+      "News und Bilder lassen sich im Admin pflegen und direkt im Viewer veröffentlichen.",
+    icon: "i-lucide-images",
+    to: `${viewerAppUrl}/media`,
+  },
+])
+</script>
+
 <template>
-  <div>
-    <UPageHero
-      title="Nuxt Starter Template"
-      description="A production-ready starter template powered by Nuxt UI. Build beautiful, accessible, and performant applications in minutes, not hours."
-      :links="[
-        {
-          label: 'Get started',
-          to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-          target: '_blank',
-          trailingIcon: 'i-lucide-arrow-right',
-          size: 'xl',
-        },
-        {
-          label: 'Use this template',
-          to: 'https://github.com/nuxt-ui-templates/starter',
-          target: '_blank',
-          icon: 'i-simple-icons-github',
-          size: 'xl',
-          color: 'neutral',
-          variant: 'subtle',
-        },
-      ]"
-    />
+  <UPage>
+    <main class="relative overflow-hidden pt-32 pb-24 md:pt-40">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="max-w-3xl">
+          <h1
+            class="mb-6 text-3xl leading-tight font-bold tracking-tighter text-neutral-900 sm:font-semibold md:text-7xl"
+          >
+            Turniere veranstalten. <br />
+            Ohne das Chaos.
+          </h1>
+          <p
+            class="mb-6 max-w-2xl text-lg leading-tight text-neutral-500 sm:mb-10 md:text-xl"
+          >
+            Die Plattform, die komplexe Brackets verwaltet, maßgeschneiderte
+            Spielpläne entwirft und die Organisation übernimmt, während sich
+            dein Team auf alles andere konzentriert.
+          </p>
+          <div
+            class="flex flex-row items-start gap-2 sm:flex-row sm:items-center sm:gap-4"
+          >
+            <NuxtLink
+              :to="viewerAppUrl"
+              external
+              class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-base font-medium text-white shadow-sm transition-all hover:bg-blue-700 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:outline-none active:scale-95"
+            >
+              Zuschauen
+            </NuxtLink>
+            <NuxtLink
+              :to="adminAppUrl"
+              external
+              class="inline-flex items-center justify-center rounded-full border border-neutral-200 bg-white px-6 py-3 text-base font-medium text-neutral-700 transition-all hover:border-neutral-300 hover:bg-neutral-50"
+            >
+              Dashboard
+            </NuxtLink>
+          </div>
+        </div>
 
-    <UPageSection
-      id="features"
-      title="Everything you need to build modern Nuxt apps"
-      description="Start with a solid foundation. This template includes all the essentials for building production-ready applications with Nuxt UI's powerful component system."
-      :features="[
-        {
-          icon: 'i-lucide-rocket',
-          title: 'Production-ready from day one',
-          description:
-            'Pre-configured with TypeScript, ESLint, Tailwind CSS, and all the best practices. Focus on building features, not setting up tooling.',
-        },
-        {
-          icon: 'i-lucide-palette',
-          title: 'Beautiful by default',
-          description:
-            'Leveraging Nuxt UI\'s design system with automatic dark mode, consistent spacing, and polished components that look great out of the box.',
-        },
-        {
-          icon: 'i-lucide-zap',
-          title: 'Lightning fast',
-          description:
-            'Optimized for performance with SSR/SSG support, automatic code splitting, and edge-ready deployment. Your users will love the speed.',
-        },
-        {
-          icon: 'i-lucide-blocks',
-          title: '100+ components included',
-          description:
-            'Access Nuxt UI\'s comprehensive component library. From forms to navigation, everything is accessible, responsive, and customizable.',
-        },
-        {
-          icon: 'i-lucide-code-2',
-          title: 'Developer experience first',
-          description:
-            'Auto-imports, hot module replacement, and TypeScript support. Write less boilerplate and ship more features.',
-        },
-        {
-          icon: 'i-lucide-shield-check',
-          title: 'Built for scale',
-          description:
-            'Enterprise-ready architecture with proper error handling, SEO optimization, and security best practices built-in.',
-        },
-      ]"
-    />
+        <div id="video-demo" class="relative mt-20">
+          <div
+            class="group relative flex aspect-video w-full cursor-pointer items-center justify-center overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-950 shadow-2xl"
+          >
+            <video
+              ref="demoVideoRef"
+              class="h-full w-full object-cover"
+              src="/dkupinic-2.mp4"
+              preload="metadata"
+              playsinline
+              controls
+              @play="syncVideoState"
+              @pause="syncVideoState"
+              @ended="syncVideoState"
+            />
 
-    <UPageSection>
-      <UPageCTA
-        title="Ready to build your next Nuxt app?"
-        description="Join thousands of developers building with Nuxt and Nuxt UI. Get this template and start shipping today."
-        variant="subtle"
-        :links="[
-          {
-            label: 'Start building',
-            to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-            target: '_blank',
-            trailingIcon: 'i-lucide-arrow-right',
-            color: 'neutral',
-          },
-          {
-            label: 'View on GitHub',
-            to: 'https://github.com/nuxt-ui-templates/starter',
-            target: '_blank',
-            icon: 'i-simple-icons-github',
-            color: 'neutral',
-            variant: 'outline',
-          },
-        ]"
-      />
-    </UPageSection>
-  </div>
+            <button
+              v-if="!isVideoPlaying"
+              type="button"
+              aria-label="Produktdemo abspielen"
+              class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-neutral-950/40 transition-transform duration-300 group-hover:scale-105"
+              @click="playDemoVideo"
+            >
+              <div
+                class="flex h-20 w-20 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-lg backdrop-blur-sm"
+              >
+                <svg
+                  class="ml-1 h-8 w-8"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+              <span class="text-sm font-medium tracking-wide text-white/60"
+                >Demo</span
+              >
+            </button>
+
+            <div
+              class="pointer-events-none absolute top-0 right-0 left-0 hidden h-12 items-center gap-2 border-b border-white/10 bg-neutral-950/50 px-6 backdrop-blur-md sm:flex"
+            >
+              <div class="flex gap-2">
+                <div class="h-3 w-3 rounded-full bg-red-500/80"></div>
+                <div class="h-3 w-3 rounded-full bg-yellow-500/80"></div>
+                <div class="h-3 w-3 rounded-full bg-green-500/80"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="features" class="mt-32 border-t border-neutral-100 pt-16">
+          <UPageGrid>
+            <UPageCard
+              v-for="(card, index) in cards"
+              :key="index"
+              v-bind="card"
+            >
+            </UPageCard>
+          </UPageGrid>
+        </div>
+
+        <div class="mt-32">
+          <UPageSection
+            title="Alles für den Turniertag"
+            description="Vom Anmeldeprozess bis zur Live-Auswertung arbeiten Admin und Viewer in einer gemeinsamen Plattform zusammen."
+            icon="i-lucide-layout-dashboard"
+            orientation="horizontal"
+            :features="features"
+          >
+            <div class="w-full">
+              <NuxtImg
+                src="/football.jpg"
+                width="600"
+                height="700"
+                alt="Fußballspieler bei einem Turnier"
+                class="w-full rounded-lg"
+                loading="lazy"
+              />
+              <p class="mt-2 text-right text-xs text-neutral-500">
+                Bildquelle:
+                <NuxtLink
+                  to="https://www.freepik.com"
+                  external
+                  target="_blank"
+                  class="underline underline-offset-2"
+                >
+                  freepik.com
+                </NuxtLink>
+              </p>
+            </div>
+          </UPageSection>
+        </div>
+
+        <div
+          class="relative my-32 overflow-hidden rounded-[3rem] bg-neutral-900 px-6 py-20 text-center text-white lg:py-24"
+        >
+          <div
+            class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.3),transparent_50%)]"
+          ></div>
+
+          <div class="relative z-10 mx-auto max-w-3xl">
+            <h2
+              class="mb-6 text-4xl font-semibold tracking-tighter md:text-6xl"
+            >
+              Bereit, deine Turniere auf das nächste Level zu bringen?
+            </h2>
+            <p class="mx-auto mb-10 max-w-xl text-lg text-neutral-400">
+              Erstelle dein erstes Turnier in Sekunden und erlebe, wie Tourney
+              die Organisation übernimmt, damit du dich auf das Wesentliche
+              konzentrieren kannst
+            </p>
+            <div
+              class="flex flex-col items-center justify-center gap-4 sm:flex-row"
+            >
+              <NuxtLink
+                :to="adminAppUrl"
+                external
+                class="inline-flex w-full items-center justify-center rounded-full bg-blue-600 px-8 py-4 text-base font-medium text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all hover:bg-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:outline-none active:scale-95 sm:w-auto"
+              >
+                Dashboard
+              </NuxtLink>
+              <NuxtLink
+                :to="viewerAppUrl"
+                external
+                class="inline-flex w-full items-center justify-center rounded-full border border-white/10 bg-white/10 px-8 py-4 text-base font-medium text-white backdrop-blur-md transition-all hover:bg-white/20 sm:w-auto"
+              >
+                Zuschauen
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <UFooter>
+      <template #left>
+        <p class="text-muted text-sm">
+          Copyright © {{ new Date().getFullYear() }} Dino Kupinic
+        </p>
+      </template>
+
+      <UNavigationMenu :items="items" variant="link" />
+
+      <template #right>
+        <UButton
+          icon="i-simple-icons-github"
+          color="neutral"
+          variant="ghost"
+          to="https://github.com/HTL-Steyr/tourney"
+          target="_blank"
+          aria-label="GitHub"
+        />
+      </template>
+    </UFooter>
+  </UPage>
 </template>

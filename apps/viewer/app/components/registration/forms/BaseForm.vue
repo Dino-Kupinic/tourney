@@ -98,8 +98,10 @@ async function submitForm() {
         message: err.message,
       }))
       form.value?.setErrors(formErrors)
+      return false
     } else {
       model.value = state.players
+      return true
     }
   } catch (error) {
     throw createError({

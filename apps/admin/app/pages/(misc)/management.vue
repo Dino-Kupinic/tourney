@@ -397,7 +397,6 @@ const refresh = async () => {
               v-model="creationStateSingle.year"
               :items="years"
               placeholder="Schuljahr auswählen"
-              size="sm"
               class="w-full"
             />
           </UFormField>
@@ -422,7 +421,6 @@ const refresh = async () => {
                 v-model="creationStateMultiple.year"
                 :items="years"
                 placeholder="Schuljahr auswählen"
-                size="sm"
                 class="w-full"
               />
             </UFormField>
@@ -449,7 +447,7 @@ const refresh = async () => {
               <div
                 v-for="className in creationStateMultiple.classes"
                 :key="className"
-                class="group flex items-center justify-between border-b px-2 py-1 dark:border-neutral-700"
+                class="group flex items-center justify-between border-b border-neutral-200 px-2 py-1 dark:border-neutral-700"
               >
                 <span>{{ className }}</span>
                 <UButton
@@ -476,7 +474,6 @@ const refresh = async () => {
               v-model="editState.year"
               :items="years"
               placeholder="Schuljahr auswählen"
-              size="sm"
               class="w-full"
             />
           </UFormField>

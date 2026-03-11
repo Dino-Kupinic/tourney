@@ -19,10 +19,30 @@ export default defineEventHandler(async (event) => {
   const { formPlayers, logo, logo_variant, registration, tournament } =
     await readBody<Body>(event)
 
-  if (!formPlayers || !logo || !registration) {
+  if (!formPlayers || !logo || !registration || !tournament) {
     throw createError({
       statusCode: 400,
       statusMessage: "Missing data fields",
+    })
+  }
+
+  const { data: currentRegistration, error: registrationError } = await supabase
+    .from("registration")
+    .select("id, status")
+    .eq("id", registration.id)
+    .single()
+
+  if (registrationError) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: registrationError.message,
+    })
+  }
+
+  if (currentRegistration.status !== "Ausstehend") {
+    throw createError({
+      statusCode: 409,
+      statusMessage: "Die Anmeldung wurde bereits abgesendet.",
     })
   }
 
@@ -80,6 +100,13 @@ export default defineEventHandler(async (event) => {
   const { data, error } = await supabase.from("team").insert(team).select()
 
   if (error) {
+    if (error.code === "23505") {
+      throw createError({
+        statusCode: 409,
+        statusMessage: "Die Anmeldung wurde bereits abgesendet.",
+      })
+    }
+
     throw createError({
       statusCode: 500,
       statusMessage: error.message,

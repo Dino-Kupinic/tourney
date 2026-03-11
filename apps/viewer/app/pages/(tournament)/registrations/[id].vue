@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { formLocked } from "../../../keys/isFormLocked"
-import { classMixing } from "../../../keys/allowClassMixing"
+import { formLocked } from "~/keys/isFormLocked"
+import { classMixing } from "~/keys/allowClassMixing"
 import type {
   FormPlayer,
   ParsedJsonTournament,
@@ -93,6 +93,7 @@ watch(selectedLogo, () => {
 })
 
 const isOpen = ref<boolean>(false)
+const isGeneratingPdf = ref<boolean>(false)
 const pdfName = ref<string>(`anmeldung_${registration.value?.class?.name}.pdf`)
 
 const formPlayers = ref<FormPlayer[]>()
@@ -108,6 +109,8 @@ const downloadPdf = (response: Blob) => {
 }
 
 const generatePDF = async () => {
+  isGeneratingPdf.value = true
+
   try {
     await fetchTeam()
 
@@ -129,10 +132,14 @@ const generatePDF = async () => {
 
     downloadPdf(response)
   } catch (error) {
+    const err = error as Error
+
     throw createError({
       message: "Error generating PDF",
-      data: error,
+      data: err.message,
     })
+  } finally {
+    isGeneratingPdf.value = false
   }
 }
 
@@ -158,9 +165,19 @@ const playerCount = computed(() => {
 })
 
 const formRef = useTemplateRef("formRef")
+const isSubmitting = ref(false)
+
 const submit = async () => {
+  if (isSubmitting.value) {
+    return
+  }
+
   // @ts-ignore build error
-  formRef.value?.$.exposed?.submitForm()
+  const isValid = await formRef.value?.$.exposed?.submitForm()
+  if (!isValid) {
+    return
+  }
+
   const payload = {
     formPlayers: formPlayers.value,
     logo: selectedLogo.value,
@@ -170,6 +187,8 @@ const submit = async () => {
   }
 
   try {
+    isSubmitting.value = true
+
     await $fetch("/api/teams/create", {
       method: "POST",
       body: payload,
@@ -184,6 +203,8 @@ const submit = async () => {
     throw createError({
       statusMessage: err.message,
     })
+  } finally {
+    isSubmitting.value = false
   }
 }
 </script>
@@ -234,7 +255,7 @@ const submit = async () => {
               :disabled="isFormLocked"
               :items="tournaments ?? []"
               placeholder="Wähle das Turnier"
-              option-attribute="name"
+              label-key="name"
               size="lg"
             />
           </div>
@@ -340,6 +361,8 @@ const submit = async () => {
         />
         <UButton
           label="Anmelden"
+          :disabled="isSubmitting"
+          :loading="isSubmitting"
           @click="submit"
           block
           size="lg"
@@ -430,6 +453,8 @@ const submit = async () => {
             size="lg"
             variant="soft"
             icon="i-heroicons-document-arrow-down"
+            :loading="isGeneratingPdf"
+            :disabled="isGeneratingPdf"
             @click="generatePDF"
           />
           <UAlert

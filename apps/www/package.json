@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "dev:host": "nuxt dev --host",
     "analyze": "nuxi analyze",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
