@@ -12,7 +12,6 @@ const svg = computed(() =>
     seed: name.value,
   }).toDataUri(),
 )
-const docsHelpUrl = `${docsUrl.replace(/\/$/, "")}/users/help`
 // TODO: make navbar rerender on live tournament change
 const { liveTournaments, fetchLiveTournaments } = useLiveTournaments()
 await fetchLiveTournaments()
@@ -103,7 +102,7 @@ const searchGroups = computed(() => [
       {
         label: "Hilfe",
         icon: "i-heroicons-question-mark-circle",
-        to: docsHelpUrl,
+        to: docsUrl,
         external: true,
         target: "_blank",
       },
@@ -215,7 +214,7 @@ const secondaryLinks = computed(() => [
   {
     label: "Hilfe",
     icon: "i-heroicons-question-mark-circle",
-    to: docsHelpUrl,
+    to: docsUrl,
     external: true,
     target: "_blank",
   },
