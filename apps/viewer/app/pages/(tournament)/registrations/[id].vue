@@ -132,9 +132,11 @@ const generatePDF = async () => {
 
     downloadPdf(response)
   } catch (error) {
+    const err = error as Error
+
     throw createError({
       message: "Error generating PDF",
-      data: error.message,
+      data: err.message,
     })
   } finally {
     isGeneratingPdf.value = false
@@ -163,9 +165,19 @@ const playerCount = computed(() => {
 })
 
 const formRef = useTemplateRef("formRef")
+const isSubmitting = ref(false)
+
 const submit = async () => {
+  if (isSubmitting.value) {
+    return
+  }
+
   // @ts-ignore build error
-  formRef.value?.$.exposed?.submitForm()
+  const isValid = await formRef.value?.$.exposed?.submitForm()
+  if (!isValid) {
+    return
+  }
+
   const payload = {
     formPlayers: formPlayers.value,
     logo: selectedLogo.value,
@@ -175,6 +187,8 @@ const submit = async () => {
   }
 
   try {
+    isSubmitting.value = true
+
     await $fetch("/api/teams/create", {
       method: "POST",
       body: payload,
@@ -189,6 +203,8 @@ const submit = async () => {
     throw createError({
       statusMessage: err.message,
     })
+  } finally {
+    isSubmitting.value = false
   }
 }
 </script>
@@ -345,6 +361,8 @@ const submit = async () => {
         />
         <UButton
           label="Anmelden"
+          :disabled="isSubmitting"
+          :loading="isSubmitting"
           @click="submit"
           block
           size="lg"
