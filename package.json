@@ -43,7 +43,7 @@
     "schema:supabase": "cd ./apps/api/supabase && bunx supabase db diff -f --local",
     "format": "turbo run format",
     "format:write": "turbo run format:write",
-    "release": "semantic-release",
+    "release": "HUSKY=0 semantic-release",
     "prepare": "husky"
   },
   "catalogs": {
