@@ -1,19 +1,18 @@
 # [0.37.0](https://github.com/HTL-Steyr/tourney/compare/v0.36.0...v0.37.0) (2026-03-11)
 
-
 ### Features
 
-* add migration for buckets ([a054924](https://github.com/HTL-Steyr/tourney/commit/a054924c91da1dfd370b03f13e53644793dd94ca))
-* add padding for mobile viewer in pwa ([9b57d23](https://github.com/HTL-Steyr/tourney/commit/9b57d23d40b4ea815bcd4a27512bd81c3488dd9a))
-* fix double registration bug ([0427ea4](https://github.com/HTL-Steyr/tourney/commit/0427ea4d5a85562b06a74a0a70e63c414bf27e0a))
-* landing improvements ([0877f9f](https://github.com/HTL-Steyr/tourney/commit/0877f9f7ab9467f4f0276c04fc814daafeef2e60))
-* landing mostly done ([32b5f18](https://github.com/HTL-Steyr/tourney/commit/32b5f18de5d3eae8eca282c6fab477259c01dc53))
-* more small fixes ([91f46fc](https://github.com/HTL-Steyr/tourney/commit/91f46fcf93c8c5fe76970a4f281cb855c6a9092c))
-* more work on landing ([c6910a1](https://github.com/HTL-Steyr/tourney/commit/c6910a1799aedf668fb55d2a225fb867d909302d))
-* small configs ([71eaf1b](https://github.com/HTL-Steyr/tourney/commit/71eaf1beded589031038e4adf62de2e7cabf5230))
-* small fixes, work on puppeteer logic for prod ([3f2c5ac](https://github.com/HTL-Steyr/tourney/commit/3f2c5acfaeb4e36ca4da1650a7a167104105d804))
-* work on landing ([18383bd](https://github.com/HTL-Steyr/tourney/commit/18383bdefa85dcc5241d173f433548c6d5707c55))
-* work on landing ([3e29302](https://github.com/HTL-Steyr/tourney/commit/3e2930248373d52ad3e768f4b6883bc0767df088))
+- add migration for buckets ([a054924](https://github.com/HTL-Steyr/tourney/commit/a054924c91da1dfd370b03f13e53644793dd94ca))
+- add padding for mobile viewer in pwa ([9b57d23](https://github.com/HTL-Steyr/tourney/commit/9b57d23d40b4ea815bcd4a27512bd81c3488dd9a))
+- fix double registration bug ([0427ea4](https://github.com/HTL-Steyr/tourney/commit/0427ea4d5a85562b06a74a0a70e63c414bf27e0a))
+- landing improvements ([0877f9f](https://github.com/HTL-Steyr/tourney/commit/0877f9f7ab9467f4f0276c04fc814daafeef2e60))
+- landing mostly done ([32b5f18](https://github.com/HTL-Steyr/tourney/commit/32b5f18de5d3eae8eca282c6fab477259c01dc53))
+- more small fixes ([91f46fc](https://github.com/HTL-Steyr/tourney/commit/91f46fcf93c8c5fe76970a4f281cb855c6a9092c))
+- more work on landing ([c6910a1](https://github.com/HTL-Steyr/tourney/commit/c6910a1799aedf668fb55d2a225fb867d909302d))
+- small configs ([71eaf1b](https://github.com/HTL-Steyr/tourney/commit/71eaf1beded589031038e4adf62de2e7cabf5230))
+- small fixes, work on puppeteer logic for prod ([3f2c5ac](https://github.com/HTL-Steyr/tourney/commit/3f2c5acfaeb4e36ca4da1650a7a167104105d804))
+- work on landing ([18383bd](https://github.com/HTL-Steyr/tourney/commit/18383bdefa85dcc5241d173f433548c6d5707c55))
+- work on landing ([3e29302](https://github.com/HTL-Steyr/tourney/commit/3e2930248373d52ad3e768f4b6883bc0767df088))
 
 # [0.36.0](https://github.com/HTL-Steyr/tourney/compare/v0.35.0...v0.36.0) (2026-03-10)
 

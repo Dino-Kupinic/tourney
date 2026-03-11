@@ -34,6 +34,18 @@ function resolveExecutablePath() {
   }
 }
 
+function serializeError(error: unknown) {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    }
+  }
+
+  return error
+}
+
 export default defineEventHandler(async (event: H3Event) => {
   const {
     pdfName,
@@ -146,7 +158,7 @@ export default defineEventHandler(async (event: H3Event) => {
     return pdfBuffer
   } catch (error) {
     console.error("Error generating PDF", {
-      error,
+      error: serializeError(error),
       executablePath: executablePath || null,
     })
 
