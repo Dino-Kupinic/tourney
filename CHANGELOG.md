@@ -1,3 +1,10 @@
+## [0.37.1](https://github.com/HTL-Steyr/tourney/compare/v0.37.0...v0.37.1) (2026-03-11)
+
+
+### Bug Fixes
+
+* puppeteer in prod ([95f79b6](https://github.com/HTL-Steyr/tourney/commit/95f79b6b0b60f15e9f52ac3523db014bbaa510c4))
+
 # [0.37.0](https://github.com/HTL-Steyr/tourney/compare/v0.36.0...v0.37.0) (2026-03-11)
 
 ### Features
