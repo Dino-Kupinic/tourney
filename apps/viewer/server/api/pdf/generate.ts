@@ -137,6 +137,10 @@ export default defineEventHandler(async (event: H3Event) => {
   formData.append("printBackground", "true")
   formData.append("paperWidth", "8.27")
   formData.append("paperHeight", "11.69")
+  formData.append("marginTop", "0.2")
+  formData.append("marginRight", "0.2")
+  formData.append("marginBottom", "0.2")
+  formData.append("marginLeft", "0.2")
 
   try {
     const response = await fetch(endpoint, {
