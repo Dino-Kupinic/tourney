@@ -1,3 +1,10 @@
+## [0.37.2](https://github.com/HTL-Steyr/tourney/compare/v0.37.1...v0.37.2) (2026-03-11)
+
+
+### Bug Fixes
+
+* nixpacks already install puppeteer pkgs ([899e3a3](https://github.com/HTL-Steyr/tourney/commit/899e3a3a0c35119084d2d08420dd1894b80d9cd2))
+
 ## [0.37.1](https://github.com/HTL-Steyr/tourney/compare/v0.37.0...v0.37.1) (2026-03-11)
 
 ### Bug Fixes
