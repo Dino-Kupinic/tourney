@@ -1,38 +1,7 @@
-import { existsSync } from "node:fs"
-import puppeteer from "puppeteer"
 import Handlebars from "handlebars"
 import { H3Event } from "h3"
 import { useDateFormat } from "@vueuse/core"
 import type { Enums, Tables } from "@tourney/types"
-
-const CHROMIUM_CANDIDATES = [
-  "/usr/bin/chromium",
-  "/usr/bin/chromium-browser",
-  "/usr/bin/google-chrome-stable",
-  "/usr/bin/google-chrome",
-]
-
-function resolveExecutablePath() {
-  const configuredPath =
-    process.env.PUPPETEER_EXECUTABLE_PATH ||
-    process.env.CHROME_EXECUTABLE_PATH ||
-    process.env.CHROMIUM_PATH
-
-  if (configuredPath) {
-    return configuredPath
-  }
-
-  const systemPath = CHROMIUM_CANDIDATES.find((path) => existsSync(path))
-  if (systemPath) {
-    return systemPath
-  }
-
-  try {
-    return puppeteer.executablePath()
-  } catch {
-    return undefined
-  }
-}
 
 function serializeError(error: unknown) {
   if (error instanceof Error) {
@@ -47,6 +16,20 @@ function serializeError(error: unknown) {
 }
 
 export default defineEventHandler(async (event: H3Event) => {
+  const runtimeConfig = useRuntimeConfig(event)
+  const gotenbergUrl =
+    typeof runtimeConfig.gotenbergUrl === "string"
+      ? runtimeConfig.gotenbergUrl
+      : ""
+  const gotenbergUsername =
+    typeof runtimeConfig.gotenbergUsername === "string"
+      ? runtimeConfig.gotenbergUsername
+      : ""
+  const gotenbergPassword =
+    typeof runtimeConfig.gotenbergPassword === "string"
+      ? runtimeConfig.gotenbergPassword
+      : ""
+
   const {
     pdfName,
     sport,
@@ -57,6 +40,13 @@ export default defineEventHandler(async (event: H3Event) => {
     team_id,
     deadline,
   } = await readBody(event)
+
+  if (!gotenbergUrl) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Missing Gotenberg configuration",
+    })
+  }
 
   if (
     !sport ||
@@ -72,6 +62,7 @@ export default defineEventHandler(async (event: H3Event) => {
       statusMessage: "Missing data fields",
     })
   }
+
   const timestamp = new Date().toISOString()
   const formattedDate = useDateFormat(date, "DD.MM.YYYY")
   const formattedDeadline = useDateFormat(deadline, "DD.MM.YYYY")
@@ -82,9 +73,9 @@ export default defineEventHandler(async (event: H3Event) => {
     return `${player.first_name} ${player.last_name}, ${player.class}`
   })
 
-  const t =
-    await useStorage("assets:templates").getItem<string>(`pdf-template.html`)
-  if (!t) {
+  const templateSource =
+    await useStorage("assets:templates").getItem<string>("pdf-template.html")
+  if (!templateSource) {
     throw createError({
       statusCode: 500,
       statusMessage: "PDF template not found",
@@ -108,7 +99,7 @@ export default defineEventHandler(async (event: H3Event) => {
       break
   }
 
-  const template = Handlebars.compile(t)
+  const template = Handlebars.compile(templateSource)
   const html = template({
     date: formattedDate.value,
     deadline: formattedDeadline.value,
@@ -122,51 +113,71 @@ export default defineEventHandler(async (event: H3Event) => {
     money,
   })
 
-  const launchOptions: Parameters<typeof puppeteer.launch>[0] = {
-    headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-    ],
+  const formData = new FormData()
+  const filename =
+    typeof pdfName === "string" && pdfName.endsWith(".pdf")
+      ? pdfName
+      : `${pdfName || "document"}.pdf`
+  const endpoint = new URL("/forms/chromium/convert/html", gotenbergUrl)
+  const headers = new Headers()
+
+  if (gotenbergUsername && gotenbergPassword) {
+    const credentials = Buffer.from(
+      `${gotenbergUsername}:${gotenbergPassword}`,
+    ).toString("base64")
+    headers.set("Authorization", `Basic ${credentials}`)
   }
 
-  const executablePath = resolveExecutablePath()
-  if (executablePath) {
-    launchOptions.executablePath = executablePath
-  }
-
-  const browser = await puppeteer.launch(launchOptions)
+  formData.append(
+    "files",
+    new File([html], "index.html", {
+      type: "text/html",
+    }),
+  )
+  formData.append("printBackground", "true")
+  formData.append("paperWidth", "8.27")
+  formData.append("paperHeight", "11.69")
 
   try {
-    const page = await browser.newPage()
-    await page.setContent(html, {
-      waitUntil: "networkidle2",
+    const response = await fetch(endpoint, {
+      method: "POST",
+      body: formData,
+      headers,
+      signal: AbortSignal.timeout(30_000),
     })
 
-    const pdfBuffer = await page.pdf({
-      format: "A4",
-      printBackground: true,
-    })
+    if (!response.ok) {
+      const errorBody = await response.text()
+      console.error("Gotenberg PDF generation failed", {
+        body: errorBody,
+        gotenbergUrl,
+        status: response.status,
+      })
+
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Gotenberg PDF generation failed",
+      })
+    }
+
+    const pdfBuffer = Buffer.from(await response.arrayBuffer())
 
     event.node.res.setHeader("Content-Type", "application/pdf")
     event.node.res.setHeader(
       "Content-Disposition",
-      `inline; filename="${pdfName}"`,
+      `inline; filename="${filename}"`,
     )
+
     return pdfBuffer
   } catch (error) {
     console.error("Error generating PDF", {
       error: serializeError(error),
-      executablePath: executablePath || null,
+      gotenbergUrl,
     })
 
     throw createError({
       statusCode: 500,
       statusMessage: "Error generating PDF",
     })
-  } finally {
-    await browser.close()
   }
 })

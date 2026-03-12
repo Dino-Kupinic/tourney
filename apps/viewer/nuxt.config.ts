@@ -4,6 +4,11 @@ export default defineNuxtConfig({
   srcDir: "app",
   compatibilityDate: "2025-07-28",
   devtools: { enabled: true },
+  runtimeConfig: {
+    gotenbergUrl: "",
+    gotenbergUsername: "",
+    gotenbergPassword: "",
+  },
   modules: ["@nuxtjs/device", "@vueuse/nuxt", "@vite-pwa/nuxt"],
   supabase: {
     redirect: false,

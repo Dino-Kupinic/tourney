@@ -14,7 +14,6 @@
     "clean": "git clean -xdf node_modules",
     "create:users": "turbo run create --filter=@tourney/user-creator",
     "fill:tournament": "cd ./apps/user-creator && bun run fill:tournament",
-    "install:browsers": "bunx puppeteer browsers install",
     "start:docs": "vitepress preview docs",
     "start:admin": "cd ./apps/admin && bun .output/server/index.mjs",
     "start:viewer": "cd ./apps/viewer && bun .output/server/index.mjs",
@@ -90,8 +89,7 @@
       "@types/k6": "^1.6.0",
       "@vite-pwa/assets-generator": "^1.0.0",
       "@vite-pwa/nuxt": "1.1.1",
-      "handlebars": "^4.7.8",
-      "puppeteer": "24.6.1"
+      "handlebars": "^4.7.8"
     },
     "release": {
       "@semantic-release/changelog": "^6.0.3",
