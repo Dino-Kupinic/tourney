@@ -135,8 +135,8 @@ const generatePDF = async () => {
     const err = error as Error
 
     throw createError({
-      message: "Error generating PDF",
-      data: err.message,
+      message: `Error generating PDF: ${err.message}`,
+      data: err,
     })
   } finally {
     isGeneratingPdf.value = false

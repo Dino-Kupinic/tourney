@@ -33,7 +33,6 @@
     "@vueuse/nuxt": "catalog:framework",
     "handlebars": "catalog:viewer-tooling",
     "nuxt": "catalog:framework",
-    "puppeteer": "catalog:viewer-tooling",
     "vue": "catalog:framework",
     "vue-router": "catalog:framework",
     "zod": "catalog:validation"
