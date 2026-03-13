@@ -34,7 +34,7 @@ const { tournaments, fetchTournaments } = useLiveTournaments()
 const selected = useState<string>("selectedTournament", () => "")
 await fetchTournaments()
 const tournamentOptions = computed<TournamentOption[]>(() =>
-  tournaments.value.map((item: ParsedJsonTournament) => ({
+  tournaments.value.map((item) => ({
     label: item.name,
     value: item.id,
   })),
@@ -337,9 +337,7 @@ const { isDesktop } = useDevice()
           </template>
 
           <template v-else>
-            <div
-              class="flex flex-col gap-3 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm xl:col-span-2 dark:border-neutral-800 dark:bg-neutral-950"
-            >
+            <div class="flex flex-col gap-3 xl:col-span-2">
               <div
                 class="ring-opacity-25 dark:bg-opacity-10 dark:ring-opacity-25 flex w-full items-center justify-center space-x-1.5 rounded-md bg-transparent px-2 py-1 ring-1 ring-red-400 ring-inset dark:bg-neutral-900"
               >
@@ -354,7 +352,7 @@ const { isDesktop } = useDevice()
                 <p class="text-xs font-medium text-red-400">Live</p>
               </div>
               <div
-                class="flex flex-col gap-1.5 rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-900"
+                class="flex flex-col gap-1.5 rounded-lg border border-neutral-200 bg-white p-3 dark:border-neutral-800 dark:bg-neutral-900"
               >
                 <template v-if="liveMatches?.length">
                   <div
@@ -382,12 +380,10 @@ const { isDesktop } = useDevice()
               </div>
             </div>
 
-            <div
-              class="flex w-full flex-col gap-1.5 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm xl:self-start dark:border-neutral-800 dark:bg-neutral-950"
-            >
+            <div class="flex w-full flex-col gap-1.5 xl:self-start">
               <USeparator>Anstehende Spiele</USeparator>
               <div
-                class="flex h-96 flex-col gap-1.5 overflow-auto rounded-lg border border-neutral-200 bg-neutral-50 p-3 pb-8 dark:border-neutral-800 dark:bg-neutral-900"
+                class="flex h-96 flex-col gap-1.5 overflow-auto rounded-lg border border-neutral-200 bg-white p-3 pb-8 dark:border-neutral-800 dark:bg-neutral-900"
               >
                 <MatchItemRow
                   v-for="(match, index) in matches"
@@ -398,12 +394,10 @@ const { isDesktop } = useDevice()
               </div>
             </div>
 
-            <div
-              class="flex w-full flex-col gap-1.5 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm xl:self-start dark:border-neutral-800 dark:bg-neutral-950"
-            >
+            <div class="flex w-full flex-col gap-1.5 xl:self-start">
               <USeparator>Historie</USeparator>
               <div
-                class="flex h-96 flex-col gap-1.5 overflow-auto rounded-lg border border-neutral-200 bg-neutral-50 p-3 pb-8 dark:border-neutral-800 dark:bg-neutral-900"
+                class="flex h-96 flex-col gap-1.5 overflow-auto rounded-lg border border-neutral-200 bg-white p-3 pb-8 dark:border-neutral-800 dark:bg-neutral-900"
               >
                 <!-- @vue-ignore -->
                 <ResultItem
@@ -417,9 +411,7 @@ const { isDesktop } = useDevice()
               </div>
             </div>
 
-            <div
-              class="flex flex-col gap-1.5 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm xl:col-span-2 dark:border-neutral-800 dark:bg-neutral-950"
-            >
+            <div class="flex flex-col gap-1.5 xl:col-span-2">
               <USeparator>Platzierungen</USeparator>
               <GroupedStandingsList
                 :grouped-standings="groupedStandings ?? []"
