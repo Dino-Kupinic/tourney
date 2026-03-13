@@ -2,6 +2,7 @@
 import { DefaultChatTransport } from "ai"
 import { Chat } from "@ai-sdk/vue"
 import {
+  createAiAssistantRequestContext,
   AI_ASSISTANT_DEFAULT_MODEL,
   AI_ASSISTANT_MODEL_OPTIONS,
 } from "#shared/aiAssistant"
@@ -9,6 +10,7 @@ import {
 const route = useRoute()
 
 const { collapsed: isCollapsed } = useAiAssistant()
+const { pageContext } = useAiAssistantPageContext()
 const input = ref("")
 const selectedModel = ref(AI_ASSISTANT_DEFAULT_MODEL)
 
@@ -16,7 +18,11 @@ const chat = new Chat({
   transport: new DefaultChatTransport({
     api: "/api/assistant/chat",
     body: () => ({
-      context: currentPageLabel.value,
+      context: createAiAssistantRequestContext({
+        route: route.path,
+        pageLabel: currentPageLabel.value,
+        dynamic: pageContext.value,
+      }),
       model: selectedModel.value,
     }),
   }),
