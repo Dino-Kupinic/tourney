@@ -1,3 +1,11 @@
+# [0.39.0](https://github.com/HTL-Steyr/tourney/compare/v0.38.0...v0.39.0) (2026-03-13)
+
+
+### Features
+
+* improve AI ([6f49daf](https://github.com/HTL-Steyr/tourney/commit/6f49daf085016d0a482f5ce626a3fd89a4f26063))
+* improve live view ([277e15e](https://github.com/HTL-Steyr/tourney/commit/277e15ef43e43312f9a055ad10c001e5238addc7))
+
 # [0.38.0](https://github.com/HTL-Steyr/tourney/compare/v0.37.2...v0.38.0) (2026-03-12)
 
 
