@@ -31,10 +31,11 @@ useHead({
 
 const { tournaments, fetchTournaments } = useLiveTournaments()
 const { showGroupedStandings, flowPanelRatio } = useLiveSettings()
+const { clearPageContext, setPageContext } = useAiAssistantPageContext()
 const selected = useState<string>("selectedTournament", () => "")
 await fetchTournaments()
 const tournamentOptions = computed<TournamentOption[]>(() =>
-  tournaments.value.map((item: ParsedJsonTournament) => ({
+  tournaments.value.map((item) => ({
     label: item.name,
     value: item.id,
   })),
@@ -218,6 +219,27 @@ const refreshMatches = async () => {
   await refreshResults()
   await refreshHistory()
 }
+
+watchEffect(() => {
+  setPageContext({
+    live: {
+      groups: groups.value.length,
+      hasSelectedTournament: Boolean(tournament.value),
+      liveMatches: liveMatches.value.length,
+      liveTournamentCount: tournaments.value.length,
+      matches: matches.value.length,
+      selectedTournamentId: tournament.value?.id ?? null,
+      selectedTournamentIsLive: tournament.value?.is_live ?? null,
+      selectedTournamentName: tournament.value?.name ?? null,
+      selectedTournamentSport: tournament.value?.sport ?? null,
+      standingsMode: showGroupedStandings.value ? "grouped" : "overall",
+    },
+  })
+})
+
+onBeforeUnmount(() => {
+  clearPageContext()
+})
 
 const schema = z.object({
   interval: z.number().int().positive(),

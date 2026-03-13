@@ -25,6 +25,7 @@ useHead({
   title: () => title.value,
 })
 const { getCurrentUserId } = useUser()
+const { clearPageContext, setPageContext } = useAiAssistantPageContext()
 const route = useRoute()
 const { data: tournament, refresh: tournamentRefresh } =
   await useFetch<ParsedJsonTournament | null>(
@@ -526,6 +527,40 @@ const onSubmitEdit = async () => {
 const { data: matches } = await useFetch(
   `/api/tournaments/${tournament.value.id}/matches`,
 )
+
+watchEffect(() => {
+  if (!tournament.value) {
+    clearPageContext()
+    return
+  }
+
+  setPageContext({
+    tournament: {
+      groupNames: (groups.value ?? []).map((group) => group.name),
+      groups: tournament.value.groups ?? null,
+      id: tournament.value.id,
+      isLive: tournament.value.is_live,
+      knockoutInterval: tournament.value.knockout_interval ?? null,
+      location: tournament.value.location ?? null,
+      matches: matches.value?.length ?? 0,
+      name: tournament.value.name,
+      participants: participants.value?.length ?? 0,
+      playableTeams: data.value?.teams ?? null,
+      sport: tournament.value.sport ?? null,
+      startDate: tournament.value.start_date ?? null,
+      teamsPerGroup: tournament.value.group_teams ?? null,
+      timeRange:
+        tournament.value.from && tournament.value.to
+          ? `${tournament.value.from} - ${tournament.value.to}`
+          : null,
+      waitingTeams: data.value?.waiting ?? null,
+    },
+  })
+})
+
+onBeforeUnmount(() => {
+  clearPageContext()
+})
 
 const hasMatches = computed<boolean>(() => {
   return Boolean(matches.value && matches.value.length > 0)

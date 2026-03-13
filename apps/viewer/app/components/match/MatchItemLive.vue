@@ -48,11 +48,16 @@ const startStopwatch = () => {
 
 startStopwatch()
 
+const startTime = computed(() => {
+  return match.start_time?.split(":").slice(0, 3).join(":") ?? "--:--:--"
+})
+
 const formattedTime = computed(() => {
-  const totalSeconds = Math.floor(timeElapsed.value / 1000)
+  const totalMilliseconds = Math.max(0, timeElapsed.value)
+  const totalSeconds = Math.floor(totalMilliseconds / 1000)
   const minutes = Math.floor(totalSeconds / 60)
   const seconds = totalSeconds % 60
-  const milliseconds = timeElapsed.value % 1000
+  const milliseconds = totalMilliseconds % 1000
 
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(milliseconds).padStart(3, "0")}`
 })
@@ -63,20 +68,21 @@ const formattedTime = computed(() => {
     class="rounded-md border border-neutral-200 shadow-sm dark:border-neutral-700"
   >
     <div
-      class="flex justify-between gap-0.5 rounded-t-md border-b border-neutral-200 bg-neutral-100 p-0.5 dark:border-neutral-700 dark:bg-neutral-800"
+      class="flex flex-wrap items-center justify-between gap-1 rounded-t-md border-b border-neutral-200 bg-neutral-100 p-1 dark:border-neutral-700 dark:bg-neutral-800"
     >
-      <div class="flex gap-0.5">
+      <div class="flex min-w-0 flex-wrap items-center gap-1">
         <UBadge
           :label="match.round ?? 'Unbekannte Runde'"
           color="secondary"
           variant="subtle"
-          block
+          class="max-w-full"
         />
         <UBadge
-          :label="match.start_time!"
+          :label="startTime"
           color="neutral"
+          variant="outline"
           icon="i-heroicons-clock"
-          block
+          class="whitespace-nowrap"
         />
       </div>
       <ClientOnly>
@@ -84,9 +90,9 @@ const formattedTime = computed(() => {
           :label="formattedTime"
           icon="i-heroicons-clock"
           color="neutral"
+          variant="outline"
           :trailing="false"
-          class="w-[90px]"
-          block
+          class="min-w-26 shrink-0 justify-center whitespace-nowrap tabular-nums"
         />
       </ClientOnly>
     </div>
