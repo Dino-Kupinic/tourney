@@ -1,3 +1,11 @@
+# [0.38.0](https://github.com/HTL-Steyr/tourney/compare/v0.37.2...v0.38.0) (2026-03-12)
+
+
+### Features
+
+* reduce paper margins ([c04a90e](https://github.com/HTL-Steyr/tourney/commit/c04a90eaed3d58c0483d19b2fbf3bf788669b98c))
+* switch from puppeteer -> gotenberg ([2f46ca3](https://github.com/HTL-Steyr/tourney/commit/2f46ca3b857994c3d5fd4c508bb54bbb9f458165))
+
 ## [0.37.2](https://github.com/HTL-Steyr/tourney/compare/v0.37.1...v0.37.2) (2026-03-11)
 
 
