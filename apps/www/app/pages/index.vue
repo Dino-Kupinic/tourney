@@ -6,26 +6,10 @@ definePageMeta({
 })
 
 const {
-  public: { adminAppUrl, viewerAppUrl },
+  public: { adminAppUrl, viewerAppUrl, muxDemoPlaybackId },
 } = useRuntimeConfig()
-const demoVideoRef = ref<HTMLVideoElement | null>(null)
-const isVideoPlaying = ref(false)
 
-const playDemoVideo = async () => {
-  if (!demoVideoRef.value) return
-
-  try {
-    await demoVideoRef.value.play()
-    isVideoPlaying.value = true
-  } catch {
-    isVideoPlaying.value = false
-  }
-}
-
-const syncVideoState = () => {
-  if (!demoVideoRef.value) return
-  isVideoPlaying.value = !demoVideoRef.value.paused
-}
+const demoVideoPlaybackId = computed(() => muxDemoPlaybackId.trim())
 
 useSeoMeta({
   title: "Tourney - Tournament Management on Autopilot",
@@ -38,9 +22,12 @@ useSeoMeta({
 })
 
 useHead({
-  htmlAttrs: {
-    lang: "de",
-  },
+  script: [
+    {
+      src: "https://cdn.jsdelivr.net/npm/@mux/mux-player",
+      defer: true,
+    },
+  ],
 })
 
 const items = [
@@ -182,51 +169,28 @@ const features = ref<PageFeatureProps[]>([
 
         <div id="video-demo" class="relative mt-20">
           <div
-            class="group relative flex aspect-video w-full cursor-pointer items-center justify-center overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-950 shadow-2xl"
+            class="overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-950 shadow-2xl"
           >
-            <video
-              ref="demoVideoRef"
-              class="h-full w-full object-cover"
-              src="/dkupinic-2.mp4"
-              preload="metadata"
-              playsinline
-              controls
-              @play="syncVideoState"
-              @pause="syncVideoState"
-              @ended="syncVideoState"
-            />
-
-            <button
-              v-if="!isVideoPlaying"
-              type="button"
-              aria-label="Produktdemo abspielen"
-              class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-neutral-950/40 transition-transform duration-300 group-hover:scale-105"
-              @click="playDemoVideo"
-            >
-              <div
-                class="flex h-20 w-20 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-lg backdrop-blur-sm"
-              >
-                <svg
-                  class="ml-1 h-8 w-8"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
-              <span class="text-sm font-medium tracking-wide text-white/60"
-                >Demo</span
-              >
-            </button>
-
             <div
-              class="pointer-events-none absolute top-0 right-0 left-0 hidden h-12 items-center gap-2 border-b border-white/10 bg-neutral-950/50 px-6 backdrop-blur-md sm:flex"
+              class="pointer-events-none hidden h-12 items-center gap-2 border-b border-white/10 bg-neutral-950/90 px-6 sm:flex"
             >
               <div class="flex gap-2">
                 <div class="h-3 w-3 rounded-full bg-red-500/80"></div>
                 <div class="h-3 w-3 rounded-full bg-yellow-500/80"></div>
                 <div class="h-3 w-3 rounded-full bg-green-500/80"></div>
               </div>
+            </div>
+
+            <div class="aspect-video w-full">
+              <ClientOnly v-if="demoVideoPlaybackId">
+                <mux-player
+                  :playback-id="demoVideoPlaybackId"
+                  stream-type="on-demand"
+                  metadata-video-title="Tourney Produktdemo"
+                  thumbnail-time="5"
+                  class="h-full w-full"
+                />
+              </ClientOnly>
             </div>
           </div>
         </div>
