@@ -1,4 +1,4 @@
-![tourney](./.github/assets/banner.png)
+![tourney](./.github/assets/preview-banner.jpg)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/github/v/release/HTL-Steyr/tourney?color=blue)](https://github.com/HTL-Steyr/tourney/releases)
@@ -20,6 +20,10 @@ Mono repository for the tourney project. This project is a web application for m
 - 📰 news and gallery management directly from the admin dashboard
 - 🌳 public tournament details, live brackets, standings, and media updates in the viewer
 - 🤖 AI assistant for tournament setup and management suggestions in the admin dashboard
+
+### Live Deployment
+
+> https://tourney.dino-kupinic.dev
 
 ## ⏳ Activity
 
@@ -46,6 +50,9 @@ git clone https://github.com/Dino-Kupinic/tourney.git
 ```bash
 ./scripts/setup.sh
 ```
+
+> [!WARNING]
+> The setup script is due to be changed.
 
 > [!NOTE]
 > Windows users need WSL installed.
@@ -196,6 +203,8 @@ If it works, great! You can now log in in the admin dashboard with the created u
 - Nuxt 4
 - Supabase
 - Docker
+- OpenAI API
+- Gotenberg
 
 ## Contributing
 
