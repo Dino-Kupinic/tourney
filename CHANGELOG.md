@@ -3,30 +3,27 @@
 
 ### Features
 
-* add landing page video ([012b285](https://github.com/HTL-Steyr/tourney/commit/012b285584516772196408fd793bf9e8c2a3d3c1))
+- add landing page video ([012b285](https://github.com/HTL-Steyr/tourney/commit/012b285584516772196408fd793bf9e8c2a3d3c1))
 
 # [0.39.0](https://github.com/HTL-Steyr/tourney/compare/v0.38.0...v0.39.0) (2026-03-13)
 
-
 ### Features
 
-* improve AI ([6f49daf](https://github.com/HTL-Steyr/tourney/commit/6f49daf085016d0a482f5ce626a3fd89a4f26063))
-* improve live view ([277e15e](https://github.com/HTL-Steyr/tourney/commit/277e15ef43e43312f9a055ad10c001e5238addc7))
+- improve AI ([6f49daf](https://github.com/HTL-Steyr/tourney/commit/6f49daf085016d0a482f5ce626a3fd89a4f26063))
+- improve live view ([277e15e](https://github.com/HTL-Steyr/tourney/commit/277e15ef43e43312f9a055ad10c001e5238addc7))
 
 # [0.38.0](https://github.com/HTL-Steyr/tourney/compare/v0.37.2...v0.38.0) (2026-03-12)
 
-
 ### Features
 
-* reduce paper margins ([c04a90e](https://github.com/HTL-Steyr/tourney/commit/c04a90eaed3d58c0483d19b2fbf3bf788669b98c))
-* switch from puppeteer -> gotenberg ([2f46ca3](https://github.com/HTL-Steyr/tourney/commit/2f46ca3b857994c3d5fd4c508bb54bbb9f458165))
+- reduce paper margins ([c04a90e](https://github.com/HTL-Steyr/tourney/commit/c04a90eaed3d58c0483d19b2fbf3bf788669b98c))
+- switch from puppeteer -> gotenberg ([2f46ca3](https://github.com/HTL-Steyr/tourney/commit/2f46ca3b857994c3d5fd4c508bb54bbb9f458165))
 
 ## [0.37.2](https://github.com/HTL-Steyr/tourney/compare/v0.37.1...v0.37.2) (2026-03-11)
 
-
 ### Bug Fixes
 
-* nixpacks already install puppeteer pkgs ([899e3a3](https://github.com/HTL-Steyr/tourney/commit/899e3a3a0c35119084d2d08420dd1894b80d9cd2))
+- nixpacks already install puppeteer pkgs ([899e3a3](https://github.com/HTL-Steyr/tourney/commit/899e3a3a0c35119084d2d08420dd1894b80d9cd2))
 
 ## [0.37.1](https://github.com/HTL-Steyr/tourney/compare/v0.37.0...v0.37.1) (2026-03-11)
 
