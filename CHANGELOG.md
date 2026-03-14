@@ -1,3 +1,10 @@
+# [0.40.0](https://github.com/HTL-Steyr/tourney/compare/v0.39.0...v0.40.0) (2026-03-14)
+
+
+### Features
+
+* add landing page video ([012b285](https://github.com/HTL-Steyr/tourney/commit/012b285584516772196408fd793bf9e8c2a3d3c1))
+
 # [0.39.0](https://github.com/HTL-Steyr/tourney/compare/v0.38.0...v0.39.0) (2026-03-13)
 
 
