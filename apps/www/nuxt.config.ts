@@ -16,6 +16,7 @@ export default defineNuxtConfig({
       viewerAppUrl:
         process.env.NUXT_PUBLIC_VIEWER_APP_URL ??
         "https://tourney-viewer.dino-kupinic.dev",
+      muxDemoPlaybackId: process.env.NUXT_PUBLIC_MUX_DEMO_PLAYBACK_ID ?? "",
     },
   },
   supabase: {
