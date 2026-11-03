@@ -1,3 +1,58 @@
+# [0.31.0](https://github.com/Dino-Kupinic/tourney/compare/v0.30.0...v0.31.0) (2026-11-03)
+
+
+### Bug Fixes
+
+* adjust logic ([01725f8](https://github.com/Dino-Kupinic/tourney/commit/01725f8e3baf0c2e87dc67c30433eae0ab31903c))
+* clear forms after submit ([9ffff40](https://github.com/Dino-Kupinic/tourney/commit/9ffff40e6cbf794e1dc0c1a17c1053d326a29aa0))
+* content shift modal ([97f95ab](https://github.com/Dino-Kupinic/tourney/commit/97f95ab0375b60bb91141185d3dcbddb8cdfce2c))
+* nixpacks already install puppeteer pkgs ([899e3a3](https://github.com/Dino-Kupinic/tourney/commit/899e3a3a0c35119084d2d08420dd1894b80d9cd2))
+* puppeteer in prod ([95f79b6](https://github.com/Dino-Kupinic/tourney/commit/95f79b6b0b60f15e9f52ac3523db014bbaa510c4))
+* update year property when start date is moved ([664b9a4](https://github.com/Dino-Kupinic/tourney/commit/664b9a44f607a65b8996b3c6ac770d5696f36168))
+
+
+### Features
+
+* add ability to remove teams ([481fe97](https://github.com/Dino-Kupinic/tourney/commit/481fe97d19e4bfb1a71058e0579c234e956de721))
+* add adjustable live flow panel ratio and enhance live page layout ([cfc933f](https://github.com/Dino-Kupinic/tourney/commit/cfc933fbd9542001b50ae86b6193ff1e64553764))
+* add engine property to packages ([d656bc0](https://github.com/Dino-Kupinic/tourney/commit/d656bc0f1e23a7296eb020ff36a217c0049d282c))
+* add landing page video ([012b285](https://github.com/Dino-Kupinic/tourney/commit/012b285584516772196408fd793bf9e8c2a3d3c1))
+* add migration for buckets ([a054924](https://github.com/Dino-Kupinic/tourney/commit/a054924c91da1dfd370b03f13e53644793dd94ca))
+* add padding for mobile viewer in pwa ([9b57d23](https://github.com/Dino-Kupinic/tourney/commit/9b57d23d40b4ea815bcd4a27512bd81c3488dd9a))
+* add team selection and participant management for tournaments ([33e5449](https://github.com/Dino-Kupinic/tourney/commit/33e54492b7b61ee3ce18c0f8d188b23ffe7010d5))
+* enhance live display component with improved styling and layout adjustments ([445d16c](https://github.com/Dino-Kupinic/tourney/commit/445d16ca530623bf919f43738d3184fa5ad7a032))
+* enhance settings layout and update terminology in tournament display ([e3baa0e](https://github.com/Dino-Kupinic/tourney/commit/e3baa0e5a64c747ff80580ca5bb4f3e24048743d))
+* enhance sidebar navigation with search functionality and new links ([4640d14](https://github.com/Dino-Kupinic/tourney/commit/4640d1428551081446b8cb01e8cb94ebfda0994d))
+* fix double registration bug ([0427ea4](https://github.com/Dino-Kupinic/tourney/commit/0427ea4d5a85562b06a74a0a70e63c414bf27e0a))
+* implement grouped standings feature and enhance standings display ([c073578](https://github.com/Dino-Kupinic/tourney/commit/c0735780afc17ce58beafff97772ec35fdb61c30))
+* implement grouped standings feature and enhance UI layout for tournament details ([c5c68cd](https://github.com/Dino-Kupinic/tourney/commit/c5c68cdbf323ff848923b8db9743585f39bf02ac))
+* improve AI ([6f49daf](https://github.com/Dino-Kupinic/tourney/commit/6f49daf085016d0a482f5ce626a3fd89a4f26063))
+* improve button styling for live flow panel resizing ([ffdbbb0](https://github.com/Dino-Kupinic/tourney/commit/ffdbbb0e5808ccf688286157f6077e0b54bfba4e))
+* improve live view ([277e15e](https://github.com/Dino-Kupinic/tourney/commit/277e15ef43e43312f9a055ad10c001e5238addc7))
+* improve standings display layout with vertical group names and enhanced styling ([9ee6f9c](https://github.com/Dino-Kupinic/tourney/commit/9ee6f9cee9e4e3f53e29735603a66c86d446f75a))
+* landing improvements ([0877f9f](https://github.com/Dino-Kupinic/tourney/commit/0877f9f7ab9467f4f0276c04fc814daafeef2e60))
+* landing mostly done ([32b5f18](https://github.com/Dino-Kupinic/tourney/commit/32b5f18de5d3eae8eca282c6fab477259c01dc53))
+* more small fixes ([91f46fc](https://github.com/Dino-Kupinic/tourney/commit/91f46fcf93c8c5fe76970a4f281cb855c6a9092c))
+* more work on landing ([c6910a1](https://github.com/Dino-Kupinic/tourney/commit/c6910a1799aedf668fb55d2a225fb867d909302d))
+* reduce paper margins ([c04a90e](https://github.com/Dino-Kupinic/tourney/commit/c04a90eaed3d58c0483d19b2fbf3bf788669b98c))
+* refactor tournament management and enhance UI for better user experience ([c06b54d](https://github.com/Dino-Kupinic/tourney/commit/c06b54d286bc9e2b0a4795c8de5cebcc2cf8d6cc))
+* restructure project files and update imports for shared modules ([d16a2de](https://github.com/Dino-Kupinic/tourney/commit/d16a2de2b445d6214a264b61c9c1965f2e391851))
+* simplify app configuration and update package dependencies ([5caa621](https://github.com/Dino-Kupinic/tourney/commit/5caa621145b477170b0c87f737b99d204199e9ed))
+* small configs ([71eaf1b](https://github.com/Dino-Kupinic/tourney/commit/71eaf1beded589031038e4adf62de2e7cabf5230))
+* small fixes, work on puppeteer logic for prod ([3f2c5ac](https://github.com/Dino-Kupinic/tourney/commit/3f2c5acfaeb4e36ca4da1650a7a167104105d804))
+* switch from puppeteer -> gotenberg ([2f46ca3](https://github.com/Dino-Kupinic/tourney/commit/2f46ca3b857994c3d5fd4c508bb54bbb9f458165))
+* update AI assistant models and enhance chat message processing ([b1d00f9](https://github.com/Dino-Kupinic/tourney/commit/b1d00f9c58afb7df2bddc0906b295cfb553306a7))
+* update date formatting and improve live display styling ([1cfa6ca](https://github.com/Dino-Kupinic/tourney/commit/1cfa6ca2d44a9f6e26c6def7a8d7cb732d28bfd6))
+* update media component to handle loading state and improve content display; add public read policy for misc bucket ([1ca5138](https://github.com/Dino-Kupinic/tourney/commit/1ca5138cd6cf56316cb71749b4474b4f4ec78e09))
+* update modals ([0392768](https://github.com/Dino-Kupinic/tourney/commit/0392768db8b099e99e104c7f1a827329658c325b))
+* update package dependencies to use catalog references ([704bc65](https://github.com/Dino-Kupinic/tourney/commit/704bc65bfe88b47e975f79885571dd48165c6d6b))
+* update README.md ([017b133](https://github.com/Dino-Kupinic/tourney/commit/017b133b74255ffd15ca7cc1068aa26731da48d9))
+* update README.md and .env.example ([181d1f8](https://github.com/Dino-Kupinic/tourney/commit/181d1f8004b2e46f62accc791fe3e1bcec95782d))
+* update sidebar state management and enhance collapsible behavior ([d83db35](https://github.com/Dino-Kupinic/tourney/commit/d83db35a662a092577da8307ca33291e2ca3bdf6))
+* work on landing ([18383bd](https://github.com/Dino-Kupinic/tourney/commit/18383bdefa85dcc5241d173f433548c6d5707c55))
+* work on landing ([3e29302](https://github.com/Dino-Kupinic/tourney/commit/3e2930248373d52ad3e768f4b6883bc0767df088))
+* **www:** add English-default language toggle ([519b76f](https://github.com/Dino-Kupinic/tourney/commit/519b76f2a7d3ab183b6fe6b72ea2fa12bff20647))
+
 # [0.41.0](https://github.com/HTL-Steyr/tourney/compare/v0.40.0...v0.41.0) (2026-03-14)
 
 
